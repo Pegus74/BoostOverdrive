@@ -220,8 +220,9 @@ public class FirstPersonController : MonoBehaviour
 
     float camRotation;
 
-    private void Update()
+    private void Update() 
     {
+        if (PauseController.isPaused) return; // надо т.к иначе при паузе игрок может смотреть по сторонам и приседать.
         #region Camera
 
         // Control camera movement
