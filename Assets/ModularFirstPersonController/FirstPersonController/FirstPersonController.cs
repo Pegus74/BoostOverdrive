@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using JetBrains.Annotations;
+
 
 
 #if UNITY_EDITOR
@@ -64,8 +66,9 @@ public class FirstPersonController : MonoBehaviour
 
     // Internal Variables
     private bool isWalking = false;
-    [Header("Sprint")]
+
     #region Sprint
+    [Header("Sprint")]
 
     public bool enableSprint = true;
     public bool unlimitedSprint = false;
@@ -94,8 +97,9 @@ public class FirstPersonController : MonoBehaviour
     private float sprintCooldownReset;
 
     #endregion
-    [Header("Jump")]
+
     #region Jump
+    [Header("Jump")]
 
     public bool enableJump = true;
     public KeyCode jumpKey = KeyCode.Space;
@@ -107,8 +111,9 @@ public class FirstPersonController : MonoBehaviour
     private bool canAirJump = true;
 
     #endregion
-    [Header("Crouch")]
+
     #region Crouch
+    [Header("Crouch")]
 
     public bool enableCrouch = true;
     public bool holdToCrouch = true;
@@ -121,8 +126,9 @@ public class FirstPersonController : MonoBehaviour
     private Vector3 originalScale;
 
     #endregion
-    [Header("Dash")]
+
     #region Dash
+    [Header("Dash")]
 
     public bool enableDash = true;
     public KeyCode dashKey = KeyCode.F;
@@ -136,16 +142,23 @@ public class FirstPersonController : MonoBehaviour
     private Vector3 dashDirection;
 
     #endregion
-    [Header("WallSlide")]
+
     #region WallSlide
+    [Header("WallSlide")]
 
     public LayerMask wallLayer;
     public float stickTime = 1f;
     public float slideSpeed = 1f;
+    public bool isTouchingRedWall;
 
-    private bool isTouchingRedWall;
     private float stickTimer;
     private Vector3 contactNormal;
+    #endregion
+
+    #region WallJump
+    [Header("WallJump")]
+    public float wallJumpHor = 8f;
+    public float wallJumpVert = 5f;
     #endregion
 
     #endregion
@@ -462,6 +475,10 @@ public class FirstPersonController : MonoBehaviour
         }
         #endregion
 
+        #region WallJump
+        TryWallJump();
+        #endregion
+
         CheckGround();
 
         if (isGrounded)
@@ -645,7 +662,7 @@ public class FirstPersonController : MonoBehaviour
             isTouchingRedWall = true;
             stickTimer = stickTime;
             contactNormal = c.contacts[0].normal;
-            enableHeadBob = false;
+            // enableHeadBob = false;
         }
     }
 
@@ -655,8 +672,20 @@ public class FirstPersonController : MonoBehaviour
         {
             isTouchingRedWall = false;
             rb.useGravity = true; // возвращаем гравитацию
-            enableHeadBob = true;
+            // enableHeadBob = true;
         }
+    }
+
+    private void TryWallJump()
+    {
+        if (!isTouchingRedWall) return;
+        if (!Input.GetKeyDown(jumpKey)) return;
+
+        isTouchingRedWall = false;
+        rb.useGravity = true;
+
+        Vector3 jumpVec = contactNormal * wallJumpHor + Vector3.up * wallJumpVert;
+        rb.AddForce(jumpVec, ForceMode.Impulse);
     }
 }
 
