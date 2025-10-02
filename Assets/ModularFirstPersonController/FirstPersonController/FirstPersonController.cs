@@ -9,9 +9,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
+
 
 #if UNITY_EDITOR
-    using UnityEditor;
+using UnityEditor;
     using System.Net;
 #endif
 
@@ -62,7 +64,7 @@ public class FirstPersonController : MonoBehaviour
 
     // Internal Variables
     private bool isWalking = false;
-
+    [Header("Sprint")]
     #region Sprint
 
     public bool enableSprint = true;
@@ -92,7 +94,7 @@ public class FirstPersonController : MonoBehaviour
     private float sprintCooldownReset;
 
     #endregion
-
+    [Header("Jump")]
     #region Jump
 
     public bool enableJump = true;
@@ -105,7 +107,7 @@ public class FirstPersonController : MonoBehaviour
     private bool canAirJump = true;
 
     #endregion
-
+    [Header("Crouch")]
     #region Crouch
 
     public bool enableCrouch = true;
@@ -119,7 +121,7 @@ public class FirstPersonController : MonoBehaviour
     private Vector3 originalScale;
 
     #endregion
-
+    [Header("Dash")]
     #region Dash
 
     public bool enableDash = true;
@@ -134,11 +136,21 @@ public class FirstPersonController : MonoBehaviour
     private Vector3 dashDirection;
 
     #endregion
+    [Header("WallSlide")]
+    #region WallSlide
 
+    public LayerMask wallLayer;
+    public float stickTime = 1f;
+    public float slideSpeed = 1f;
 
+    private bool isTouchingRedWall;
+    private float stickTimer;
+    private Vector3 contactNormal;
     #endregion
 
+    #endregion
     #region Head Bob
+    [Header("HeadBob")]
 
     public bool enableHeadBob = true;
     public Transform joint;
@@ -433,6 +445,23 @@ public class FirstPersonController : MonoBehaviour
 
         #endregion
 
+        #region WallSlide
+        if (isTouchingRedWall)
+        {
+            stickTimer -= Time.deltaTime;
+            if (stickTimer <= 0) // скольжение вниз
+            {
+                rb.useGravity = true;
+                rb.velocity = new Vector3(0, -slideSpeed, 0);
+            }
+            else // отключение гравитации и гор. скорости
+            {
+                rb.useGravity = false;
+                rb.velocity = Vector3.zero;
+            }
+        }
+        #endregion
+
         CheckGround();
 
         if (isGrounded)
@@ -606,6 +635,27 @@ public class FirstPersonController : MonoBehaviour
             // Resets when play stops moving
             timer = 0;
             joint.localPosition = new Vector3(Mathf.Lerp(joint.localPosition.x, jointOriginalPos.x, Time.deltaTime * bobSpeed), Mathf.Lerp(joint.localPosition.y, jointOriginalPos.y, Time.deltaTime * bobSpeed), Mathf.Lerp(joint.localPosition.z, jointOriginalPos.z, Time.deltaTime * bobSpeed));
+        }
+    }
+
+    private void OnCollisionEnter(Collision c)
+    {
+        if (c.gameObject.layer == LayerMask.NameToLayer("WallRed"))
+        {
+            isTouchingRedWall = true;
+            stickTimer = stickTime;
+            contactNormal = c.contacts[0].normal;
+            enableHeadBob = false;
+        }
+    }
+
+    private void OnCollisionExit(Collision c)
+    {
+        if (c.gameObject.layer == LayerMask.NameToLayer("WallRed"))
+        {
+            isTouchingRedWall = false;
+            rb.useGravity = true; // возвращаем гравитацию
+            enableHeadBob = true;
         }
     }
 }
