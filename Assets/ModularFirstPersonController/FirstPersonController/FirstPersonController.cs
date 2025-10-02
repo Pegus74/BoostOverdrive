@@ -126,12 +126,21 @@ public class FirstPersonController : MonoBehaviour
     public KeyCode dashKey = KeyCode.F;
     public float dashPower = 15f;  
     public float dashDuration = 0.2f;  
-    public float dashCooldown = 1f;  
+    public float dashCooldown = 1f;
+
+    public bool useDashCircle = true;  
+    public bool hideCircleWhenReady = true;  
+    public Image dashCircleBG;  
+    public Image dashCircle; 
+    public float dashCircleWidthPercent = .1f;  
+    public float dashCircleHeightPercent = .1f;  
 
     private bool isDashing = false;
     private float dashTimer = 0f;
     private float dashCooldownTimer = 0f;
     private Vector3 dashDirection;
+    private CanvasGroup dashCircleCG;
+
 
     #endregion
 
@@ -213,6 +222,42 @@ public class FirstPersonController : MonoBehaviour
         {
             sprintBarBG.gameObject.SetActive(false);
             sprintBar.gameObject.SetActive(false);
+        }
+
+        #endregion
+
+        #region Dash Circle
+
+        dashCircleCG = dashCircle != null ? dashCircle.GetComponentInParent<CanvasGroup>() : null;
+
+        if (useDashCircle && dashCircle != null && dashCircleBG != null)
+        {
+            dashCircleBG.gameObject.SetActive(true);
+            dashCircle.gameObject.SetActive(true);
+
+            float screenWidth = Screen.width;
+            float screenHeight = Screen.height;
+
+            float dashCircleWidth = screenWidth * dashCircleWidthPercent;
+            float dashCircleHeight = screenHeight * dashCircleHeightPercent;
+
+            dashCircleBG.rectTransform.sizeDelta = new Vector3(dashCircleWidth, dashCircleHeight, 0f);
+            dashCircle.rectTransform.sizeDelta = new Vector3(dashCircleWidth - 2, dashCircleHeight - 2, 0f);
+
+            if (hideCircleWhenReady)
+            {
+                dashCircleCG.alpha = 0;
+            }
+
+           
+            dashCircle.type = Image.Type.Filled;
+            dashCircle.fillMethod = Image.FillMethod.Radial360;
+            dashCircle.fillOrigin = (int)Image.Origin360.Top;
+        }
+        else
+        {
+            if (dashCircleBG != null) dashCircleBG.gameObject.SetActive(false);
+            if (dashCircle != null) dashCircle.gameObject.SetActive(false);
         }
 
         #endregion
@@ -427,6 +472,23 @@ public class FirstPersonController : MonoBehaviour
                 {
                     isDashing = false;
                     dashCooldownTimer = dashCooldown; 
+                }
+            }
+            if (useDashCircle && dashCircle != null)
+            {
+                float dashCooldownPercent = 1f - (dashCooldownTimer / dashCooldown);  
+                dashCircle.fillAmount = dashCooldownPercent;
+
+                if (hideCircleWhenReady && dashCircleCG != null)
+                {
+                    if (dashCooldownTimer > 0)
+                    {
+                        dashCircleCG.alpha = 1f;  
+                    }
+                    else
+                    {
+                        dashCircleCG.alpha = 0f;  
+                    }
                 }
             }
         }
