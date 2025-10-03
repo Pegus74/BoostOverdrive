@@ -17,10 +17,10 @@ using UnityEngine.UI;
 
 public class FirstPersonController : MonoBehaviour
 {
-    private Rigidbody rb;
+    [HideInInspector] public Rigidbody rb;
 
     #region Camera Movement Variables
-
+    [Header("Camera Movement Variables")]
     public Camera playerCamera;
 
     public float fov = 60f;
@@ -40,8 +40,10 @@ public class FirstPersonController : MonoBehaviour
     private float pitch = 0.0f;
     private Image crosshairObject;
 
-    #region Camera Zoom Variables
+    private Coroutine currentCameraRotationCoroutine;
 
+    #region Camera Zoom Variables
+    [Header("Camera Zoom Variables")]
     public bool enableZoom = true;
     public bool holdToZoom = false;
     public KeyCode zoomKey = KeyCode.Mouse1;
@@ -55,16 +57,17 @@ public class FirstPersonController : MonoBehaviour
     #endregion
 
     #region Movement Variables
-
+    [Header("Movement Variables")]
     public bool playerCanMove = true;
     public float walkSpeed = 5f;
     public float maxVelocityChange = 10f;
 
     // Internal Variables
     private bool isWalking = false;
+    private Vector3 externalImpulse;
 
     #region Sprint
-
+    [Header("Sprint")]
     public bool enableSprint = true;
     public bool unlimitedSprint = false;
     public KeyCode sprintKey = KeyCode.LeftShift;
@@ -94,7 +97,7 @@ public class FirstPersonController : MonoBehaviour
     #endregion
 
     #region Jump
-
+    [Header("Jump")]
     public bool enableJump = true;
     public KeyCode jumpKey = KeyCode.Space;
     public float jumpPower = 5f;
@@ -107,7 +110,7 @@ public class FirstPersonController : MonoBehaviour
     #endregion
 
     #region Crouch
-
+    [Header("Crouch")]
     public bool enableCrouch = true;
     public bool holdToCrouch = true;
     public KeyCode crouchKey = KeyCode.LeftControl;
@@ -121,7 +124,7 @@ public class FirstPersonController : MonoBehaviour
     #endregion
 
     #region Dash
-
+    [Header("Dash")]
     public bool enableDash = true;
     public KeyCode dashKey = KeyCode.F;
     public float dashPower = 15f;  
@@ -148,7 +151,7 @@ public class FirstPersonController : MonoBehaviour
     #endregion
 
     #region Head Bob
-
+    [Header("Head Bob")]
     public bool enableHeadBob = true;
     public Transform joint;
     public float bobSpeed = 10f;
@@ -533,6 +536,9 @@ public class FirstPersonController : MonoBehaviour
             {
                 targetVelocity = transform.TransformDirection(targetVelocity) * sprintSpeed;
 
+                // добавление внешнего импульса от отталкивающей стены
+                targetVelocity += externalImpulse;
+
                 // Apply a force that attempts to reach our target velocity
                 Vector3 velocity = rb.velocity;
                 Vector3 velocityChange = (targetVelocity - velocity);
@@ -571,6 +577,9 @@ public class FirstPersonController : MonoBehaviour
 
                 targetVelocity = transform.TransformDirection(targetVelocity) * walkSpeed;
 
+                // добавление внешнего импульса от отталкивающей стены
+                targetVelocity += externalImpulse;
+
                 // Apply a force that attempts to reach our target velocity
                 Vector3 velocity = rb.velocity;
                 Vector3 velocityChange = (targetVelocity - velocity);
@@ -581,8 +590,9 @@ public class FirstPersonController : MonoBehaviour
                 rb.AddForce(velocityChange, ForceMode.VelocityChange);
             }
         }
-
         #endregion
+        // гашение внешнего импульса от отталкивающей стены
+        externalImpulse = Vector3.Lerp(externalImpulse, Vector3.zero, 5f * Time.fixedDeltaTime);
     }
 
     // Sets isGrounded based on a raycast sent straight down from the player object
@@ -670,5 +680,49 @@ public class FirstPersonController : MonoBehaviour
             joint.localPosition = new Vector3(Mathf.Lerp(joint.localPosition.x, jointOriginalPos.x, Time.deltaTime * bobSpeed), Mathf.Lerp(joint.localPosition.y, jointOriginalPos.y, Time.deltaTime * bobSpeed), Mathf.Lerp(joint.localPosition.z, jointOriginalPos.z, Time.deltaTime * bobSpeed));
         }
     }
-}
 
+    public void SetExternalImpulse(Vector3 impulse)
+    {
+        // Не используем ForceMode.Impulse напрямую, т.к. FPC постоянно корректирует velocity в FixedUpdate.
+        // Вместо этого устанавливаем externalImpulse, который будет добавлен к целевой скорости.
+        externalImpulse = impulse;
+    }
+
+    public void SmoothlyRotateCameraYaw(float targetYaw, float duration)
+    {
+        if (currentCameraRotationCoroutine != null)
+            StopCoroutine(currentCameraRotationCoroutine);
+
+        currentCameraRotationCoroutine = StartCoroutine(RotateCameraCoroutine(targetYaw, duration));
+    }
+
+    private IEnumerator RotateCameraCoroutine(float targetYaw, float duration)
+    {
+        cameraCanMove = false;
+        float initialYaw = transform.localEulerAngles.y;
+        float timer = 0f;
+
+        float currentYaw = initialYaw;
+        float deltaYaw = Mathf.DeltaAngle(currentYaw, targetYaw);
+
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+            float t = timer / duration;
+
+            float newYaw = initialYaw + deltaYaw * t;
+
+            transform.localEulerAngles = new Vector3(0, newYaw, 0);
+
+            yaw = newYaw;
+
+            yield return null;
+        }
+
+        transform.localEulerAngles = new Vector3(0, targetYaw, 0);
+        yaw = targetYaw;
+
+        cameraCanMove = true;
+        currentCameraRotationCoroutine = null;
+    }
+}
