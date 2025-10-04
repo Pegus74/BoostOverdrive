@@ -1,19 +1,6 @@
-﻿// CHANGE LOG
-// 
-// CHANGES || version VERSION
-//
-// "Enable/Disable Headbob, Changed look rotations - should result in reduced camera jitters" || version 1.0.1
-// "Added Dash system for side movement variety" || version 1.0.2 (custom mod)
-
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-
-#if UNITY_EDITOR
-    using UnityEditor;
-    using System.Net;
-#endif
 
 public class FirstPersonController : MonoBehaviour
 {
@@ -35,25 +22,11 @@ public class FirstPersonController : MonoBehaviour
     public Sprite crosshairImage;
     public Color crosshairColor = Color.white;
 
-    // Internal Variables
-    private float yaw = 0.0f;
-    private float pitch = 0.0f;
+    // Internal
+    private float yaw = 0f;
+    private float pitch = 0f;
     private Image crosshairObject;
-
     private Coroutine currentCameraRotationCoroutine;
-
-    #region Camera Zoom Variables
-    [Header("Camera Zoom Variables")]
-    public bool enableZoom = true;
-    public bool holdToZoom = false;
-    public KeyCode zoomKey = KeyCode.Mouse1;
-    public float zoomFOV = 30f;
-    public float zoomStepTime = 5f;
-
-    // Internal Variables
-    private bool isZoomed = false;
-
-    #endregion
     #endregion
 
     #region Movement Variables
@@ -62,39 +35,8 @@ public class FirstPersonController : MonoBehaviour
     public float walkSpeed = 5f;
     public float maxVelocityChange = 10f;
 
-    // Internal Variables
     private bool isWalking = false;
     private Vector3 externalImpulse;
-
-    #region Sprint
-    [Header("Sprint")]
-    public bool enableSprint = true;
-    public bool unlimitedSprint = false;
-    public KeyCode sprintKey = KeyCode.LeftShift;
-    public float sprintSpeed = 7f;
-    public float sprintDuration = 5f;
-    public float sprintCooldown = .5f;
-    public float sprintFOV = 80f;
-    public float sprintFOVStepTime = 10f;
-
-    // Sprint Bar
-    public bool useSprintBar = true;
-    public bool hideBarWhenFull = true;
-    public Image sprintBarBG;
-    public Image sprintBar;
-    public float sprintBarWidthPercent = .3f;
-    public float sprintBarHeightPercent = .015f;
-
-    // Internal Variables
-    private CanvasGroup sprintBarCG;
-    private bool isSprinting = false;
-    private float sprintRemaining;
-    private float sprintBarWidth;
-    private float sprintBarHeight;
-    private bool isSprintCooldown = false;
-    private float sprintCooldownReset;
-
-    #endregion
 
     #region Jump
     [Header("Jump")]
@@ -103,51 +45,31 @@ public class FirstPersonController : MonoBehaviour
     public float jumpPower = 5f;
     public bool enableAirJump = true;
 
-    // Internal Variables
     private bool isGrounded = false;
     private bool canAirJump = true;
-
-    #endregion
-
-    #region Crouch
-    [Header("Crouch")]
-    public bool enableCrouch = true;
-    public bool holdToCrouch = true;
-    public KeyCode crouchKey = KeyCode.LeftControl;
-    public float crouchHeight = .75f;
-    public float speedReduction = .5f;
-
-    // Internal Variables
-    private bool isCrouched = false;
-    private Vector3 originalScale;
-
     #endregion
 
     #region Dash
     [Header("Dash")]
     public bool enableDash = true;
     public KeyCode dashKey = KeyCode.F;
-    public float dashPower = 15f;  
-    public float dashDuration = 0.2f;  
+    public float dashPower = 15f;
+    public float dashDuration = 0.2f;
     public float dashCooldown = 1f;
 
-    public bool useDashCircle = true;  
-    public bool hideCircleWhenReady = true;  
-    public Image dashCircleBG;  
-    public Image dashCircle; 
-    public float dashCircleWidthPercent = .1f;  
-    public float dashCircleHeightPercent = .1f;  
+    public bool useDashCircle = true;
+    public bool hideCircleWhenReady = true;
+    public Image dashCircleBG;
+    public Image dashCircle;
+    public float dashCircleWidthPercent = .1f;
+    public float dashCircleHeightPercent = .1f;
 
     private bool isDashing = false;
     private float dashTimer = 0f;
     private float dashCooldownTimer = 0f;
     private Vector3 dashDirection;
     private CanvasGroup dashCircleCG;
-
-
     #endregion
-
-
     #endregion
 
     #region Head Bob
@@ -157,571 +79,197 @@ public class FirstPersonController : MonoBehaviour
     public float bobSpeed = 10f;
     public Vector3 bobAmount = new Vector3(.15f, .05f, 0f);
 
-    // Internal Variables
     private Vector3 jointOriginalPos;
     private float timer = 0;
-
     #endregion
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-
         crosshairObject = GetComponentInChildren<Image>();
 
-        // Set internal variables
         playerCamera.fieldOfView = fov;
-        originalScale = transform.localScale;
         jointOriginalPos = joint.localPosition;
-
-        if (!unlimitedSprint)
-        {
-            sprintRemaining = sprintDuration;
-            sprintCooldownReset = sprintCooldown;
-        }
     }
 
-    void Start()
+    private void Start()
     {
-        if (lockCursor)
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-        }
+        if (lockCursor) Cursor.lockState = CursorLockMode.Locked;
 
         if (crosshair)
         {
             crosshairObject.sprite = crosshairImage;
             crosshairObject.color = crosshairColor;
         }
-        else
-        {
-            crosshairObject.gameObject.SetActive(false);
-        }
-
-        #region Sprint Bar
-
-        sprintBarCG = GetComponentInChildren<CanvasGroup>();
-
-        if (useSprintBar)
-        {
-            sprintBarBG.gameObject.SetActive(true);
-            sprintBar.gameObject.SetActive(true);
-
-            float screenWidth = Screen.width;
-            float screenHeight = Screen.height;
-
-            sprintBarWidth = screenWidth * sprintBarWidthPercent;
-            sprintBarHeight = screenHeight * sprintBarHeightPercent;
-
-            sprintBarBG.rectTransform.sizeDelta = new Vector3(sprintBarWidth, sprintBarHeight, 0f);
-            sprintBar.rectTransform.sizeDelta = new Vector3(sprintBarWidth - 2, sprintBarHeight - 2, 0f);
-
-            if (hideBarWhenFull)
-            {
-                sprintBarCG.alpha = 0;
-            }
-        }
-        else
-        {
-            sprintBarBG.gameObject.SetActive(false);
-            sprintBar.gameObject.SetActive(false);
-        }
-
-        #endregion
+        else crosshairObject.gameObject.SetActive(false);
 
         #region Dash Circle
+        dashCircleCG = dashCircle?.GetComponentInParent<CanvasGroup>();
 
-        dashCircleCG = dashCircle != null ? dashCircle.GetComponentInParent<CanvasGroup>() : null;
-
-        if (useDashCircle && dashCircle != null && dashCircleBG != null)
+        if (useDashCircle && dashCircle && dashCircleBG)
         {
             dashCircleBG.gameObject.SetActive(true);
             dashCircle.gameObject.SetActive(true);
 
-            float screenWidth = Screen.width;
-            float screenHeight = Screen.height;
+            float w = Screen.width * dashCircleWidthPercent;
+            float h = Screen.height * dashCircleHeightPercent;
+            dashCircleBG.rectTransform.sizeDelta = new Vector3(w, h, 0);
+            dashCircle.rectTransform.sizeDelta = new Vector3(w - 2, h - 2, 0);
 
-            float dashCircleWidth = screenWidth * dashCircleWidthPercent;
-            float dashCircleHeight = screenHeight * dashCircleHeightPercent;
-
-            dashCircleBG.rectTransform.sizeDelta = new Vector3(dashCircleWidth, dashCircleHeight, 0f);
-            dashCircle.rectTransform.sizeDelta = new Vector3(dashCircleWidth - 2, dashCircleHeight - 2, 0f);
-
-            if (hideCircleWhenReady)
-            {
-                dashCircleCG.alpha = 0;
-            }
-
-           
             dashCircle.type = Image.Type.Filled;
             dashCircle.fillMethod = Image.FillMethod.Radial360;
             dashCircle.fillOrigin = (int)Image.Origin360.Top;
+
+            if (hideCircleWhenReady) dashCircleCG.alpha = 0;
         }
         else
         {
-            if (dashCircleBG != null) dashCircleBG.gameObject.SetActive(false);
-            if (dashCircle != null) dashCircle.gameObject.SetActive(false);
+            if (dashCircleBG) dashCircleBG.gameObject.SetActive(false);
+            if (dashCircle) dashCircle.gameObject.SetActive(false);
         }
-
         #endregion
     }
 
-    float camRotation;
-
-    private void Update() 
+    private void Update()
     {
-        if (PauseController.isPaused) return; // надо т.к иначе при паузе игрок может смотреть по сторонам и приседать.
-        #region Camera
+        if (PauseController.isPaused) return;
 
-        // Control camera movement
+        #region Camera Look
         if (cameraCanMove)
         {
-            yaw = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * mouseSensitivity;
-
-            if (!invertCamera)
-            {
-                pitch -= mouseSensitivity * Input.GetAxis("Mouse Y");
-            }
-            else
-            {
-                // Inverted Y
-                pitch += mouseSensitivity * Input.GetAxis("Mouse Y");
-            }
-
-            // Clamp pitch between lookAngle
+            yaw += Input.GetAxis("Mouse X") * mouseSensitivity;
+            pitch += (invertCamera ? 1 : -1) * Input.GetAxis("Mouse Y") * mouseSensitivity;
             pitch = Mathf.Clamp(pitch, -maxLookAngle, maxLookAngle);
 
             transform.localEulerAngles = new Vector3(0, yaw, 0);
             playerCamera.transform.localEulerAngles = new Vector3(pitch, 0, 0);
         }
-
-        #region Camera Zoom
-
-        if (enableZoom)
-        {
-            // Changes isZoomed when key is pressed
-            // Behavior for toogle zoom
-            if (Input.GetKeyDown(zoomKey) && !holdToZoom && !isSprinting)
-            {
-                if (!isZoomed)
-                {
-                    isZoomed = true;
-                }
-                else
-                {
-                    isZoomed = false;
-                }
-            }
-
-            // Changes isZoomed when key is pressed
-            // Behavior for hold to zoom
-            if (holdToZoom && !isSprinting)
-            {
-                if (Input.GetKeyDown(zoomKey))
-                {
-                    isZoomed = true;
-                }
-                else if (Input.GetKeyUp(zoomKey))
-                {
-                    isZoomed = false;
-                }
-            }
-
-            // Lerps camera.fieldOfView to allow for a smooth transistion
-            if (isZoomed)
-            {
-                playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, zoomFOV, zoomStepTime * Time.deltaTime);
-            }
-            else if (!isZoomed && !isSprinting)
-            {
-                playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, fov, zoomStepTime * Time.deltaTime);
-            }
-        }
-
-        #endregion
-        #endregion
-
-        #region Sprint
-
-        if (enableSprint)
-        {
-            if (isSprinting)
-            {
-                isZoomed = false;
-                playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, sprintFOV, sprintFOVStepTime * Time.deltaTime);
-
-                // Drain sprint remaining while sprinting
-                if (!unlimitedSprint)
-                {
-                    sprintRemaining -= 1 * Time.deltaTime;
-                    if (sprintRemaining <= 0)
-                    {
-                        isSprinting = false;
-                        isSprintCooldown = true;
-                    }
-                }
-            }
-            else
-            {
-                // Regain sprint while not sprinting
-                sprintRemaining = Mathf.Clamp(sprintRemaining += 1 * Time.deltaTime, 0, sprintDuration);
-            }
-
-            // Handles sprint cooldown 
-            // When sprint remaining == 0 stops sprint ability until hitting cooldown
-            if (isSprintCooldown)
-            {
-                sprintCooldown -= 1 * Time.deltaTime;
-                if (sprintCooldown <= 0)
-                {
-                    isSprintCooldown = false;
-                }
-            }
-            else
-            {
-                sprintCooldown = sprintCooldownReset;
-            }
-
-            // Handles sprintBar 
-            if (useSprintBar && !unlimitedSprint)
-            {
-                float sprintRemainingPercent = sprintRemaining / sprintDuration;
-                sprintBar.transform.localScale = new Vector3(sprintRemainingPercent, 1f, 1f);
-            }
-        }
-
         #endregion
 
         #region Jump
-        // Gets input and calls jump method
         if (enableJump && Input.GetKeyDown(jumpKey))
         {
-            if (isGrounded)
-            {
-                Jump();
-               
-            }
-            else if (enableAirJump && canAirJump)
-            {
-                Jump();  
-                canAirJump = false;  
-            }
+            if (isGrounded) { Jump(); }
+            else if (enableAirJump && canAirJump) { Jump(); canAirJump = false; }
         }
-        #endregion
-
-        #region Crouch
-
-        if (enableCrouch)
-        {
-            if (Input.GetKeyDown(crouchKey) && !holdToCrouch)
-            {
-                Crouch();
-            }
-
-            if (Input.GetKeyDown(crouchKey) && holdToCrouch)
-            {
-                isCrouched = false;
-                Crouch();
-            }
-            else if (Input.GetKeyUp(crouchKey) && holdToCrouch)
-            {
-                isCrouched = true;
-                Crouch();
-            }
-        }
-
         #endregion
 
         #region Dash
-
         if (enableDash)
         {
-            if (dashCooldownTimer > 0)
-            {
-                dashCooldownTimer -= Time.deltaTime;
-            }
+            if (dashCooldownTimer > 0) dashCooldownTimer -= Time.deltaTime;
 
             if (Input.GetKeyDown(dashKey) && dashCooldownTimer <= 0 && !isDashing)
             {
-                float horizontalInput = Input.GetAxis("Horizontal");
-                float verticalInput = Input.GetAxis("Vertical");
+                float h = Input.GetAxis("Horizontal");
+                float v = Input.GetAxis("Vertical");
 
-                if (Mathf.Abs(horizontalInput) > 0.1f || Mathf.Abs(verticalInput) > 0.1f)
-                {
-                    dashDirection = transform.TransformDirection(new Vector3(horizontalInput, 0, verticalInput));
-                }
-                else
-                {
-                    dashDirection = transform.forward;
-                }
-                dashDirection.Normalize();
+                dashDirection = (Mathf.Abs(h) > 0.1f || Mathf.Abs(v) > 0.1f)
+                    ? transform.TransformDirection(new Vector3(h, 0, v)).normalized
+                    : transform.forward;
 
                 isDashing = true;
                 dashTimer = dashDuration;
-
                 rb.AddForce(dashDirection * dashPower, ForceMode.Impulse);
-
-                isZoomed = false;
-                isSprinting = false;
             }
 
             if (isDashing)
             {
                 dashTimer -= Time.deltaTime;
-
                 rb.AddForce(dashDirection * (dashPower * 0.5f) * (dashTimer / dashDuration), ForceMode.Acceleration);
-
-                if (dashTimer <= 0)
-                {
-                    isDashing = false;
-                    dashCooldownTimer = dashCooldown; 
-                }
+                if (dashTimer <= 0) { isDashing = false; dashCooldownTimer = dashCooldown; }
             }
-            if (useDashCircle && dashCircle != null)
-            {
-                float dashCooldownPercent = 1f - (dashCooldownTimer / dashCooldown);  
-                dashCircle.fillAmount = dashCooldownPercent;
 
-                if (hideCircleWhenReady && dashCircleCG != null)
-                {
-                    if (dashCooldownTimer > 0)
-                    {
-                        dashCircleCG.alpha = 1f;  
-                    }
-                    else
-                    {
-                        dashCircleCG.alpha = 0f;  
-                    }
-                }
+            if (useDashCircle && dashCircle)
+            {
+                dashCircle.fillAmount = 1f - (dashCooldownTimer / dashCooldown);
+                if (hideCircleWhenReady && dashCircleCG)
+                    dashCircleCG.alpha = dashCooldownTimer > 0 ? 1f : 0f;
             }
         }
-
         #endregion
 
         CheckGround();
+        if (isGrounded) canAirJump = true;
 
-        if (isGrounded)
-        {
-            canAirJump = true;
-        }
-
-        if (enableHeadBob)
-        {
-            HeadBob();
-        }
+        if (enableHeadBob) HeadBob();
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         #region Movement
-
-        if (playerCanMove && !isDashing)  // Блокируем стандартное движение во время дэша
+        if (playerCanMove && !isDashing)
         {
-            // Calculate how fast we should be moving
-            Vector3 targetVelocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+            Vector3 target = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+            isWalking = (target.x != 0 || target.z != 0) && isGrounded;
 
-            // Checks if player is walking and isGrounded
-            // Will allow head bob
-            if (targetVelocity.x != 0 || targetVelocity.z != 0 && isGrounded)
-            {
-                isWalking = true;
-            }
-            else
-            {
-                isWalking = false;
-            }
+            target = transform.TransformDirection(target) * walkSpeed + externalImpulse;
 
-            // All movement calculations while sprint is active
-            if (enableSprint && Input.GetKey(sprintKey) && sprintRemaining > 0f && !isSprintCooldown)
-            {
-                targetVelocity = transform.TransformDirection(targetVelocity) * sprintSpeed;
+            Vector3 velocity = rb.velocity;
+            Vector3 velocityChange = target - velocity;
+            velocityChange.x = Mathf.Clamp(velocityChange.x, -maxVelocityChange, maxVelocityChange);
+            velocityChange.z = Mathf.Clamp(velocityChange.z, -maxVelocityChange, maxVelocityChange);
+            velocityChange.y = 0;
 
-                // добавление внешнего импульса от отталкивающей стены
-                targetVelocity += externalImpulse;
-
-                // Apply a force that attempts to reach our target velocity
-                Vector3 velocity = rb.velocity;
-                Vector3 velocityChange = (targetVelocity - velocity);
-                velocityChange.x = Mathf.Clamp(velocityChange.x, -maxVelocityChange, maxVelocityChange);
-                velocityChange.z = Mathf.Clamp(velocityChange.z, -maxVelocityChange, maxVelocityChange);
-                velocityChange.y = 0;
-
-                // Player is only moving when velocity change != 0
-                // Makes sure fov change only happens during movement
-                if (velocityChange.x != 0 || velocityChange.z != 0)
-                {
-                    isSprinting = true;
-
-                    if (isCrouched)
-                    {
-                        Crouch();
-                    }
-
-                    if (hideBarWhenFull && !unlimitedSprint)
-                    {
-                        sprintBarCG.alpha += 5 * Time.deltaTime;
-                    }
-                }
-
-                rb.AddForce(velocityChange, ForceMode.VelocityChange);
-            }
-            // All movement calculations while walking
-            else
-            {
-                isSprinting = false;
-
-                if (hideBarWhenFull && sprintRemaining == sprintDuration)
-                {
-                    sprintBarCG.alpha -= 3 * Time.deltaTime;
-                }
-
-                targetVelocity = transform.TransformDirection(targetVelocity) * walkSpeed;
-
-                // добавление внешнего импульса от отталкивающей стены
-                targetVelocity += externalImpulse;
-
-                // Apply a force that attempts to reach our target velocity
-                Vector3 velocity = rb.velocity;
-                Vector3 velocityChange = (targetVelocity - velocity);
-                velocityChange.x = Mathf.Clamp(velocityChange.x, -maxVelocityChange, maxVelocityChange);
-                velocityChange.z = Mathf.Clamp(velocityChange.z, -maxVelocityChange, maxVelocityChange);
-                velocityChange.y = 0;
-
-                rb.AddForce(velocityChange, ForceMode.VelocityChange);
-            }
+            rb.AddForce(velocityChange, ForceMode.VelocityChange);
         }
         #endregion
-        // гашение внешнего импульса от отталкивающей стены
+
         externalImpulse = Vector3.Lerp(externalImpulse, Vector3.zero, 5f * Time.fixedDeltaTime);
     }
 
-    // Sets isGrounded based on a raycast sent straight down from the player object
     private void CheckGround()
     {
-        Vector3 origin = new Vector3(transform.position.x, transform.position.y - (transform.localScale.y * .5f), transform.position.z);
-        Vector3 direction = transform.TransformDirection(Vector3.down);
-        float distance = .75f;
-
-        if (Physics.Raycast(origin, direction, out RaycastHit hit, distance))
-        {
-            Debug.DrawRay(origin, direction * distance, Color.red);
-            isGrounded = true;
-        }
-        else
-        {
-            isGrounded = false;
-        }
+        Vector3 origin = transform.position + Vector3.down * (transform.localScale.y * .5f);
+        isGrounded = Physics.Raycast(origin, Vector3.down, .75f);
     }
 
     private void Jump()
     {
-        // Adds force to the player rigidbody to jump
-        if (isGrounded)
-        {
-            rb.AddForce(0f, jumpPower, 0f, ForceMode.Impulse);
-            isGrounded = false;
-        }
-
-        // When crouched and using toggle system, will uncrouch for a jump
-        if (isCrouched && !holdToCrouch)
-        {
-            Crouch();
-        }
-    }
-
-    private void Crouch()
-    {
-        // Stands player up to full height
-        // Brings walkSpeed back up to original speed
-        if (isCrouched)
-        {
-            transform.localScale = new Vector3(originalScale.x, originalScale.y, originalScale.z);
-            walkSpeed /= speedReduction;
-
-            isCrouched = false;
-        }
-        // Crouches player down to set height
-        // Reduces walkSpeed
-        else
-        {
-            transform.localScale = new Vector3(originalScale.x, crouchHeight, originalScale.z);
-            walkSpeed *= speedReduction;
-
-            isCrouched = true;
-        }
+        rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
+        isGrounded = false;
     }
 
     private void HeadBob()
     {
         if (isWalking)
         {
-            // Calculates HeadBob speed during sprint
-            if (isSprinting)
-            {
-                timer += Time.deltaTime * (bobSpeed + sprintSpeed);
-            }
-            // Calculates HeadBob speed during crouched movement
-            else if (isCrouched)
-            {
-                timer += Time.deltaTime * (bobSpeed * speedReduction);
-            }
-            // Calculates HeadBob speed during walking
-            else
-            {
-                timer += Time.deltaTime * bobSpeed;
-            }
-            // Applies HeadBob movement
-            joint.localPosition = new Vector3(jointOriginalPos.x + Mathf.Sin(timer) * bobAmount.x, jointOriginalPos.y + Mathf.Sin(timer) * bobAmount.y, jointOriginalPos.z + Mathf.Sin(timer) * bobAmount.z);
+            timer += Time.deltaTime * bobSpeed;
+            joint.localPosition = jointOriginalPos + new Vector3(
+                Mathf.Sin(timer) * bobAmount.x,
+                Mathf.Sin(timer) * bobAmount.y,
+                Mathf.Sin(timer) * bobAmount.z);
         }
         else
         {
-            // Resets when play stops moving
             timer = 0;
-            joint.localPosition = new Vector3(Mathf.Lerp(joint.localPosition.x, jointOriginalPos.x, Time.deltaTime * bobSpeed), Mathf.Lerp(joint.localPosition.y, jointOriginalPos.y, Time.deltaTime * bobSpeed), Mathf.Lerp(joint.localPosition.z, jointOriginalPos.z, Time.deltaTime * bobSpeed));
+            joint.localPosition = Vector3.Lerp(joint.localPosition, jointOriginalPos, Time.deltaTime * bobSpeed);
         }
     }
 
-    public void SetExternalImpulse(Vector3 impulse)
-    {
-        // Не используем ForceMode.Impulse напрямую, т.к. FPC постоянно корректирует velocity в FixedUpdate.
-        // Вместо этого устанавливаем externalImpulse, который будет добавлен к целевой скорости.
-        externalImpulse = impulse;
-    }
+    public void SetExternalImpulse(Vector3 impulse) => externalImpulse = impulse;
 
     public void SmoothlyRotateCameraYaw(float targetYaw, float duration)
     {
-        if (currentCameraRotationCoroutine != null)
-            StopCoroutine(currentCameraRotationCoroutine);
-
+        if (currentCameraRotationCoroutine != null) StopCoroutine(currentCameraRotationCoroutine);
         currentCameraRotationCoroutine = StartCoroutine(RotateCameraCoroutine(targetYaw, duration));
     }
 
     private IEnumerator RotateCameraCoroutine(float targetYaw, float duration)
     {
         cameraCanMove = false;
-        float initialYaw = transform.localEulerAngles.y;
-        float timer = 0f;
-
-        float currentYaw = initialYaw;
-        float deltaYaw = Mathf.DeltaAngle(currentYaw, targetYaw);
-
-        while (timer < duration)
+        float startYaw = transform.localEulerAngles.y;
+        float t = 0;
+        while (t < duration)
         {
-            timer += Time.deltaTime;
-            float t = timer / duration;
-
-            float newYaw = initialYaw + deltaYaw * t;
-
-            transform.localEulerAngles = new Vector3(0, newYaw, 0);
-
-            yaw = newYaw;
-
+            t += Time.deltaTime;
+            float y = Mathf.LerpAngle(startYaw, targetYaw, t / duration);
+            transform.localEulerAngles = new Vector3(0, y, 0);
+            yaw = y;
             yield return null;
         }
-
         transform.localEulerAngles = new Vector3(0, targetYaw, 0);
         yaw = targetYaw;
-
         cameraCanMove = true;
         currentCameraRotationCoroutine = null;
     }
