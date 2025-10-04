@@ -249,6 +249,17 @@ public class FirstPersonController : MonoBehaviour
 
     public void SetExternalImpulse(Vector3 impulse) => externalImpulse = impulse;
 
+    public Vector3 GetForwardVector() => transform.forward;
+
+    public Vector3 GetCurrentHorizontalVelocity()
+    {
+        Vector3 vel = rb.velocity;
+        vel.y = 0;
+        return vel;
+    }
+
+    public KeyCode GetJumpKey() => jumpKey;
+
     public void SmoothlyRotateCameraYaw(float targetYaw, float duration)
     {
         if (currentCameraRotationCoroutine != null) StopCoroutine(currentCameraRotationCoroutine);
@@ -272,5 +283,20 @@ public class FirstPersonController : MonoBehaviour
         yaw = targetYaw;
         cameraCanMove = true;
         currentCameraRotationCoroutine = null;
+    }
+
+    public bool IsGrounded() => isGrounded;
+
+    public void InitiateJumpLogic()
+    {
+        if (isGrounded)
+        {
+            Jump();
+        }
+        else if (enableAirJump && canAirJump)
+        {
+            Jump();
+            canAirJump = false;
+        }
     }
 }

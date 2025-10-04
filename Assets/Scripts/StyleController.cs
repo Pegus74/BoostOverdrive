@@ -18,7 +18,7 @@ public class StyleController : MonoBehaviour
     private int currentStyleIndex = 0;  
 
     private FirstPersonController controller;
-    private Camera playerCamera; 
+    private Camera playerCamera;
     void Awake()
     {
         controller = GetComponent<FirstPersonController>();
@@ -55,4 +55,15 @@ public class StyleController : MonoBehaviour
         playerCamera.fieldOfView = style.fov;
 
     }
+
+    public PlayerStyle GetCurrentStyle()
+    {
+        if (currentStyleIndex >= 0 && currentStyleIndex < styles.Length)
+        {
+            return styles[currentStyleIndex];
+        }
+        return null; // или возвращаем дефолтный стиль
+    }
+
+    public int GetCurrentStyleIndex() => currentStyleIndex;
 }
