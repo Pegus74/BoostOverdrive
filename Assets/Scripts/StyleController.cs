@@ -9,7 +9,8 @@ public class PlayerStyle
     public float walkSpeed = 5f;  
     public float sprintSpeed = 7f;  
     public float jumpPower = 5f; 
-    public float fov = 60f;  
+    public float fov = 60f;
+    public bool canBreakWallsWithDash = false;
 }
 
 public class StyleController : MonoBehaviour
@@ -19,7 +20,9 @@ public class StyleController : MonoBehaviour
     private int currentStyleIndex = 0;  
 
     private FirstPersonController controller;
-    private Camera playerCamera; 
+    private Camera playerCamera;
+    public PlayerStyle CurrentStyle => styles[currentStyleIndex];
+
     void Awake()
     {
         controller = GetComponent<FirstPersonController>();
@@ -28,8 +31,8 @@ public class StyleController : MonoBehaviour
         if (styles.Length == 0)
         {
             styles = new PlayerStyle[2];
-            styles[0] = new PlayerStyle { styleName = "Legs style", walkSpeed = 10f, sprintSpeed = 15f, jumpPower = 10f, fov = 60f };
-            styles[1] = new PlayerStyle { styleName = "Hands style", walkSpeed = 6f, sprintSpeed = 8f, jumpPower = 6f, fov = 80f };
+            styles[0] = new PlayerStyle { styleName = "Legs style", walkSpeed = 10f, sprintSpeed = 15f, jumpPower = 10f, fov = 60f, canBreakWallsWithDash = false };
+            styles[1] = new PlayerStyle { styleName = "Hands style", walkSpeed = 6f, sprintSpeed = 8f, jumpPower = 6f, fov = 80f, canBreakWallsWithDash = true };
         }
 
         ApplyStyle(currentStyleIndex);
