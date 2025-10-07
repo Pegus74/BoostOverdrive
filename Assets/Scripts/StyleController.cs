@@ -30,8 +30,8 @@ public class StyleController : MonoBehaviour
         if (styles.Length == 0)
         {
             styles = new PlayerStyle[2];
-            styles[0] = new PlayerStyle { styleName = "Legs style", walkSpeed = 10f, sprintSpeed = 15f, jumpPower = 10f, fov = 60f, canBreakWallsWithDash = false };
-            styles[1] = new PlayerStyle { styleName = "Hands style", walkSpeed = 6f, sprintSpeed = 8f, jumpPower = 6f, fov = 80f, canBreakWallsWithDash = true };
+            styles[0] = new PlayerStyle { styleName = "Legs style", walkSpeed = 10f, jumpPower = 10f, fov = 60f, canBreakWallsWithDash = false };
+            styles[1] = new PlayerStyle { styleName = "Hands style", walkSpeed = 6f,  jumpPower = 6f, fov = 80f, canBreakWallsWithDash = true };
         }
 
         ApplyStyle(currentStyleIndex);
