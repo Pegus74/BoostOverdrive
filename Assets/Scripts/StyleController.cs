@@ -6,8 +6,7 @@ using UnityEngine;
 public class PlayerStyle
 {
     public string styleName = "Style"; 
-    public float walkSpeed = 5f;  
-    public float sprintSpeed = 7f;  
+    public float walkSpeed = 5f;    
     public float jumpPower = 5f; 
     public float fov = 60f;
     public bool canBreakWallsWithDash = false;
@@ -54,10 +53,20 @@ public class StyleController : MonoBehaviour
         PlayerStyle style = styles[index];
 
         controller.walkSpeed = style.walkSpeed;
-        controller.sprintSpeed = style.sprintSpeed;
         controller.jumpPower = style.jumpPower;
         controller.fov = style.fov;
         playerCamera.fieldOfView = style.fov;
 
     }
+
+    public PlayerStyle GetCurrentStyle()
+    {
+        if (currentStyleIndex >= 0 && currentStyleIndex < styles.Length)
+        {
+            return styles[currentStyleIndex];
+        }
+        return null; // ��� ���������� ��������� �����
+    }
+
+    public int GetCurrentStyleIndex() => currentStyleIndex;
 }
