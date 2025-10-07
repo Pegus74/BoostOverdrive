@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class FirstPersonController : MonoBehaviour
 {
     [HideInInspector] public Rigidbody rb;
-
+    private StyleController styleManager;
     #region Camera Movement Variables
     [Header("Camera Movement Variables")]
     public Camera playerCamera;
@@ -86,6 +86,7 @@ public class FirstPersonController : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        styleManager = GetComponent<StyleController>();
         crosshairObject = GetComponentInChildren<Image>();
 
         playerCamera.fieldOfView = fov;
@@ -299,4 +300,17 @@ public class FirstPersonController : MonoBehaviour
             canAirJump = false;
         }
     }
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (isDashing && styleManager != null && styleManager.CurrentStyle.canBreakWallsWithDash) 
+        {
+            DestructibleWall wall = collision.gameObject.GetComponent<DestructibleWall>();
+            if (wall != null)
+            {
+                wall.DestroyWall();  
+            }
+        }
+    }
+
+
 }

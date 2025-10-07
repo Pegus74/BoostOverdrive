@@ -47,6 +47,7 @@ public class DestructibleWall : MonoBehaviour
                 rb.isKinematic = true;                                 
             }
             part.transform.localRotation = Quaternion.identity;
+            part.layer = LayerMask.NameToLayer("Default");
         }
     }
 
@@ -60,11 +61,12 @@ public class DestructibleWall : MonoBehaviour
         {
             wallCollider.enabled = false;
         }
-
+        int cubeLayer = LayerMask.NameToLayer("IgnorePlayer");
         foreach (GameObject part in wallParts)
         {
             if (part != null)
             {
+                part.layer = cubeLayer;
                 Rigidbody rb = part.GetComponent<Rigidbody>();
                 if (rb == null)
                 {
@@ -72,6 +74,7 @@ public class DestructibleWall : MonoBehaviour
                 }
                 rb.isKinematic = false;
                 rb.AddExplosionForce(explosionForce, transform.position, explosionRadius, 1f, ForceMode.Impulse);
+                
             }
         }
     }
