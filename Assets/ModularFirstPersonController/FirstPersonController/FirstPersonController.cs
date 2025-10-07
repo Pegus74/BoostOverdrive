@@ -6,6 +6,8 @@ public class FirstPersonController : MonoBehaviour
 {
     [HideInInspector] public Rigidbody rb;
     private StyleController styleManager;
+    private float speedModifier = 1f;
+    private Coroutine lingerCoroutine;
     #region Camera Movement Variables
     [Header("Camera Movement Variables")]
     public Camera playerCamera;
@@ -45,7 +47,7 @@ public class FirstPersonController : MonoBehaviour
     public float jumpPower = 5f;
     public bool enableAirJump = true;
 
-    private bool isGrounded = false;
+    public bool isGrounded = false;
     private bool canAirJump = true;
     #endregion
 
@@ -204,7 +206,7 @@ public class FirstPersonController : MonoBehaviour
             Vector3 target = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
             isWalking = (target.x != 0 || target.z != 0) && isGrounded;
 
-            target = transform.TransformDirection(target) * walkSpeed + externalImpulse;
+            target = transform.TransformDirection(target) * walkSpeed * speedModifier + externalImpulse;
 
             Vector3 velocity = rb.velocity;
             Vector3 velocityChange = target - velocity;
@@ -310,6 +312,34 @@ public class FirstPersonController : MonoBehaviour
                 wall.DestroyWall();  
             }
         }
+    }
+    public void SetSpeedModifier(float modifier)
+    {
+        speedModifier = modifier;
+        if (lingerCoroutine != null)
+        {
+            StopCoroutine(lingerCoroutine);  
+        }
+    }
+
+    public void ResetSpeedModifier()
+    {
+        speedModifier = 1f;
+    }
+
+    public void StartLingerSpeedModifier(float lingerTime)
+    {
+        if (lingerCoroutine != null)
+        {
+            StopCoroutine(lingerCoroutine);
+        }
+        lingerCoroutine = StartCoroutine(LingerSpeedModifierCoroutine(lingerTime));
+    }
+
+    private IEnumerator LingerSpeedModifierCoroutine(float lingerTime)
+    {
+        yield return new WaitForSeconds(lingerTime);
+        ResetSpeedModifier();
     }
 
 
