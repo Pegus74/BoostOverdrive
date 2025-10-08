@@ -135,7 +135,8 @@ public class FirstPersonController : MonoBehaviour
 
     private void Update()
     {
-        if (PauseController.isPaused) return;
+        if (GameManager.Instance == null) return;
+        if (GameManager.Instance.GetCurrentState() != GameManager.State.Playing) return;
 
         #region Camera Look
         if (cameraCanMove)

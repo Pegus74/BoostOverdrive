@@ -5,6 +5,7 @@ public class Speedometer : MonoBehaviour
 {
     [SerializeField] private TMP_Text speedLabel;
     [SerializeField] private TMP_Text styleLabel;
+    [SerializeField] private TMP_Text stateLabel;
     private Rigidbody rb;
     StyleController controller;
 
@@ -23,5 +24,6 @@ public class Speedometer : MonoBehaviour
         float units = velH.magnitude;
         speedLabel.text = $"Speed: {units:F1}";
         styleLabel.text = $"Style: {styleIndex.styleName}";
+        stateLabel.text = $"{GameManager.Instance.GetCurrentState()}";
     }
 }
