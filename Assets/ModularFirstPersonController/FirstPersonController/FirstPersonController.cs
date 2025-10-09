@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -304,12 +305,15 @@ public class FirstPersonController : MonoBehaviour
     }
     private void OnCollisionEnter(Collision collision)
     {
-        if (isDashing && styleManager != null && styleManager.CurrentStyle.canBreakWallsWithDash) 
+        if (isDashing && styleManager != null && styleManager.CurrentStyle.canBreakWallsWithDash)
         {
             DestructibleWall wall = collision.gameObject.GetComponent<DestructibleWall>();
             if (wall != null)
             {
-                wall.DestroyWall();  
+                Vector3 horizontalVelocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+                wall.DestroyWall(); 
+                rb.velocity = new Vector3(horizontalVelocity.x, rb.velocity.y, horizontalVelocity.z);// восстанавливаем  скорость и добавляем дополнительный толчок в направлении дэша
+                rb.AddForce(dashDirection * dashPower * 0.5f, ForceMode.Impulse);  // для частичной компенсации
             }
         }
     }
