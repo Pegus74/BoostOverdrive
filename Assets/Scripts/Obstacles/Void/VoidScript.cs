@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class VoidScript : MonoBehaviour
 {
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision other)
     {
-        if (other.CompareTag("Player"))
+        if (other.collider.CompareTag("Player"))
         {
             GameManager.Instance.PlayerDied();
         }
