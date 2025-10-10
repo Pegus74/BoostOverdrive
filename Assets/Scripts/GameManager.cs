@@ -51,9 +51,10 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
+
     private void UpdateGameState()
     {
-        bool shouldTimeStop = (currentState == State.Paused || currentState == State.GameWin);
+        bool shouldTimeStop = (currentState != State.Playing);
         bool allowCursor = (currentState != State.Playing);
         bool changeMusicToGameOver = (currentState == State.GameOver);
 
