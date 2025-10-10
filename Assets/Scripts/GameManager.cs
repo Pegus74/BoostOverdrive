@@ -4,8 +4,10 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public GameObject gameOverCanvas;
-    public MusicManager musicManager;
+    public GameObject gameWinCanvas;
     public GameObject pauseCanvas;
+
+    public MusicManager musicManager;
 
     public static GameManager Instance;
 
@@ -13,7 +15,8 @@ public class GameManager : MonoBehaviour
     {
         Playing,
         Paused,
-        GameOver
+        GameOver,
+        GameWin
     }
     private State currentState = State.Playing;
 
@@ -30,6 +33,8 @@ public class GameManager : MonoBehaviour
                 pauseCanvas.SetActive(false);
             if (gameOverCanvas != null)
                 gameOverCanvas.SetActive(false);
+            if (gameWinCanvas != null)
+                gameWinCanvas.SetActive(false);
             if (musicManager != null)
                 musicManager.PlayMusic();
 
@@ -48,8 +53,8 @@ public class GameManager : MonoBehaviour
     }
     private void UpdateGameState()
     {
-        bool shouldTimeStop = (currentState == State.Paused);
-        bool allowCursor = (currentState == State.Paused || currentState == State.GameOver);
+        bool shouldTimeStop = (currentState == State.Paused || currentState == State.GameWin);
+        bool allowCursor = (currentState != State.Playing);
         bool changeMusicToGameOver = (currentState == State.GameOver);
 
         Time.timeScale = shouldTimeStop ? 0f : 1f;
@@ -78,7 +83,18 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    #region Win
+    public void PlayerWin()
+    {
+        currentState = State.GameWin;
+        gameWinCanvas.SetActive(true);
+        UpdateGameState();
+    }
+
+    #endregion
+
     #region GameOver
+
     public void PlayerDied()
     {
         currentState = State.GameOver;
@@ -89,6 +105,7 @@ public class GameManager : MonoBehaviour
     public void RestartLevel()
     {
         gameOverCanvas.SetActive(false);
+        gameWinCanvas.SetActive(false);
         currentState = State.Playing;
 
         UpdateGameState();
@@ -103,7 +120,7 @@ public class GameManager : MonoBehaviour
 
     public void TogglePause()
     {
-        if (currentState != State.Playing && currentState != State.Paused)
+        if (currentState != State.Playing && currentState != State.Paused && currentState != State.GameWin)
             return;
 
         bool isPlaying = (currentState == State.Playing);
