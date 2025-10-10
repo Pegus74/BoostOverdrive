@@ -9,7 +9,6 @@ public class StoppingObjectDeadly : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             GameManager.Instance.PlayerDied();
-            Debug.Log("AAAA");
         }
     }
 }

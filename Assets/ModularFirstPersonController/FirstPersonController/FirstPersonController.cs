@@ -206,6 +206,9 @@ public class FirstPersonController : MonoBehaviour
         if (playerCanMove && !isDashing)
         {
             Vector3 target = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+
+            if (target.sqrMagnitude > 1f) target.Normalize();
+
             isWalking = (target.x != 0 || target.z != 0) && isGrounded;
 
             target = transform.TransformDirection(target) * walkSpeed * speedModifier + externalImpulse;
