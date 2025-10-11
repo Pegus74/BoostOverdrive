@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 [System.Serializable]
 public class PlayerStyle
@@ -16,7 +17,12 @@ public class StyleController : MonoBehaviour
 {
     public PlayerStyle[] styles = new PlayerStyle[2]; 
     public KeyCode switchStyleKey = KeyCode.Tab; 
-    private int currentStyleIndex = 0;  
+    private int currentStyleIndex = 0;
+
+    [Header("UI Elements")]
+    public Image LegstyleUI;    
+    public Image HandsStyleUI;    
+    public Canvas styleCanvas;
 
     private FirstPersonController controller;
     private Camera playerCamera;
@@ -35,6 +41,7 @@ public class StyleController : MonoBehaviour
         }
 
         ApplyStyle(currentStyleIndex);
+        UpdateStyleUI();
     }
 
     void Update()
@@ -43,6 +50,7 @@ public class StyleController : MonoBehaviour
         {
             currentStyleIndex = (currentStyleIndex + 1) % styles.Length;  
             ApplyStyle(currentStyleIndex);
+            UpdateStyleUI();
         }
     }
 
@@ -58,6 +66,15 @@ public class StyleController : MonoBehaviour
         playerCamera.fieldOfView = style.fov;
 
     }
+    private void UpdateStyleUI()
+    {
+        if (LegstyleUI != null && HandsStyleUI != null)
+        {
+
+            LegstyleUI.gameObject.SetActive(currentStyleIndex == 0);
+            HandsStyleUI.gameObject.SetActive(currentStyleIndex == 1);
+        }
+    }
 
     public PlayerStyle GetCurrentStyle()
     {
@@ -65,7 +82,7 @@ public class StyleController : MonoBehaviour
         {
             return styles[currentStyleIndex];
         }
-        return null; // ��� ���������� ��������� �����
+        return null; 
     }
 
     public int GetCurrentStyleIndex() => currentStyleIndex;
