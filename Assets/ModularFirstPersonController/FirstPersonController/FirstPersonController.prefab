@@ -698,7 +698,7 @@ MonoBehaviour:
   enableAirJump: 0
   isGrounded: 0
   enableDash: 1
-  dashKey: 102
+  dashKey: 304
   dashPower: 30
   dashDuration: 0.2
   dashCooldown: 1
@@ -728,7 +728,7 @@ MonoBehaviour:
   - styleName: "\u041D\u043E\u0433\u0438"
     walkSpeed: 10
     jumpPower: 8
-    fov: 60
+    fov: 90
     canBreakWallsWithDash: 0
   - styleName: "\u0420\u0443\u043A\u0438"
     walkSpeed: 5
@@ -1288,11 +1288,11 @@ RectTransform:
   - {fileID: 4445438273046152300}
   m_Father: {fileID: 4459864851551516607}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -487, y: -361}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.49999976, y: 0.49999973}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 116.24219}
+  m_Pivot: {x: 0, y: 0}
 --- !u!225 &5250636497835845455
 CanvasGroup:
   m_ObjectHideFlags: 0
