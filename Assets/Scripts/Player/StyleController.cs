@@ -28,6 +28,10 @@ public class StyleController : MonoBehaviour
     private Camera playerCamera;
     public PlayerStyle CurrentStyle => styles[currentStyleIndex];
 
+    private float airbornWalkSpeed; 
+    private bool isInAir = false;  
+    private int styleAtJumpStart;
+
     void Awake()
     {
         controller = GetComponent<FirstPersonController>();
@@ -42,16 +46,36 @@ public class StyleController : MonoBehaviour
 
         ApplyStyle(currentStyleIndex);
         UpdateStyleUI();
+        if (controller != null)
+        {
+      
+            var originalJumpMethod = System.Delegate.CreateDelegate(typeof(System.Action), controller, "Jump") as System.Action;
+        }
     }
 
     void Update()
     {
         if (Input.GetKeyDown(switchStyleKey))
         {
-            currentStyleIndex = (currentStyleIndex + 1) % styles.Length;  
-            ApplyStyle(currentStyleIndex);
-            UpdateStyleUI();
+            SwitchStyle();
+        }        
+        UpdateAirbornState();
+    }
+
+    private void SwitchStyle()
+    {
+        int newStyleIndex = (currentStyleIndex + 1) % styles.Length;
+        if (isInAir)
+        {
+            currentStyleIndex = newStyleIndex;
+            ApplyStyleAirborn(newStyleIndex);
         }
+        else
+        {
+            currentStyleIndex = newStyleIndex;
+            ApplyStyle(currentStyleIndex);
+        }
+        UpdateStyleUI();
     }
 
     private void ApplyStyle(int index)
@@ -64,8 +88,36 @@ public class StyleController : MonoBehaviour
         controller.jumpPower = style.jumpPower;
         controller.fov = style.fov;
         playerCamera.fieldOfView = style.fov;
+        airbornWalkSpeed = style.walkSpeed;
 
     }
+
+    private void ApplyStyleAirborn(int index)
+    {
+        if (index < 0 || index >= styles.Length) return;
+        PlayerStyle style = styles[index];
+        controller.jumpPower = style.jumpPower; 
+        controller.fov = style.fov;
+        playerCamera.fieldOfView = style.fov;
+    }
+
+    private void UpdateAirbornState()
+    {
+        if (controller == null) return;
+        bool wasInAir = isInAir;
+        isInAir = !controller.IsGrounded();
+        if (wasInAir && !isInAir)
+        {
+            ApplyStyle(currentStyleIndex);
+        }
+        if (!wasInAir && isInAir)
+        {
+            styleAtJumpStart = currentStyleIndex;
+            airbornWalkSpeed = styles[styleAtJumpStart].walkSpeed;
+            controller.walkSpeed = airbornWalkSpeed;
+        }
+    }
+
     private void UpdateStyleUI()
     {
         if (LegstyleUI != null && HandsStyleUI != null)
