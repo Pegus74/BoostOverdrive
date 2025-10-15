@@ -33,7 +33,7 @@ public class SpringWall : MonoBehaviour
 
     private void Start()
     {
-        playerController = FindObjectOfType<FirstPersonController>();
+        playerController = FindAnyObjectByType<FirstPersonController>();
         styleController = playerController?.GetComponent<StyleController>();
         jumpKey = playerController.GetJumpKey();
     }

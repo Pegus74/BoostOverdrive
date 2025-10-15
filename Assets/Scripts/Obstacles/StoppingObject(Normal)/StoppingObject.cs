@@ -12,7 +12,7 @@ public class StoppingObject : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            controller = FindObjectOfType<FirstPersonController>();
+            controller = FindAnyObjectByType<FirstPersonController>();
             controller.SetSpeedModifier(slowdownModifier);
         }
     }
