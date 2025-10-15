@@ -17,6 +17,8 @@ public class SpringWall : MonoBehaviour
     public float extraAccelerationHands = 5f;
     public float verticalBounceOn90Degree = 2.0f;
     public float cameraRotationDuration = 0.3f;
+    public float fixedVerticalReboundLegs = 12f;
+
 
     private const int LEGS_STYLE_INDEX = 0;
     private const int HANDS_STYLE_INDEX = 1;
@@ -215,7 +217,7 @@ public class SpringWall : MonoBehaviour
 
             // 2. Рассчитываем полный вектор импульса: Горизонтальный толчок + Вертикальный прыжок
             float horizontalForce = reboundForceLegs;
-            float verticalForce = playerController.jumpPower;
+            float verticalForce = fixedVerticalReboundLegs;
 
             Vector3 finalImpulse = jumpDirection * horizontalForce + Vector3.up * verticalForce;
 
