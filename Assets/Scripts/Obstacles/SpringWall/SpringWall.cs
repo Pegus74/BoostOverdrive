@@ -12,14 +12,16 @@ public class SpringWall : MonoBehaviour
     public float raycastCheckDistance = 1.0f;
 
     [Header("Настройки отталкивания")]
-    public float reboundForceLegs = 15f;
+    [Header("Ноги")]
+    public float horizontalForceLegs = 15f;
+    public float verticalForceLegs = 12f;
+
+    [Header("Руки")]
     public float reboundForceHands = 20f;
     public float extraAccelerationHands = 5f;
     public float verticalBounceOn90Degree = 2.0f;
     public float cameraRotationDuration = 0.3f;
-    public float fixedVerticalReboundLegs = 12f;
-
-
+    
     private const int LEGS_STYLE_INDEX = 0;
     private const int HANDS_STYLE_INDEX = 1;
 
@@ -42,9 +44,17 @@ public class SpringWall : MonoBehaviour
 
     private void Update()
     {
+        if (playerController.IsGrounded())
+        {
+            playerController.ClearLastWallJumpedFrom();
+        }
+
         if (Input.GetKeyDown(jumpKey))
         {
-            Debug.Log("-----------------------------------------------------");
+            //Debug.Log("-----------------------------------------------------");
+
+            if (playerController.LastWallJumpedFrom == this)
+                return;
 
             Vector3 surfaceNormal;
             int currentStyleIndex = styleController.GetCurrentStyleIndex();
@@ -89,7 +99,7 @@ public class SpringWall : MonoBehaviour
                     right,
                     -right
                 };
-                Debug.Log("Стиль НОГ: Используется 4 Raycast'а для гибкости.");
+                //Debug.Log("Стиль НОГ: Используется 4 Raycast'а для гибкости.");
             }
 
             if (TryCheckWallContact(checkDirections, out surfaceNormal))
@@ -99,7 +109,7 @@ public class SpringWall : MonoBehaviour
             }
             else
             {
-                Debug.Log("НЕТ КОНТАКТА");
+                //Debug.Log("НЕТ КОНТАКТА");
             }
         }
     }
@@ -148,9 +158,11 @@ public class SpringWall : MonoBehaviour
 
         if (playerController.IsGrounded())
         {
-            Debug.Log("Игрок стоит на месте. Выполняется обычный прыжок.");
+            //Debug.Log("Игрок стоит на месте. Выполняется обычный прыжок.");
             return;
         }
+
+        playerController.SetLastWallJumpedFrom(this);
 
         int currentStyleIndex = styleController.GetCurrentStyleIndex();
 
@@ -216,8 +228,8 @@ public class SpringWall : MonoBehaviour
             jumpDirection.Normalize();
 
             // 2. Рассчитываем полный вектор импульса: Горизонтальный толчок + Вертикальный прыжок
-            float horizontalForce = reboundForceLegs;
-            float verticalForce = fixedVerticalReboundLegs;
+            float horizontalForce = horizontalForceLegs;
+            float verticalForce = verticalForceLegs;
 
             Vector3 finalImpulse = jumpDirection * horizontalForce + Vector3.up * verticalForce;
 
@@ -232,18 +244,18 @@ public class SpringWall : MonoBehaviour
 
             playerController.SetExternalImpulse(Vector3.zero);
 
-            Debug.Log($"Финальный импульс (НОГИ): {finalImpulse}");
-            Debug.Log($"Горизонтальная сила: {horizontalForce}, Вертикальная сила: {verticalForce}");
+            //Debug.Log($"Финальный импульс (НОГИ): {finalImpulse}");
+            //Debug.Log($"Горизонтальная сила: {horizontalForce}, Вертикальная сила: {verticalForce}");
         }
         #endregion
 
         if (specialVerticalCaseTriggered)
         {
             playerController.rb.AddForce(Vector3.up * playerController.jumpPower * 0.5f, ForceMode.Impulse);
-            Debug.Log($"Добавлен дополнительный вертикальный импульс: {playerController.jumpPower * 0.5f}");
+            //Debug.Log($"Добавлен дополнительный вертикальный импульс: {playerController.jumpPower * 0.5f}");
         }
 
-        Debug.Log("-----------------------------------------------------");
+        //Debug.Log("-----------------------------------------------------");
     }
 
     private void OnDrawGizmosSelected()
