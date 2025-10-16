@@ -9,6 +9,10 @@ public class FirstPersonController : MonoBehaviour
     private StyleController styleManager;
     private float speedModifier = 1f;
     private Coroutine lingerCoroutine;
+
+    [HideInInspector]
+    public Component LastWallJumpedFrom { get; private set; } = null;
+
     #region Camera Movement Variables
     [Header("Camera Movement Variables")]
     public Camera playerCamera;
@@ -350,5 +354,15 @@ public class FirstPersonController : MonoBehaviour
         ResetSpeedModifier();
     }
 
+    #region LastWallJumpedFrom
+    public void SetLastWallJumpedFrom(Component wallComponent)
+    {
+        LastWallJumpedFrom = wallComponent;
+    }
 
+    public void ClearLastWallJumpedFrom()
+    {
+        LastWallJumpedFrom = null;
+    }
+    #endregion
 }

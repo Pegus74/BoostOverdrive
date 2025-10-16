@@ -12,12 +12,17 @@ public class SpringWall : MonoBehaviour
     public float raycastCheckDistance = 1.0f;
 
     [Header("Настройки отталкивания")]
-    public float reboundForceLegs = 15f;
+    [Header("Ноги")]
+    public float horizontalForceLegs = 15f;
+    public float verticalForceLegs = 12f;
+
+    [Header("Руки")]
     public float reboundForceHands = 20f;
     public float extraAccelerationHands = 5f;
     public float verticalBounceOn90Degree = 2.0f;
     public float cameraRotationDuration = 0.3f;
-
+    public KeyCode cameraRotateKey = KeyCode.Q;
+    
     private const int LEGS_STYLE_INDEX = 0;
     private const int HANDS_STYLE_INDEX = 1;
 
@@ -33,16 +38,24 @@ public class SpringWall : MonoBehaviour
 
     private void Start()
     {
-        playerController = FindObjectOfType<FirstPersonController>();
+        playerController = FindAnyObjectByType<FirstPersonController>();
         styleController = playerController?.GetComponent<StyleController>();
         jumpKey = playerController.GetJumpKey();
     }
 
     private void Update()
     {
+        if (playerController.IsGrounded())
+        {
+            playerController.ClearLastWallJumpedFrom();
+        }
+
         if (Input.GetKeyDown(jumpKey))
         {
-            Debug.Log("-----------------------------------------------------");
+            //Debug.Log("-----------------------------------------------------");
+
+            if (playerController.LastWallJumpedFrom == this)
+                return;
 
             Vector3 surfaceNormal;
             int currentStyleIndex = styleController.GetCurrentStyleIndex();
@@ -63,13 +76,13 @@ public class SpringWall : MonoBehaviour
                 {
                     // Если игрок движется, проверяем и по направлению взгляда, и по направлению движения
                     checkDirections = new Vector3[] { forward, velocityDirection };
-                    Debug.Log($"Стиль РУК: Используется Raycast вперед и по направлению скорости ({velocityDirection}) для Wall Climb.");
+                    // Debug.Log($"Стиль РУК: Используется Raycast вперед и по направлению скорости ({velocityDirection}) для Wall Climb.");
                 }
                 else
                 {
                     // Иначе, только вперед
                     checkDirections = new Vector3[] { forward };
-                    Debug.Log("Стиль РУК: Используется одиночный Raycast вперед.");
+                    // Debug.Log("Стиль РУК: Используется одиночный Raycast вперед.");
                 }
             }
             else // LEGS_STYLE_INDEX
@@ -87,17 +100,12 @@ public class SpringWall : MonoBehaviour
                     right,
                     -right
                 };
-                Debug.Log("Стиль НОГ: Используется 4 Raycast'а для гибкости.");
+                //Debug.Log("Стиль НОГ: Используется 4 Raycast'а для гибкости.");
             }
 
             if (TryCheckWallContact(checkDirections, out surfaceNormal))
             {
-                Debug.Log($"КОНТАКТ");
                 HandleRebound(surfaceNormal);
-            }
-            else
-            {
-                Debug.Log("НЕТ КОНТАКТА");
             }
         }
     }
@@ -146,9 +154,11 @@ public class SpringWall : MonoBehaviour
 
         if (playerController.IsGrounded())
         {
-            Debug.Log("Игрок стоит на месте. Выполняется обычный прыжок.");
+            //Debug.Log("Игрок стоит на месте. Выполняется обычный прыжок.");
             return;
         }
+
+        playerController.SetLastWallJumpedFrom(this);
 
         int currentStyleIndex = styleController.GetCurrentStyleIndex();
 
@@ -166,7 +176,7 @@ public class SpringWall : MonoBehaviour
 
             // Расчет угла приближения: угол между V_пад и вектором от стены к игроку (-surfaceNormal).
             float angle = Vector3.Angle(V_approach_norm, -surfaceNormal);
-            Debug.Log($"Угол между V_пад и -N (приближение): {angle:F2} градусов");
+            //Debug.Log($"Угол между V_пад и -N (приближение): {angle:F2} градусов");
 
             bool isSpecialCase = (angle <= 15f || angle >= 165f || (angle >= 75f && angle <= 105f));
 
@@ -179,7 +189,7 @@ public class SpringWall : MonoBehaviour
                 reboundVector += Vector3.up * verticalBounceOn90Degree;
                 reboundVector.Normalize();
                 specialVerticalCaseTriggered = true;
-                Debug.Log($"Срабатывание '90-градусного отскока");
+                // Debug.Log($"Срабатывание '90-градусного отскока");
             }
             else
             {
@@ -188,7 +198,7 @@ public class SpringWall : MonoBehaviour
 
                 reboundVector.y = 0;
                 reboundVector.Normalize();
-                Debug.Log($"Срабатывание стандартного отскока");
+                // Debug.Log($"Срабатывание стандартного отскока");
             }
 
             // 2. Применяем импульс и ускорение
@@ -196,12 +206,15 @@ public class SpringWall : MonoBehaviour
             impulse += reboundVector * extraAccelerationHands; // Дополнительное ускорение
 
             playerController.SetExternalImpulse(impulse);
-            Debug.Log($"Финальный импульс (РУКИ): {impulse}");
+            // Debug.Log($"Финальный импульс (РУКИ): {impulse}");
 
-            // 3. Поворот камеры
-            float targetYaw = Quaternion.LookRotation(reboundVector).eulerAngles.y;
-            playerController.SmoothlyRotateCameraYaw(targetYaw, cameraRotationDuration);
-            Debug.Log($"Поворот камеры: {targetYaw:F2} градусов.");
+            if (Input.GetKey(cameraRotateKey))
+            {
+                // 3. Поворот камеры
+                float targetYaw = Quaternion.LookRotation(reboundVector).eulerAngles.y;
+                playerController.SmoothlyRotateCameraYaw(targetYaw, cameraRotationDuration);
+                // Debug.Log($"Поворот камеры: {targetYaw:F2} градусов.");
+            }
         }
         #endregion
 
@@ -214,8 +227,8 @@ public class SpringWall : MonoBehaviour
             jumpDirection.Normalize();
 
             // 2. Рассчитываем полный вектор импульса: Горизонтальный толчок + Вертикальный прыжок
-            float horizontalForce = reboundForceLegs;
-            float verticalForce = playerController.jumpPower;
+            float horizontalForce = horizontalForceLegs;
+            float verticalForce = verticalForceLegs;
 
             Vector3 finalImpulse = jumpDirection * horizontalForce + Vector3.up * verticalForce;
 
@@ -230,18 +243,18 @@ public class SpringWall : MonoBehaviour
 
             playerController.SetExternalImpulse(Vector3.zero);
 
-            Debug.Log($"Финальный импульс (НОГИ): {finalImpulse}");
-            Debug.Log($"Горизонтальная сила: {horizontalForce}, Вертикальная сила: {verticalForce}");
+            //Debug.Log($"Финальный импульс (НОГИ): {finalImpulse}");
+            //Debug.Log($"Горизонтальная сила: {horizontalForce}, Вертикальная сила: {verticalForce}");
         }
         #endregion
 
         if (specialVerticalCaseTriggered)
         {
             playerController.rb.AddForce(Vector3.up * playerController.jumpPower * 0.5f, ForceMode.Impulse);
-            Debug.Log($"Добавлен дополнительный вертикальный импульс: {playerController.jumpPower * 0.5f}");
+            //Debug.Log($"Добавлен дополнительный вертикальный импульс: {playerController.jumpPower * 0.5f}");
         }
 
-        Debug.Log("-----------------------------------------------------");
+        //Debug.Log("-----------------------------------------------------");
     }
 
     private void OnDrawGizmosSelected()
