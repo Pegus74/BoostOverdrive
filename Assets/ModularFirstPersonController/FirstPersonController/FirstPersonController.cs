@@ -77,6 +77,19 @@ public class FirstPersonController : MonoBehaviour
     private Vector3 dashDirection;
     private CanvasGroup dashCircleCG;
     #endregion
+
+    #region SpringWallVariables
+    [Header("Настройки отталкивания")]
+    [Header("Ноги")]
+    public float horizontalForceLegs = 15f;
+    public float verticalForceLegs = 12f;
+
+    [Header("Руки")]
+    public float reboundForceHands = 20f;
+    public float extraAccelerationHands = 5f;
+    public float cameraRotationDuration = 0.3f;
+    public KeyCode cameraRotateKey = KeyCode.Q;
+    #endregion
     #endregion
 
     #region Head Bob

@@ -11,18 +11,6 @@ public class SpringWall : MonoBehaviour
     public LayerMask playerLayer;
     public float raycastCheckDistance = 1.0f;
 
-    [Header("Настройки отталкивания")]
-    [Header("Ноги")]
-    public float horizontalForceLegs = 15f;
-    public float verticalForceLegs = 12f;
-
-    [Header("Руки")]
-    public float reboundForceHands = 20f;
-    public float extraAccelerationHands = 5f;
-    public float verticalBounceOn90Degree = 2.0f;
-    public float cameraRotationDuration = 0.3f;
-    public KeyCode cameraRotateKey = KeyCode.Q;
-    
     private const int LEGS_STYLE_INDEX = 0;
     private const int HANDS_STYLE_INDEX = 1;
 
@@ -184,9 +172,9 @@ public class SpringWall : MonoBehaviour
             {
                 // отскок строго назад + подброс
                 reboundVector = surfaceNormal;
-                reboundForce = reboundForceHands;
+                reboundForce = playerController.reboundForceHands;
 
-                reboundVector += Vector3.up * verticalBounceOn90Degree;
+                reboundVector += Vector3.up;
                 reboundVector.Normalize();
                 specialVerticalCaseTriggered = true;
                 // Debug.Log($"Срабатывание '90-градусного отскока");
@@ -194,7 +182,7 @@ public class SpringWall : MonoBehaviour
             else
             {
                 reboundVector = Vector3.Reflect(V_approach_norm, surfaceNormal);
-                reboundForce = reboundForceHands;
+                reboundForce = playerController.reboundForceHands;
 
                 reboundVector.y = 0;
                 reboundVector.Normalize();
@@ -203,16 +191,16 @@ public class SpringWall : MonoBehaviour
 
             // 2. Применяем импульс и ускорение
             Vector3 impulse = reboundVector * reboundForce;
-            impulse += reboundVector * extraAccelerationHands; // Дополнительное ускорение
+            impulse += reboundVector * playerController.extraAccelerationHands; // Дополнительное ускорение
 
             playerController.SetExternalImpulse(impulse);
             // Debug.Log($"Финальный импульс (РУКИ): {impulse}");
 
-            if (Input.GetKey(cameraRotateKey))
+            if (Input.GetKey(playerController.cameraRotateKey))
             {
                 // 3. Поворот камеры
                 float targetYaw = Quaternion.LookRotation(reboundVector).eulerAngles.y;
-                playerController.SmoothlyRotateCameraYaw(targetYaw, cameraRotationDuration);
+                playerController.SmoothlyRotateCameraYaw(targetYaw, playerController.cameraRotationDuration);
                 // Debug.Log($"Поворот камеры: {targetYaw:F2} градусов.");
             }
         }
@@ -227,8 +215,8 @@ public class SpringWall : MonoBehaviour
             jumpDirection.Normalize();
 
             // 2. Рассчитываем полный вектор импульса: Горизонтальный толчок + Вертикальный прыжок
-            float horizontalForce = horizontalForceLegs;
-            float verticalForce = verticalForceLegs;
+            float horizontalForce = playerController.horizontalForceLegs;
+            float verticalForce = playerController.verticalForceLegs;
 
             Vector3 finalImpulse = jumpDirection * horizontalForce + Vector3.up * verticalForce;
 
