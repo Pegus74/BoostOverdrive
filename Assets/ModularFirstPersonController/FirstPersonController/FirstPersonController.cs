@@ -90,6 +90,22 @@ public class FirstPersonController : MonoBehaviour
     public float cameraRotationDuration = 0.3f;
     public KeyCode cameraRotateKey = KeyCode.Q;
     #endregion
+
+    #region CrawlSlide
+    [Header("Crawl Slide")]
+    public bool enableCrawlSlide = true;
+    public KeyCode crawlSlideKey = KeyCode.C;
+    public float slideDuration = 2f;
+    public float initialSpeedMultiplier = 1.2f;
+    public float finalSpeedMultiplier = 1f;
+    public float squatHeightScale = 0.5f;
+    public float squatTransitionDuration = 0.5f;
+    public float slideFrictionMultiplier = 0.95f;
+    private bool isSliding = false;
+    private Vector3 originalScale;
+    private Coroutine slideCoroutine;
+    #endregion
+
     #endregion
 
     #region Head Bob
@@ -111,6 +127,8 @@ public class FirstPersonController : MonoBehaviour
 
         playerCamera.fieldOfView = fov;
         jointOriginalPos = joint.localPosition;
+
+        originalScale = transform.localScale;
     }
 
     private void Start()
@@ -211,6 +229,14 @@ public class FirstPersonController : MonoBehaviour
         }
         #endregion
 
+        #region Crawlslide
+        if (enableCrawlSlide && Input.GetKeyDown(crawlSlideKey) && !isSliding && !isDashing)
+        {
+            if (slideCoroutine != null) StopCoroutine(slideCoroutine);
+            slideCoroutine = StartCoroutine(CrawlSlideCoroutine());
+        }
+        #endregion
+
         CheckGround();
         if (isGrounded) canAirJump = true;
 
@@ -219,6 +245,35 @@ public class FirstPersonController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        #region Crawl Slide Movement
+        if (isSliding)
+        {
+            float verticalVelocity = rb.velocity.y;
+            float currentTargetSpeed = walkSpeed * speedModifier;
+
+            Vector3 horizontalVelocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+
+            if (horizontalVelocity.magnitude > currentTargetSpeed)
+            {
+                Vector3 newHorizontalVelocity = Vector3.Lerp(horizontalVelocity, Vector3.zero, Time.fixedDeltaTime * (1.0f - slideFrictionMultiplier));
+
+                if (newHorizontalVelocity.magnitude < currentTargetSpeed)
+                {
+                    newHorizontalVelocity = newHorizontalVelocity.normalized * currentTargetSpeed;
+                }
+
+                rb.velocity = newHorizontalVelocity + Vector3.up * verticalVelocity;
+            }
+            else if (horizontalVelocity.magnitude < currentTargetSpeed && horizontalVelocity.magnitude > 0.1f)
+            {
+                Vector3 newHorizontalVelocity = Vector3.MoveTowards(horizontalVelocity, horizontalVelocity.normalized * currentTargetSpeed, Time.fixedDeltaTime * 2f);
+                rb.velocity = newHorizontalVelocity + Vector3.up * verticalVelocity;
+            }
+
+            return;
+        }
+        #endregion
+
         #region Movement
         if (playerCanMove && !isDashing)
         {
@@ -378,4 +433,112 @@ public class FirstPersonController : MonoBehaviour
         LastWallJumpedFrom = null;
     }
     #endregion
+
+    private IEnumerator CrawlSlideCoroutine()
+    {
+        isSliding = true;
+        float timer = 0f;
+        Vector3 targetScale = originalScale;
+        targetScale.y *= squatHeightScale;
+
+        int currentStyleIndex = styleManager?.GetCurrentStyleIndex() ?? 0;
+
+        Vector3 originalPos = transform.localPosition;
+        Vector3 targetPos = originalPos;
+
+        if (currentStyleIndex == 0)
+        {
+            targetPos.y = originalPos.y - (originalScale.y - targetScale.y) * 0.5f;
+        }
+        else
+        {
+            targetPos.y = originalPos.y + (originalScale.y - targetScale.y) * 0.5f;
+        }
+
+        if (currentStyleIndex == 1 && isGrounded)
+            rb.useGravity = false;
+
+        float t = 0f;
+        while (t < squatTransitionDuration)
+        {
+            t += Time.deltaTime;
+            float progress = t / squatTransitionDuration;
+            transform.localScale = Vector3.Lerp(originalScale, targetScale, progress);
+            transform.localPosition = Vector3.Lerp(originalPos, targetPos, progress);
+            yield return null;
+        }
+        transform.localScale = targetScale;
+        transform.localPosition = targetPos;
+
+        if (currentStyleIndex == 1)
+        {
+            rb.useGravity = true;
+        }
+
+        float initialSpeed = walkSpeed * initialSpeedMultiplier;
+        Vector3 slideDirection = GetForwardVector();
+        slideDirection.y = 0;
+        slideDirection.Normalize();
+
+        Vector3 currentHorizontalVelocity = GetCurrentHorizontalVelocity();
+        float requiredForce = initialSpeed - currentHorizontalVelocity.magnitude;
+
+        if (requiredForce > 0)
+        {
+            rb.AddForce(slideDirection * requiredForce, ForceMode.VelocityChange);
+        }
+        else
+        {
+            SetSpeedModifier(initialSpeedMultiplier);
+        }
+
+        float finalSpeed = walkSpeed * finalSpeedMultiplier;
+
+        timer = 0f;
+        while (timer < slideDuration)
+        {
+            timer += Time.deltaTime;
+
+            float currentSpeedLerp = Mathf.Lerp(initialSpeedMultiplier, 1.0f, timer / (slideDuration * 0.25f));
+            float finalSpeedLerp = Mathf.Lerp(1.0f, finalSpeedMultiplier, (timer - slideDuration * 0.25f) / (slideDuration * 0.75f));
+
+            if (timer < slideDuration * 0.25f)
+            {
+                SetSpeedModifier(currentSpeedLerp);
+            }
+            else
+            {
+                SetSpeedModifier(finalSpeedLerp);
+            }
+
+            yield return null;
+        }
+
+        t = 0f;
+        originalPos = transform.localPosition;
+        targetPos = originalPos;
+
+        if (currentStyleIndex == 0)
+        {
+            targetPos.y = originalPos.y + (originalScale.y - targetScale.y) * 0.5f;
+        }
+        else
+        {
+            targetPos.y = originalPos.y - (originalScale.y - targetScale.y) * 0.5f;
+        }
+
+        while (t < squatTransitionDuration)
+        {
+            t += Time.deltaTime;
+            float progress = t / squatTransitionDuration;
+            transform.localScale = Vector3.Lerp(targetScale, originalScale, progress);
+            transform.localPosition = Vector3.Lerp(originalPos, originalPos, progress);
+            yield return null;
+        }
+        transform.localScale = originalScale;
+        transform.localPosition = originalPos;
+
+        ResetSpeedModifier();
+        isSliding = false;
+    }
 }
