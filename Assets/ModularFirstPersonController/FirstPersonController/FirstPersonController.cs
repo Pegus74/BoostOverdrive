@@ -40,7 +40,7 @@ public class FirstPersonController : MonoBehaviour
 
     private bool isWalking = false;
     private Vector3 externalImpulse;
-
+    #endregion
     #region Jump
     [Header("Jump")]
     public bool enableJump = true;
@@ -73,7 +73,18 @@ public class FirstPersonController : MonoBehaviour
     private Vector3 dashDirection;
     private CanvasGroup dashCircleCG;
     #endregion
+
+    #region Slam 
+    [SerializeField] private bool enableSlam = true;
+    [SerializeField] private KeyCode slamKey = KeyCode.F;  
+    [SerializeField] private float slamPower = 15f;  
+    [SerializeField] private float slamDuration = 0.2f;  
+    [SerializeField] private float slamCooldown = 1f;  
+    private bool isSlamming = false;
+    private float slamTimer = 0f;
+    private float slamCooldownTimer = 0f;
     #endregion
+
 
     #region Head Bob
     [Header("Head Bob")]
@@ -163,33 +174,64 @@ public class FirstPersonController : MonoBehaviour
         if (enableDash)
         {
             if (dashCooldownTimer > 0) dashCooldownTimer -= Time.deltaTime;
-
             if (Input.GetKeyDown(dashKey) && dashCooldownTimer <= 0 && !isDashing)
             {
                 float h = Input.GetAxis("Horizontal");
                 float v = Input.GetAxis("Vertical");
-
-                dashDirection = (Mathf.Abs(h) > 0.1f || Mathf.Abs(v) > 0.1f)
-                    ? transform.TransformDirection(new Vector3(h, 0, v)).normalized
-                    : transform.forward;
-
+                dashDirection = playerCamera.transform.right * h + playerCamera.transform.forward * v;             
+                dashDirection.y = 0f;
+                if (dashDirection.sqrMagnitude > 0.1f)
+                {
+                    dashDirection.Normalize();
+                }
+                else
+                {
+                    dashDirection = playerCamera.transform.forward;  
+                    dashDirection.y = 0f;  
+                    dashDirection.Normalize();
+                }
                 isDashing = true;
                 dashTimer = dashDuration;
                 rb.AddForce(dashDirection * dashPower, ForceMode.Impulse);
             }
-
             if (isDashing)
             {
                 dashTimer -= Time.deltaTime;
                 rb.AddForce(dashDirection * (dashPower * 0.5f) * (dashTimer / dashDuration), ForceMode.Acceleration);
-                if (dashTimer <= 0) { isDashing = false; dashCooldownTimer = dashCooldown; }
+                if (dashTimer <= 0)
+                {
+                    isDashing = false;
+                    dashCooldownTimer = dashCooldown;
+                }
             }
-
             if (useDashCircle && dashCircle)
             {
                 dashCircle.fillAmount = 1f - (dashCooldownTimer / dashCooldown);
                 if (hideCircleWhenReady && dashCircleCG)
                     dashCircleCG.alpha = dashCooldownTimer > 0 ? 1f : 0f;
+            }
+        }
+        #endregion
+
+        #region Slam
+        if (enableSlam)
+        {
+            if (slamCooldownTimer > 0) slamCooldownTimer -= Time.deltaTime;
+            if (Input.GetKeyDown(slamKey) && slamCooldownTimer <= 0 && !isSlamming && !isGrounded)  
+            {
+                isSlamming = true;
+                slamTimer = slamDuration;
+                rb.AddForce(Vector3.down * slamPower, ForceMode.Impulse); 
+            }
+            if (isSlamming)
+            {
+                slamTimer -= Time.deltaTime;
+                rb.AddForce(Vector3.down * (slamPower * 0.5f) * (slamTimer / slamDuration), ForceMode.Acceleration);
+                if (slamTimer <= 0)
+                {
+                    isSlamming = false;
+                    slamCooldownTimer = slamCooldown;
+                }
             }
         }
         #endregion
@@ -203,7 +245,7 @@ public class FirstPersonController : MonoBehaviour
     private void FixedUpdate()
     {
         #region Movement
-        if (playerCanMove && !isDashing)
+       if (playerCanMove && !isDashing && !isSlamming)
         {
             Vector3 target = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
@@ -350,5 +392,5 @@ public class FirstPersonController : MonoBehaviour
         ResetSpeedModifier();
     }
 
-
+   
 }
