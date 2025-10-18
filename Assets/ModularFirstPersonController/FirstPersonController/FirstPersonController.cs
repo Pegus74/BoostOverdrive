@@ -72,6 +72,9 @@ public class FirstPersonController : MonoBehaviour
     private float dashCooldownTimer = 0f;
     private Vector3 dashDirection;
     private CanvasGroup dashCircleCG;
+
+    private bool dashInCameraDirection = true; // Рывок всегда в направлении камеры
+    private bool allowHorizontalDashOnly = true;
     #endregion
 
     #region Slam 
@@ -176,20 +179,17 @@ public class FirstPersonController : MonoBehaviour
             if (dashCooldownTimer > 0) dashCooldownTimer -= Time.deltaTime;
             if (Input.GetKeyDown(dashKey) && dashCooldownTimer <= 0 && !isDashing)
             {
-                float h = Input.GetAxis("Horizontal");
-                float v = Input.GetAxis("Vertical");
-                dashDirection = playerCamera.transform.right * h + playerCamera.transform.forward * v;             
-                dashDirection.y = 0f;
-                if (dashDirection.sqrMagnitude > 0.1f)
+                // Получаем направление взгляда камеры
+                dashDirection = playerCamera.transform.forward;
+
+                // Если нужно ограничить только горизонтальным направлением
+                if (allowHorizontalDashOnly)
                 {
-                    dashDirection.Normalize();
+                    dashDirection.y = 0f;
                 }
-                else
-                {
-                    dashDirection = playerCamera.transform.forward;  
-                    dashDirection.y = 0f;  
-                    dashDirection.Normalize();
-                }
+
+                dashDirection.Normalize();
+
                 isDashing = true;
                 dashTimer = dashDuration;
                 rb.AddForce(dashDirection * dashPower, ForceMode.Impulse);
