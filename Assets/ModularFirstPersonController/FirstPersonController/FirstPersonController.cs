@@ -267,7 +267,7 @@ public class FirstPersonController : MonoBehaviour
                     slamCooldownTimer = slamCooldown;
                 }
             }
-            
+        }
             #endregion
         #region Crawlslide
         if (enableCrawlSlide && Input.GetKeyDown(crawlSlideKey) && !isSliding && !isDashing)
