@@ -93,6 +93,7 @@ public class FirstPersonController : MonoBehaviour
     private bool isSlamming = false;
     private float slamCooldownTimer = 0f;
     private bool slamImpactOccurred = false;
+    private bool isReboundingFromSlam = false;
     #endregion
 
     #region SpringWallVariables
@@ -234,12 +235,15 @@ public class FirstPersonController : MonoBehaviour
 
                 isDashing = true;
                 dashTimer = dashDuration;
-                rb.AddForce(dashDirection * dashPower, ForceMode.Impulse);
+                Vector3 currentVelocity = rb.velocity;
+                Vector3 dashVelocity = dashDirection * dashPower;
+                dashVelocity.y = currentVelocity.y;
+                rb.velocity = dashVelocity;
             }
             if (isDashing)
             {
                 dashTimer -= Time.deltaTime;
-                rb.AddForce(dashDirection * (dashPower * 0.5f) * (dashTimer / dashDuration), ForceMode.Acceleration);
+                // Убирано дополнительное ускорение во время дэша чтобы не накапливалась скорость от предыдущих импульсов
                 if (dashTimer <= 0)
                 {
                     isDashing = false;
@@ -258,7 +262,6 @@ public class FirstPersonController : MonoBehaviour
         #region Slam
         if (enableSlam && !isGrounded && !isSlamming && slamCooldownTimer <= 0)
         {
-            
             Ray ray = new Ray(transform.position, Vector3.down);
             if (Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask("Default")))
             {
@@ -283,14 +286,16 @@ public class FirstPersonController : MonoBehaviour
             if (slamCooldownTimer > 0) slamCooldownTimer -= Time.deltaTime;
             if (Input.GetKeyDown(slamKey) && slamCooldownTimer <= 0 && !isSlamming && !isGrounded)
             {
-                isSlamming = true;
-                slamImpactOccurred = false;  
-                rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-                rb.AddForce(Vector3.down * slamPower, ForceMode.Impulse);  
+                StartSlam();
             }
-            
-            if (isSlamming && !slamImpactOccurred)
+
+            if (isSlamming && !slamImpactOccurred && !isReboundingFromSlam)
             {
+                Vector3 currentVelocity = rb.velocity;
+                currentVelocity.x = 0f;
+                currentVelocity.z = 0f;
+                rb.velocity = currentVelocity;
+
                 rb.AddForce(Vector3.down * (slamPower * 0.8f), ForceMode.Acceleration);
             }
         }
@@ -307,12 +312,7 @@ public class FirstPersonController : MonoBehaviour
         CheckGround();
         if (isGrounded && isSlamming)
         {
-            isSlamming = false;
-            slamCooldownTimer = slamCooldown;  
-            slamImpactOccurred = false;  
-            Vector3 currentVelocity = rb.velocity;
-            currentVelocity.y = Mathf.Min(currentVelocity.y, 0f);  
-            rb.velocity = currentVelocity;
+            EndSlam();
         }
         if (isGrounded) canAirJump = true;
 
@@ -351,7 +351,7 @@ public class FirstPersonController : MonoBehaviour
         #endregion
 
         #region Movement
-       if (playerCanMove && !isDashing && !isSlamming)
+        if (playerCanMove && !isDashing && (!isSlamming || isReboundingFromSlam))
         {
             Vector3 target = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
@@ -372,13 +372,39 @@ public class FirstPersonController : MonoBehaviour
         #endregion
 
         externalImpulse = Vector3.Lerp(externalImpulse, Vector3.zero, 5f * Time.fixedDeltaTime);
-        if (isSlamming && !slamImpactOccurred)
+        if (isSlamming && !slamImpactOccurred && !isReboundingFromSlam)
         {
-            rb.AddForce(Vector3.down * slamPower * 0.5f, ForceMode.Acceleration);  
+            Vector3 currentVelocity = rb.velocity;
+            currentVelocity.x = 0f;
+            currentVelocity.z = 0f;
+            rb.velocity = currentVelocity;
+
+            rb.AddForce(Vector3.down * slamPower * 0.5f, ForceMode.Acceleration);
         }
     }
 
-   
+    private void StartSlam()
+    {
+        isSlamming = true;
+        slamImpactOccurred = false;
+        isReboundingFromSlam = false; 
+        Vector3 currentVelocity = rb.velocity;
+        currentVelocity.x = 0f;
+        currentVelocity.z = 0f;
+        rb.velocity = currentVelocity;
+        rb.AddForce(Vector3.down * slamPower, ForceMode.Impulse);
+    }
+
+    private void EndSlam()
+    {
+        isSlamming = false;
+        isReboundingFromSlam = false; 
+        slamCooldownTimer = slamCooldown;
+        slamImpactOccurred = false;
+        Vector3 currentVelocity = rb.velocity;
+        currentVelocity.y = Mathf.Min(currentVelocity.y, 0f);
+        rb.velocity = currentVelocity;
+    }
 
     public bool IsSlamming() => isSlamming;
 
@@ -482,13 +508,11 @@ public class FirstPersonController : MonoBehaviour
             DestructibleWall wall = collision.gameObject.GetComponent<DestructibleWall>();
             if (wall != null)
             {
-                slamImpactOccurred = true;  
+                slamImpactOccurred = true;
+                isReboundingFromSlam = true; 
                 Vector3 impactPoint = collision.contacts[0].point;
                 wall.DestroyWallFromSlam(impactPoint);
-                Vector3 reboundDirection = (transform.position - impactPoint).normalized;
-                reboundDirection.y = Mathf.Abs(reboundDirection.y);
-                rb.AddForce(reboundDirection * slamPower * reboundMultiplier, ForceMode.Impulse);  
-                rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);  
+                rb.AddForce(Vector3.up * slamPower * reboundMultiplier, ForceMode.Impulse);
             }
         }
     }
