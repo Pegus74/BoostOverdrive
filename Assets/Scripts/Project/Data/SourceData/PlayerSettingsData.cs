@@ -36,4 +36,10 @@ public class PlayerSettingsData : ScriptableObject
     
     [Tooltip("Сила вертикального отталкивания при взаимодействии со стеной (Legs style)")]
     public float verticalForceLegs = 15f;
+
+    public bool enableAirJump = false;
+    public bool enableDash = true;
+    public bool enableSlam = true;
+    public bool playerCanMove = true;
+    public bool enableJump = true;
 }

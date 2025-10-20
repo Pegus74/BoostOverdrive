@@ -4,7 +4,4 @@ using UnityEngine;
 /// Событие SO для оповещения изменения булевых
 /// </summary>
 [CreateAssetMenu(menuName = "Architecture/Events/Bool Event")]
-public class BoolEvent: GameEvent<bool>
-{
-        
-}
+public class BoolEvent: GameEvent<bool> {}
