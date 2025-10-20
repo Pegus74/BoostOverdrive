@@ -79,6 +79,33 @@ public class DestructibleWall : MonoBehaviour
         }
     }
 
+    public void DestroyWallFromSlam(Vector3 impactPoint)
+    {
+        if (isDestroyed) return;
+
+        isDestroyed = true;
+
+        if (wallCollider != null)
+        {
+            wallCollider.enabled = false;
+        }
+        int cubeLayer = LayerMask.NameToLayer("IgnorePlayer");
+        foreach (GameObject part in wallParts)
+        {
+            if (part != null)
+            {
+                part.layer = cubeLayer;
+                Rigidbody rb = part.GetComponent<Rigidbody>();
+                if (rb == null)
+                {
+                    rb = part.AddComponent<Rigidbody>();
+                }
+                rb.isKinematic = false;
+                rb.AddExplosionForce(explosionForce * 1.2f, impactPoint, explosionRadius, 2f, ForceMode.Impulse);
+            }
+        }
+    }
+
 
     [ContextMenu("Test")]  
     private void TestDestroyWall()

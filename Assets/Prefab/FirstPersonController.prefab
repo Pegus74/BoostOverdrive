@@ -662,6 +662,26 @@ MonoBehaviour:
   dashCircle: {fileID: 7311350096812975845}
   dashCircleWidthPercent: 0.1
   dashCircleHeightPercent: 0.1
+  enableSlam: 1
+  slamKey: 102
+  slamPower: 30
+  slamCooldown: 0
+  reboundMultiplier: 0.3
+  slamIndicatorPrefab: {fileID: 773316331030536582, guid: fc851329742e8754b8bce76605c07921, type: 3}
+  horizontalForceLegs: 15
+  verticalForceLegs: 12
+  reboundForceHands: 20
+  extraAccelerationHands: 5
+  cameraRotationDuration: 0.5
+  cameraRotateKey: 113
+  enableCrawlSlide: 1
+  crawlSlideKey: 99
+  slideDuration: 2
+  initialSpeedMultiplier: 1.2
+  finalSpeedMultiplier: 1
+  squatHeightScale: 0.5
+  squatTransitionDuration: 0.5
+  slideFrictionMultiplier: 0.95
   enableHeadBob: 1
   joint: {fileID: 345690940785026658}
   bobSpeed: 10
@@ -684,11 +704,13 @@ MonoBehaviour:
     jumpPower: 8
     fov: 90
     canBreakWallsWithDash: 0
+    canBreakWallsWithSlam: 0
   - styleName: "\u0420\u0443\u043A\u0438"
     walkSpeed: 5
     jumpPower: 10
     fov: 90
     canBreakWallsWithDash: 1
+    canBreakWallsWithSlam: 1
   switchStyleKey: 9
   LegstyleUI: {fileID: 0}
   HandsStyleUI: {fileID: 0}
@@ -1155,7 +1177,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
@@ -1507,7 +1529,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
@@ -1643,7 +1665,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
