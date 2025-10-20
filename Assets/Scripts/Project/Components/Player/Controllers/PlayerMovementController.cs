@@ -85,6 +85,7 @@ public class PlayerMovementController : MonoBehaviour
         if (playerStateModel.IsGrounded)
         {
             Jump();
+            Debug.Log("Jump Attempted!");
         }
         else if (playerSettingsData.enableAirJump && canAirJump)
         {

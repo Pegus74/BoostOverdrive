@@ -22,12 +22,9 @@ public class PlayerInputController : MonoBehaviour
     private void Awake()
     {
         playerControls = new PlayerControls();
-
-        // Подписка на действия
+        
         playerControls.Gameplay.Move.performed += OnMove;
         playerControls.Gameplay.Move.canceled += OnMove;
-        
-        playerControls.Gameplay.Look.performed += OnLook;
 
         playerControls.Gameplay.Look.performed += OnLook;
         playerControls.Gameplay.Look.canceled += OnLook;
@@ -52,6 +49,14 @@ public class PlayerInputController : MonoBehaviour
     {
         playerControls.Gameplay.Move.performed -= OnMove;
         playerControls.Gameplay.Move.canceled -= OnMove;
+        
+        playerControls.Gameplay.Look.performed -= OnLook;
+        playerControls.Gameplay.Look.canceled -= OnLook;
+        
+        playerControls.Gameplay.Jump.performed -= OnJump;
+        playerControls.Gameplay.Dash.performed -= OnDash;
+        playerControls.Gameplay.Slam.performed -= OnSlam;
+        playerControls.Gameplay.ToggleStyle.performed -= OnToggleStyle;
         
         playerControls.Dispose();
     }

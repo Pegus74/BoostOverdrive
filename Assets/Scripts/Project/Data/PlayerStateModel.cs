@@ -7,8 +7,8 @@ using UnityEngine;
 public class PlayerStateModel : ScriptableObject
 {
     // Приватные поля для хранения данных (НЕ МЕНЯЮТСЯ напрямую извне)
-    private float _currentWalkSpeed = 0f;
-    private float _currentJumpPower = 0f;
+    private float _currentWalkSpeed = 5f;
+    private float _currentJumpPower = 10f;
     private bool _isGrounded = false;
     private int _currentStyleIndex = 0;
     
