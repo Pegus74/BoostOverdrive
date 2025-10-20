@@ -82,6 +82,19 @@ public class GameManager : MonoBehaviour
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
+        else
+        {
+            StartTimerOnSceneLoad();
+        }
+    }
+
+    private void StartTimerOnSceneLoad()
+    {
+        TimerManager timerManager = FindObjectOfType<TimerManager>();
+        if (timerManager != null)
+        {
+            timerManager.StartTimer();
+        }
     }
 
     #region Win
@@ -89,6 +102,7 @@ public class GameManager : MonoBehaviour
     {
         currentState = State.GameWin;
         gameWinCanvas.SetActive(true);
+        FindObjectOfType<TimerManager>().StopTimer();
         UpdateGameState();
     }
 
