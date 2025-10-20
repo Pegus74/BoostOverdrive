@@ -6,14 +6,16 @@ using UnityEngine.UI;
 [System.Serializable]
 public class PlayerStyle
 {
-    public string styleName = "Style"; 
-    public float walkSpeed = 5f;    
-    public float jumpPower = 5f; 
+    public string styleName = "Style";
+    public float walkSpeed = 5f;
+    public float jumpPower = 5f;
     public float fov = 60f;
     public bool canBreakWallsWithDash = false;
+    public bool canBreakWallsWithSlam = false;
 }
 
-public class StyleController : MonoBehaviour
+
+    public class StyleController : MonoBehaviour
 {
     public PlayerStyle[] styles = new PlayerStyle[2]; 
     public KeyCode switchStyleKey = KeyCode.Tab; 
@@ -40,8 +42,8 @@ public class StyleController : MonoBehaviour
         if (styles.Length == 0)
         {
             styles = new PlayerStyle[2];
-            styles[0] = new PlayerStyle { styleName = "Legs style", walkSpeed = 10f, jumpPower = 10f, fov = 60f, canBreakWallsWithDash = false };
-            styles[1] = new PlayerStyle { styleName = "Hands style", walkSpeed = 6f,  jumpPower = 6f, fov = 80f, canBreakWallsWithDash = true };
+            styles[0] = new PlayerStyle { styleName = "Legs style", walkSpeed = 10f, jumpPower = 10f, fov = 60f, canBreakWallsWithDash = false, canBreakWallsWithSlam = false };
+            styles[1] = new PlayerStyle { styleName = "Hands style", walkSpeed = 6f,  jumpPower = 6f, fov = 80f, canBreakWallsWithDash = true, canBreakWallsWithSlam = true };
         }
 
         ApplyStyle(currentStyleIndex);
