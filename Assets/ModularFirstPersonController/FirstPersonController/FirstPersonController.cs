@@ -9,6 +9,12 @@ public class FirstPersonController : MonoBehaviour
     private StyleController styleManager;
     private float speedModifier = 1f;
     private Coroutine lingerCoroutine;
+    private Coroutine speedLerpCoroutine;
+    private float targetSpeedModifier = 1f;
+    private float speedLerpDuration = 0f;
+    private float speedLerpTimer = 0f;
+    private float initialSpeedModifier = 1f;
+
 
     [HideInInspector]
     public Component LastWallJumpedFrom { get; private set; } = null;
@@ -519,11 +525,14 @@ public class FirstPersonController : MonoBehaviour
 
     public void SetSpeedModifier(float modifier)
     {
-        speedModifier = modifier;
-        if (lingerCoroutine != null)
+        if (speedLerpCoroutine != null)
         {
-            StopCoroutine(lingerCoroutine);  
+            StopCoroutine(speedLerpCoroutine);
+            speedLerpCoroutine = null;
         }
+
+        speedModifier = modifier;
+        targetSpeedModifier = modifier;
     }
 
     public void ResetSpeedModifier()
@@ -533,20 +542,32 @@ public class FirstPersonController : MonoBehaviour
 
     public void StartLingerSpeedModifier(float lingerTime)
     {
-        if (lingerCoroutine != null)
+        if (speedLerpCoroutine != null)
         {
-            StopCoroutine(lingerCoroutine);
+            StopCoroutine(speedLerpCoroutine);
         }
-        lingerCoroutine = StartCoroutine(LingerSpeedModifierCoroutine(lingerTime));
+        speedLerpCoroutine = StartCoroutine(LerpSpeedModifierOverTime(lingerTime));
     }
 
-    private IEnumerator LingerSpeedModifierCoroutine(float lingerTime)
+    private IEnumerator LerpSpeedModifierOverTime(float duration)
     {
-        yield return new WaitForSeconds(lingerTime);
-        ResetSpeedModifier();
+        initialSpeedModifier = speedModifier;
+        targetSpeedModifier = 1f;
+        speedLerpDuration = duration;
+        speedLerpTimer = 0f;
+
+        while (speedLerpTimer < speedLerpDuration)
+        {
+            speedLerpTimer += Time.deltaTime;
+            float t = speedLerpTimer / speedLerpDuration;
+            speedModifier = Mathf.Lerp(initialSpeedModifier, targetSpeedModifier, t);
+            yield return null;
+        }
+        speedModifier = targetSpeedModifier;
+        speedLerpCoroutine = null;
     }
 
-   
+
     #region LastWallJumpedFrom
     public void SetLastWallJumpedFrom(Component wallComponent)
     {

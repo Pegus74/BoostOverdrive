@@ -668,9 +668,9 @@ MonoBehaviour:
   slamCooldown: 0
   reboundMultiplier: 0.5
   slamIndicatorPrefab: {fileID: 773316331030536582, guid: fc851329742e8754b8bce76605c07921, type: 3}
-  horizontalForceLegs: 15
-  verticalForceLegs: 12
-  reboundForceHands: 20
+  horizontalForceLegs: 7
+  verticalForceLegs: 7
+  reboundForceHands: 10
   extraAccelerationHands: 5
   cameraRotationDuration: 0.5
   cameraRotateKey: 113
@@ -701,13 +701,13 @@ MonoBehaviour:
   styles:
   - styleName: "\u041D\u043E\u0433\u0438"
     walkSpeed: 10
-    jumpPower: 8
+    jumpPower: 6
     fov: 90
     canBreakWallsWithDash: 0
     canBreakWallsWithSlam: 0
   - styleName: "\u0420\u0443\u043A\u0438"
-    walkSpeed: 5
-    jumpPower: 10
+    walkSpeed: 7
+    jumpPower: 8.5
     fov: 90
     canBreakWallsWithDash: 1
     canBreakWallsWithSlam: 1
