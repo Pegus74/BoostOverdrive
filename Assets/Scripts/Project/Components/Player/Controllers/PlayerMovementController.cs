@@ -20,8 +20,8 @@ public class PlayerMovementController : MonoBehaviour
 
     // Внутреннее состояние контроллера движения
     private Vector2 currentMoveInput = Vector2.zero; // Текущий ввод для FixedUpdate
-    private bool isSlamming = false;
-    private bool canAirJump = true;
+    private bool isSlamming;
+    private bool canAirJump;
 
     // old FPC
     private Vector3 externalImpulse;
@@ -107,7 +107,10 @@ public class PlayerMovementController : MonoBehaviour
     {
         if (rb == null) return;
 
-        if (playerSettingsData.playerCanMove && !playerStateModel.IsDashing && !isSlamming)
+        if (playerSettingsData.playerCanMove && 
+            !playerStateModel.IsDashing &&
+            !playerStateModel.IsSliding &&
+            !isSlamming)
         {
             ApplyMovementForce(currentMoveInput);
         }

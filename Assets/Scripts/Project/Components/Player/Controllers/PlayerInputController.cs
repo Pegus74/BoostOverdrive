@@ -14,6 +14,8 @@ public class PlayerInputController : MonoBehaviour
     public GameEvent DashAttemptEvent;
     [Tooltip("Slam Attempt (Void)")]
     public GameEvent SlamAttemptEvent;
+    [Tooltip("Slide Attempt (Void)")]
+    public GameEvent SlideAttemptEvent;
     [Tooltip("Toggle Style Attempt (Void)")]
     public GameEvent ToggleStyleAttemptEvent;
 
@@ -31,6 +33,7 @@ public class PlayerInputController : MonoBehaviour
 
         playerControls.Gameplay.Jump.performed += OnJump;
         playerControls.Gameplay.Dash.performed += OnDash;
+        playerControls.Gameplay.Slide.performed += OnSlide;
         playerControls.Gameplay.Slam.performed += OnSlam;
         playerControls.Gameplay.ToggleStyle.performed += OnToggleStyle;
     }
@@ -55,6 +58,7 @@ public class PlayerInputController : MonoBehaviour
         
         playerControls.Gameplay.Jump.performed -= OnJump;
         playerControls.Gameplay.Dash.performed -= OnDash;
+        playerControls.Gameplay.Slide.performed -= OnSlide;
         playerControls.Gameplay.Slam.performed -= OnSlam;
         playerControls.Gameplay.ToggleStyle.performed -= OnToggleStyle;
         
@@ -86,6 +90,11 @@ public class PlayerInputController : MonoBehaviour
     private void OnSlam(InputAction.CallbackContext context)
     {
         SlamAttemptEvent?.Raise();
+    }
+    
+    private void OnSlide(InputAction.CallbackContext context)
+    {
+        SlideAttemptEvent?.Raise();
     }
 
     private void OnToggleStyle(InputAction.CallbackContext context)

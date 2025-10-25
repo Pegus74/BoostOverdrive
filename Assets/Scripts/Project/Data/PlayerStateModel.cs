@@ -10,8 +10,12 @@ public class PlayerStateModel : ScriptableObject
     private float _currentWalkSpeed;
     private float _currentJumpPower;
     private float _currentDashPower;
+    private float _movementSpeedModifier;
+    
     private bool _isGrounded = false;
     private bool _isDashing = false;
+    private bool _isSliding = false;
+    
     private int _currentStyleIndex = 0;
     
     // Геттеры для чтения состояния извне
@@ -19,10 +23,12 @@ public class PlayerStateModel : ScriptableObject
     public float CurrentWalkSpeed => _currentWalkSpeed;
     public float CurrentJumpPower => _currentJumpPower;
     public float CurrentDashPower => _currentDashPower;
+    public float MovementSpeedModifier => _movementSpeedModifier;
 
     [Header("Текущее Состояние (GET-Only)")]
     public bool IsGrounded => _isGrounded;
     public bool IsDashing => _isDashing;
+    public bool IsSliding => _isSliding;
 
     public int CurrentStyleIndex => _currentStyleIndex;
 
@@ -91,8 +97,17 @@ public class PlayerStateModel : ScriptableObject
             Debug.Log($"[Model] isDashing updated to: {isDashing}");
         }
     }
-    
 
+    public void SetIsSliding(bool isSliding)
+    {
+        if (_isSliding != isSliding)
+        {
+            _isSliding = isSliding;
+            OnGroundedStateChangedEvent.Raise(isSliding);
+            Debug.Log($"[Model] isSliding updated to: {isSliding}");
+        }
+    }
+    
     /// <summary>
     /// Устанавливает новый индекс стиля и оповещает слушателей
     /// </summary>
@@ -103,6 +118,15 @@ public class PlayerStateModel : ScriptableObject
             _currentStyleIndex = newIndex;
             OnStyleChangedEvent.Raise(newIndex);
             Debug.Log($"[Model] Style Index updated to: {newIndex}");
+        }
+    }
+
+    public void SetMovementSpeedModifier(float newSpeedModifier)
+    {
+        if (_movementSpeedModifier != newSpeedModifier)
+        {
+            _movementSpeedModifier = newSpeedModifier;
+            Debug.Log($"[Model] Movement Speed modifier updated to: {newSpeedModifier}");
         }
     }
     

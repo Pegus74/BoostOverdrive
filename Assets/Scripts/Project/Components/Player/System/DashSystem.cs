@@ -1,9 +1,6 @@
 using UnityEngine;
 using System.Collections;
 
-/// <summary>
-/// Управляет дешем
-/// </summary>
 public class DashSystem : MonoBehaviour
 {
     [Header("Model & Settings")] [Tooltip("Рабочие параметры состояния игрока")]

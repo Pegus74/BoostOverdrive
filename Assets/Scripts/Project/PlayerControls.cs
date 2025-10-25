@@ -73,6 +73,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""Slide"",
+                    ""type"": ""Button"",
+                    ""id"": ""026b6802-dc3b-4776-bfd7-4a6679ce37ba"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""ToggleStyle"",
                     ""type"": ""Button"",
                     ""id"": ""6567011c-443f-499f-a781-d21d9e6d62c6"",
@@ -236,6 +245,28 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ecc81c27-710a-4138-86f9-2e837b9ca7f0"",
+                    ""path"": ""<Keyboard>/c"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""K&M"",
+                    ""action"": ""Slide"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6cb64f53-3942-42c8-84ef-072ef3b70a8f"",
+                    ""path"": ""<Keyboard>/ctrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""K&M"",
+                    ""action"": ""Slide"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -255,6 +286,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Gameplay_Jump = m_Gameplay.FindAction("Jump", throwIfNotFound: true);
         m_Gameplay_Dash = m_Gameplay.FindAction("Dash", throwIfNotFound: true);
         m_Gameplay_Slam = m_Gameplay.FindAction("Slam", throwIfNotFound: true);
+        m_Gameplay_Slide = m_Gameplay.FindAction("Slide", throwIfNotFound: true);
         m_Gameplay_ToggleStyle = m_Gameplay.FindAction("ToggleStyle", throwIfNotFound: true);
     }
 
@@ -322,6 +354,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_Jump;
     private readonly InputAction m_Gameplay_Dash;
     private readonly InputAction m_Gameplay_Slam;
+    private readonly InputAction m_Gameplay_Slide;
     private readonly InputAction m_Gameplay_ToggleStyle;
     public struct GameplayActions
     {
@@ -332,6 +365,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         public InputAction @Jump => m_Wrapper.m_Gameplay_Jump;
         public InputAction @Dash => m_Wrapper.m_Gameplay_Dash;
         public InputAction @Slam => m_Wrapper.m_Gameplay_Slam;
+        public InputAction @Slide => m_Wrapper.m_Gameplay_Slide;
         public InputAction @ToggleStyle => m_Wrapper.m_Gameplay_ToggleStyle;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
@@ -357,6 +391,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Slam.started += instance.OnSlam;
             @Slam.performed += instance.OnSlam;
             @Slam.canceled += instance.OnSlam;
+            @Slide.started += instance.OnSlide;
+            @Slide.performed += instance.OnSlide;
+            @Slide.canceled += instance.OnSlide;
             @ToggleStyle.started += instance.OnToggleStyle;
             @ToggleStyle.performed += instance.OnToggleStyle;
             @ToggleStyle.canceled += instance.OnToggleStyle;
@@ -379,6 +416,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Slam.started -= instance.OnSlam;
             @Slam.performed -= instance.OnSlam;
             @Slam.canceled -= instance.OnSlam;
+            @Slide.started -= instance.OnSlide;
+            @Slide.performed -= instance.OnSlide;
+            @Slide.canceled -= instance.OnSlide;
             @ToggleStyle.started -= instance.OnToggleStyle;
             @ToggleStyle.performed -= instance.OnToggleStyle;
             @ToggleStyle.canceled -= instance.OnToggleStyle;
@@ -415,6 +455,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnDash(InputAction.CallbackContext context);
         void OnSlam(InputAction.CallbackContext context);
+        void OnSlide(InputAction.CallbackContext context);
         void OnToggleStyle(InputAction.CallbackContext context);
     }
 }
