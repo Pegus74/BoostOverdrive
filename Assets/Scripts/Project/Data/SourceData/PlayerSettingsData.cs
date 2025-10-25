@@ -13,19 +13,17 @@ public class PlayerSettingsData : ScriptableObject
 
     [Tooltip("Продолжительность, за которую камера должна повернуться (для SmoothlyRotateCameraYaw)")]
     public float cameraRotationDuration = 0.5f;
-
+    
     [Header("Настройки Движения")]
     [Tooltip("Максимальное изменение скорости за один кадр физики (maxVelocityChange)")]
     public float maxVelocityChange = 10f;
     
     [Tooltip("Длительность рывка")]
     public float dashDuration = 0.15f;
-    
+
+    public float dashPower = 20f;
     [Tooltip("Время перезарядки рывка (cooldown)")]
     public float dashCooldown = 1.0f;
-    
-    [Tooltip("Коэффициент скорости для первого рывка/скольжения")]
-    public float initialSpeedMultiplier = 2.0f;
     
     [Header("Настройки Взаимодействия со Стенами")]
     [Tooltip("Расстояние для проверки столкновения со стеной (raycastCheckDistance)")]

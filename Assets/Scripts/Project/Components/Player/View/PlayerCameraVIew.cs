@@ -59,13 +59,11 @@ public class PlayerCameraView : MonoBehaviour
     private void OnEnable()
     {
         LookInputEvent?.RegisterListener(OnLookInput);
-        playerStateModel?.OnStyleChangedEvent.RegisterListener(OnStyleChanged);
     }
 
     private void OnDisable()
     {
         LookInputEvent?.UnregisterListener(OnLookInput);
-        playerStateModel?.OnStyleChangedEvent.UnregisterListener(OnStyleChanged);
     }
 
     /// <summary>
@@ -79,15 +77,15 @@ public class PlayerCameraView : MonoBehaviour
     /// <summary>
     /// Вызывается при смене стиля, чтобы обновить FOV или другие визуальные эффекты.
     /// </summary>
-    public void OnStyleChanged(int newStyleIndex)
-    {
-        float targetFov = (newStyleIndex == 0) ? 60f : 80f;
-        
-        if (playerCamera.fieldOfView != targetFov)
-        {
-            playerCamera.fieldOfView = targetFov;
-        }
-    }
+    // public void OnStyleChanged(int newStyleIndex)
+    // {
+    //     float targetFov = (newStyleIndex == 0) ? 60f : 80f;
+    //     
+    //     if (playerCamera.fieldOfView != targetFov)
+    //     {
+    //         playerCamera.fieldOfView = targetFov;
+    //     }
+    // }
 
     private void Update()
     {
@@ -154,7 +152,6 @@ public class PlayerCameraView : MonoBehaviour
         crosshairObject.sprite = crosshairImage;
         crosshairObject.color = crosshairColor;
         
-        // Базовая настройка размера (может потребоваться более сложная логика)
-        crosshairObject.rectTransform.sizeDelta = new Vector2(32, 32); 
+        crosshairObject.rectTransform.sizeDelta = new Vector2(2, 4); 
     }
 }

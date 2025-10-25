@@ -7,18 +7,23 @@ using UnityEngine;
 public class PlayerStateModel : ScriptableObject
 {
     // Приватные поля для хранения данных (НЕ МЕНЯЮТСЯ напрямую извне)
-    private float _currentWalkSpeed = 5f;
-    private float _currentJumpPower = 10f;
+    private float _currentWalkSpeed;
+    private float _currentJumpPower;
+    private float _currentDashPower;
     private bool _isGrounded = false;
+    private bool _isDashing = false;
     private int _currentStyleIndex = 0;
     
     // Геттеры для чтения состояния извне
     [Header("Рабочие Параметры (GET-Only)")]
     public float CurrentWalkSpeed => _currentWalkSpeed;
     public float CurrentJumpPower => _currentJumpPower;
+    public float CurrentDashPower => _currentDashPower;
 
     [Header("Текущее Состояние (GET-Only)")]
     public bool IsGrounded => _isGrounded;
+    public bool IsDashing => _isDashing;
+
     public int CurrentStyleIndex => _currentStyleIndex;
 
     // Ссылки на ассеты событий
@@ -48,6 +53,19 @@ public class PlayerStateModel : ScriptableObject
         _currentJumpPower = newPower;
     }
     
+    public void SetDashPower(float newPower)
+    {
+        if (_currentDashPower != newPower)
+        {
+            _currentDashPower = newPower;
+            // Здесь можно вызвать отдельное событие, если другие системы
+            // должны реагировать на изменение только множителя дэша
+            // Например: OnDashMultiplierChangedEvent.Raise(newMultiplier);
+        
+            Debug.Log($"[Model] Dash Multiplier updated to: {newPower}");
+        }
+    }
+    
     /// <summary>
     /// Устанавливает новое состояние нахождения на земле и оповещает слушателей
     /// </summary>
@@ -60,6 +78,20 @@ public class PlayerStateModel : ScriptableObject
             Debug.Log($"[Model] IsGrounded updated to: {isGrounded}");
         }
     }
+    
+    /// <summary>
+    /// Устанавливает новое состояние дэша и оповещает слушателей
+    /// </summary>
+    public void SetIsDashing(bool isDashing)
+    {
+        if (_isDashing != isDashing)
+        {
+            _isDashing = isDashing;
+            OnGroundedStateChangedEvent.Raise(isDashing);
+            Debug.Log($"[Model] isDashing updated to: {isDashing}");
+        }
+    }
+    
 
     /// <summary>
     /// Устанавливает новый индекс стиля и оповещает слушателей

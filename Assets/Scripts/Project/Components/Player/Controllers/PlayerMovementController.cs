@@ -13,16 +13,13 @@ public class PlayerMovementController : MonoBehaviour
     
     [Header("Input Listeners (Events)")] public Vector2Event MoveInputEvent;
     public GameEvent JumpAttemptEvent;
-    public GameEvent DashAttemptEvent;
     public GameEvent SlamAttemptEvent;
     // public VoidEventSO ToggleStyleAttemptEvent; 
     
     [HideInInspector] public Rigidbody rb;
-    private float speedModifier = 1f; // Для Dash/Slide
 
     // Внутреннее состояние контроллера движения
     private Vector2 currentMoveInput = Vector2.zero; // Текущий ввод для FixedUpdate
-    private bool isDashing = false;
     private bool isSlamming = false;
     private bool canAirJump = true;
 
@@ -51,7 +48,6 @@ public class PlayerMovementController : MonoBehaviour
         // Подписка на события ввода
         MoveInputEvent?.RegisterListener(OnMoveInput);
         JumpAttemptEvent?.RegisterListener(InitiateJumpLogic);
-        DashAttemptEvent?.RegisterListener(InitiateDashLogic);
         SlamAttemptEvent?.RegisterListener(InitiateSlamLogic);
 
         // Подписка на изменение состояния, если нужно для логики движения
@@ -63,7 +59,6 @@ public class PlayerMovementController : MonoBehaviour
         // Отписка от событий
         MoveInputEvent?.UnregisterListener(OnMoveInput);
         JumpAttemptEvent?.UnregisterListener(InitiateJumpLogic);
-        DashAttemptEvent?.UnregisterListener(InitiateDashLogic);
         SlamAttemptEvent?.UnregisterListener(InitiateSlamLogic);
 
         playerStateModel?.OnGroundedStateChangedEvent.UnregisterListener(OnGroundedStateChanged);
@@ -95,26 +90,12 @@ public class PlayerMovementController : MonoBehaviour
     }
 
     /// <summary>
-    /// Вызывается при попытке дэша (через DashAttemptEvent)
-    /// </summary>
-    public void InitiateDashLogic()
-    {
-        if (playerSettingsData.enableDash && !isDashing)
-        {
-            // Здесь должна быть проверка кулдауна (если он еще не в отдельной системе)
-            // StartCoroutine(DashCoroutine()); 
-            Debug.Log("Dash Attempted! (TODO: refactoring to DashSystem)");
-        }
-    }
-
-    /// <summary>
     /// Вызывается при попытке слэма (через SlamAttemptEvent)
     /// </summary>
     public void InitiateSlamLogic()
     {
         if (playerSettingsData.enableSlam && !isSlamming && !playerStateModel.IsGrounded)
         {
-            // Здесь должна быть проверка кулдауна
             // StartCoroutine(SlamCoroutine());
             Debug.Log("Slam Attempted! (TODO: refactoring to SlamSystem)");
         }
@@ -126,7 +107,7 @@ public class PlayerMovementController : MonoBehaviour
     {
         if (rb == null) return;
 
-        if (playerSettingsData.playerCanMove && !isDashing && !isSlamming)
+        if (playerSettingsData.playerCanMove && !playerStateModel.IsDashing && !isSlamming)
         {
             ApplyMovementForce(currentMoveInput);
         }
@@ -142,11 +123,10 @@ public class PlayerMovementController : MonoBehaviour
         if (targetDirection.sqrMagnitude > 1f) targetDirection.Normalize();
 
         // Преобразование Vector2 в Vector3 относительно направления игрока
-        Vector3 targetVelocity = transform.TransformDirection(targetDirection) * playerStateModel.CurrentWalkSpeed *
-                                 speedModifier;
+        Vector3 targetVelocity = transform.TransformDirection(targetDirection) * playerStateModel.CurrentWalkSpeed;
 
         Vector3 velocity = rb.velocity;
-        Vector3 velocityChange = (targetVelocity - velocity);
+        Vector3 velocityChange = (targetVelocity - velocity); 
         
         velocityChange.x = Mathf.Clamp(velocityChange.x, -playerSettingsData.maxVelocityChange,
             playerSettingsData.maxVelocityChange);

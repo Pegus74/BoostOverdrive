@@ -16,11 +16,11 @@ public class PlayerStyleData : ScriptableObject
     public float jumpPower = 5f;
 
     [Tooltip("Дополнительный множитель скорости во время рывка")]
-    public float dashSpeedMultiplier = 2f;
+    public float dashPower = 15f;
 
-    [Header("Параметры Камеры")]
-    [Tooltip("Field of View")]
-    public float fov = 60f;
+    // [Header("Параметры Камеры")]
+    // [Tooltip("Field of View")]
+    // public float fov = 60f;
 
     [Header("Способности")]
     [Tooltip("Может ли этот стиль разбивать стены с помощью рывка")]
