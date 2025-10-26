@@ -1,10 +1,15 @@
 using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// Управляет способностью ползания/скольжения (CrawlSlide).
+/// Реализует сжатие к низу (Стиль Ног) или к верху (Стиль Рук)
+/// путем коррекции центра коллайдера, масштаба модели и позиции корневого объекта.
+/// </summary>
 public class CrawlSlideSystem : MonoBehaviour
 {
     [Header("Model & Settings")] [Tooltip("Рабочие параметры состояния игрока")]
-    public PlayerStateModel playerStateModel;
+    public PlayerStateModel playerStateModel; 
     
     [Tooltip("Неизменяемые настройки игрока")]
     public PlayerSettingsData playerSettingsData; 
@@ -21,7 +26,6 @@ public class CrawlSlideSystem : MonoBehaviour
     private bool _isSlideAvailable = true;
     private Coroutine _currentSlideCoroutine;
     
-    // Исходные параметры
     private float _originalColliderHeight;
     private float _originalColliderCenterY;
     private Vector3 _originalModelScale;
@@ -79,7 +83,6 @@ public class CrawlSlideSystem : MonoBehaviour
 
     private void InitiateCrawlSlide()
     {
-        // Проверка доступности, состояния и нахождения на земле
         if (!_isSlideAvailable || playerStateModel.IsSliding || !playerStateModel.IsGrounded)
         {
             return;
@@ -101,36 +104,37 @@ public class CrawlSlideSystem : MonoBehaviour
         float targetScaleY = playerSettingsData.squatHeightScale;
         float targetHeight = _originalColliderHeight * targetScaleY;
         
-        // Рассчёт вертикального сдвиг центра
         float verticalShiftMagnitude = (_originalColliderHeight - targetHeight) / 2f; 
         float shiftDirection = 0f;
         
-        // 0: Стиль Ног
         if (styleIndex == 0) 
         {
             shiftDirection = -1f;
             _rootPositionAdjustmentY = 0f; 
             Debug.Log("[CrawlSlide] Squatting to the Bottom (Legs Style)");
         }
-        // 1: Стиль Рук
         else 
         {
             shiftDirection = 1f;
             _rootPositionAdjustmentY = -verticalShiftMagnitude; 
-            Debug.Log("[CrawlSlide] Squatting to the Top (Hands Style)");
+            Debug.Log("[CrawlSlide] Squatting to the Top (Hands Style) with Root Adjustment");
         }
 
-        float verticalShift = verticalShiftMagnitude * shiftDirection; 
+        float verticalShift = verticalShiftMagnitude * shiftDirection;
         
-        // Целевые локальные позиции (сдвигаются вместе с центром коллайдера)
         float targetCenterY = _originalColliderCenterY + verticalShift; 
+        
         float targetVisualModelLocalY = _originalVisualModelLocalY + verticalShift; 
+        
+        if (styleIndex != 0)
+        {
+            targetVisualModelLocalY += verticalShiftMagnitude; 
+        }
+
         float targetCameraY = _originalCameraLocalY + verticalShift; 
         
-        // Целевая глобальная позиция корневого объекта
         Vector3 initialRootPosition = transform.position;
         float targetRootY = initialRootPosition.y + _rootPositionAdjustmentY;
-        
         
         // 1. ФАЗА СЖАТИЯ (SQUAT DOWN)
         _rb.isKinematic = true; 
@@ -141,17 +145,17 @@ public class CrawlSlideSystem : MonoBehaviour
             timer += Time.deltaTime;
             float t = timer / transitionDuration;
             
-            // Плавное изменение всех параметров
             UpdateTransformAndCollider(t, targetScaleY, targetHeight, targetCenterY, targetVisualModelLocalY, targetCameraY, targetRootY, initialRootPosition.y);
 
             yield return null; 
         }
+
         UpdateTransformAndCollider(1f, targetScaleY, targetHeight, targetCenterY, targetVisualModelLocalY, targetCameraY, targetRootY, initialRootPosition.y);
         
         // 2. ФАЗА СКОЛЬЖЕНИЯ (SLIDE)
+        
         _rb.isKinematic = false;
         
-        // Прикладываем импульс
         Vector3 slideDirection = transform.forward;
         slideDirection.y = 0f; 
         slideDirection.Normalize();
@@ -170,7 +174,7 @@ public class CrawlSlideSystem : MonoBehaviour
         targetCenterY = _originalColliderCenterY;
         targetVisualModelLocalY = _originalVisualModelLocalY;
         targetCameraY = _originalCameraLocalY;
-        targetRootY = initialRootPosition.y;
+        targetRootY = initialRootPosition.y; 
         
         // Сохраняем начальные значения для восстановления
         float startRestoreHeight = _capsuleCollider.height;
@@ -178,7 +182,7 @@ public class CrawlSlideSystem : MonoBehaviour
         float startRestoreScaleY = visualModelTransform.localScale.y;
         float startRestoreVisualModelY = visualModelTransform.localPosition.y;
         float startRestoreCameraY = playerCamera.transform.localPosition.y;
-        float startRestoreRootY = transform.position.y;
+        float startRestoreRootY = transform.position.y; 
 
         timer = 0f;
         while (timer < transitionDuration)
@@ -197,8 +201,9 @@ public class CrawlSlideSystem : MonoBehaviour
         yield return null; 
 
         _rb.isKinematic = false;
-        _rootPositionAdjustmentY = 0f;
+        _rootPositionAdjustmentY = 0f; 
         
+        // 4. ФАЗА ПЕРЕЗАРЯДКИ (COOLDOWN)
         yield return new WaitForSeconds(playerSettingsData.slideCooldown);
 
         _isSlideAvailable = true;
