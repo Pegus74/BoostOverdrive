@@ -5,20 +5,16 @@ using UnityEngine;
 public class PlayerStyleData : ScriptableObject
 {
     [Header("Параметры Движения")]
-    [Tooltip("Скорость ходьбы, применимая, когда игрок находится на земле")]
     public float walkSpeed = 5f;
-
-    [Tooltip("Сила прыжка")]
     public float jumpPower = 5f;
 
-    [Tooltip("Дополнительный множитель скорости во время рывка")]
+    [Header("Параметры Способностей")]
     public float dashPower = 15f;
-    
-    [Header("Способности")]
-    [Tooltip("Может ли этот стиль разбивать стены с помощью рывка")]
     public bool canBreakWallsWithDash = false;
-    [Tooltip("Сила отталкивания при взаимодействии со стеной")]
+    
+    public float slamPower = 15f;
+    public bool canBreakWallsWithSlam = false;
+    
     public float wallReboundForce = 15f;
-    [Tooltip("Требуется ли вертикальное движение при отталкивании от стены (например, только прыжок)")]
     public bool requireVerticalOnWallJump = true;
 }

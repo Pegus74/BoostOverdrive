@@ -1,45 +1,38 @@
 using UnityEngine;
 
 /// <summary>
-/// отвечает только за ФИЗИЧЕСКОЕ ДВИЖЕНИЯ игрока
+/// отвечает только за физическое движение игрока
 /// </summary>
 public class PlayerMovementController : MonoBehaviour
 {
-    [Header("Model & Settings")] [Tooltip("Рабочие параметры состояния игрока")]
+    [Header("Model & Settings")]
     public PlayerStateModel playerStateModel;
-
-    [Tooltip("Неизменяемые настройки игрока")]
     public PlayerSettingsData playerSettingsData;
     
-    [Header("Input Listeners (Events)")] public Vector2Event MoveInputEvent;
+    [Header("Input Listeners")] 
+    public Vector2Event MoveInputEvent;
     public GameEvent JumpAttemptEvent;
-    public GameEvent SlamAttemptEvent;
-    // public VoidEventSO ToggleStyleAttemptEvent; 
     
     [HideInInspector] public Rigidbody rb;
 
     // Внутреннее состояние контроллера движения
     private Vector2 currentMoveInput = Vector2.zero; // Текущий ввод для FixedUpdate
-    private bool isSlamming;
     private bool canAirJump;
 
-    // old FPC
-    private Vector3 externalImpulse;
-    private Coroutine lingerCoroutine;
-    private Component LastWallJumpedFrom = null;
+    // // old FPC
+    // private Vector3 externalImpulse;
+    // private Coroutine lingerCoroutine;
+    // private Component LastWallJumpedFrom = null;
     
-
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
         if (rb == null)
         {
-            Debug.LogError("Rigidbody not found on PlayerMovementController!");
             enabled = false;
             return;
         }
-
-        // Замораживаем вращение, чтобы не мешал RigidBody
+        
         rb.freezeRotation = true;
     }
 
@@ -48,10 +41,7 @@ public class PlayerMovementController : MonoBehaviour
         // Подписка на события ввода
         MoveInputEvent?.RegisterListener(OnMoveInput);
         JumpAttemptEvent?.RegisterListener(InitiateJumpLogic);
-        SlamAttemptEvent?.RegisterListener(InitiateSlamLogic);
-
-        // Подписка на изменение состояния, если нужно для логики движения
-        playerStateModel?.OnGroundedStateChangedEvent.RegisterListener(OnGroundedStateChanged);
+        
     }
 
     void OnDisable()
@@ -59,9 +49,6 @@ public class PlayerMovementController : MonoBehaviour
         // Отписка от событий
         MoveInputEvent?.UnregisterListener(OnMoveInput);
         JumpAttemptEvent?.UnregisterListener(InitiateJumpLogic);
-        SlamAttemptEvent?.UnregisterListener(InitiateSlamLogic);
-
-        playerStateModel?.OnGroundedStateChangedEvent.UnregisterListener(OnGroundedStateChanged);
     }
     
     /// <summary>
@@ -89,18 +76,6 @@ public class PlayerMovementController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Вызывается при попытке слэма (через SlamAttemptEvent)
-    /// </summary>
-    public void InitiateSlamLogic()
-    {
-        if (playerSettingsData.enableSlam && !isSlamming && !playerStateModel.IsGrounded)
-        {
-            // StartCoroutine(SlamCoroutine());
-            Debug.Log("Slam Attempted! (TODO: refactoring to SlamSystem)");
-        }
-    }
-
     // --- ФИЗИЧЕСКАЯ ЛОГИКА ---
 
     private void FixedUpdate()
@@ -110,7 +85,7 @@ public class PlayerMovementController : MonoBehaviour
         if (playerSettingsData.playerCanMove && 
             !playerStateModel.IsDashing &&
             !playerStateModel.IsSliding &&
-            !isSlamming)
+            !playerStateModel.IsSlamming)
         {
             ApplyMovementForce(currentMoveInput);
         }
@@ -146,24 +121,5 @@ public class PlayerMovementController : MonoBehaviour
         
         rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         rb.AddForce(Vector3.up * playerStateModel.CurrentJumpPower, ForceMode.Impulse);
-    }
-    
-    /// <summary>
-    /// Обновление внутреннего состояния, когда модель сообщает о смене IsGrounded.
-    /// </summary>
-    private void OnGroundedStateChanged(bool isGrounded)
-    {
-        if (isGrounded)
-        {
-            canAirJump = true;
-            // Логика сброса состояния (например, slam/dash)
-            isSlamming = false;
-
-            // Если была внешняя импульсная сила, прекращаем ее действие
-            if (lingerCoroutine != null) StopCoroutine(lingerCoroutine);
-
-            // Сброс externalImpulse (если она не обнуляется в FixedUpdate)
-            externalImpulse = Vector3.zero;
-        }
     }
 }

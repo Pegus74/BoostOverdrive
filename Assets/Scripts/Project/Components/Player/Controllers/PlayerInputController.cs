@@ -1,22 +1,16 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 public class PlayerInputController : MonoBehaviour
 {
     [Header("Input Events")]
-    [Tooltip("Move Input (Vector2)")]
-    public Vector2Event MoveInputEvent;
-    [Tooltip("Look Input (Vector2)")]
+    public Vector2Event moveInputEvent;
     public Vector2Event LookInputEvent;
-    [Tooltip("Jump Attempt (Void)")]
     public GameEvent JumpAttemptEvent;
-    [Tooltip("Dash Attempt (Void)")]
     public GameEvent DashAttemptEvent;
-    [Tooltip("Slam Attempt (Void)")]
     public GameEvent SlamAttemptEvent;
-    [Tooltip("Slide Attempt (Void)")]
     public GameEvent SlideAttemptEvent;
-    [Tooltip("Toggle Style Attempt (Void)")]
     public GameEvent ToggleStyleAttemptEvent;
 
     private PlayerControls playerControls;
@@ -68,7 +62,7 @@ public class PlayerInputController : MonoBehaviour
     private void OnMove(InputAction.CallbackContext context)
     {
         Vector2 value = context.ReadValue<Vector2>();
-        MoveInputEvent?.Raise(value); // OnMove(value) -> MoveInputEvent.Raise(Vector2 value)
+        moveInputEvent?.Raise(value);
     }
 
     private void OnLook(InputAction.CallbackContext context)
@@ -79,12 +73,12 @@ public class PlayerInputController : MonoBehaviour
 
     private void OnJump(InputAction.CallbackContext context)
     {
-        JumpAttemptEvent?.Raise(); // OnJump(performed) -> JumpAttemptEvent.Raise()
+        JumpAttemptEvent?.Raise();
     }
 
     private void OnDash(InputAction.CallbackContext context)
     {
-        DashAttemptEvent?.Raise(); // OnDash(performed) -> DashAttemptEvent.Raise()
+        DashAttemptEvent?.Raise();
     }
 
     private void OnSlam(InputAction.CallbackContext context)

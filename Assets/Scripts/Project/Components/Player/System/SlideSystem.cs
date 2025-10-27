@@ -2,23 +2,18 @@ using UnityEngine;
 using System.Collections;
 
 /// <summary>
-/// Управляет способностью ползания/скольжения (CrawlSlide).
-/// Реализует сжатие к низу (Стиль Ног) или к верху (Стиль Рук)
-/// путем коррекции центра коллайдера, масштаба модели и позиции корневого объекта.
+/// Управляет способностью CrawlSlide
 /// </summary>
 public class CrawlSlideSystem : MonoBehaviour
 {
-    [Header("Model & Settings")] [Tooltip("Рабочие параметры состояния игрока")]
+    [Header("Model & Settings")]
     public PlayerStateModel playerStateModel; 
-    
-    [Tooltip("Неизменяемые настройки игрока")]
     public PlayerSettingsData playerSettingsData; 
     
     public Transform visualModelTransform; 
     public Camera playerCamera; 
     
     [Header("Input Listener")]
-    [Tooltip("Событие, вызываемое при попытке игрока сделать слайд")]
     public GameEvent SlideAttemptEvent; 
     
     private Rigidbody _rb;

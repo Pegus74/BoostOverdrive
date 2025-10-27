@@ -6,17 +6,13 @@ using UnityEngine;
 /// </summary>
 public class GroundCheckComponent : MonoBehaviour
 {
-    [Header("Model Link")]
-    [Tooltip("Модель состояния игрока для записи IsGrounded")]
+    [Header("Model")]
     public PlayerStateModel playerStateModel;
 
     [Header("Ground Check Settings")]
-    [Tooltip("Маска слоев, которые считаются землей")]
     public LayerMask groundLayer;
-    
-    [Tooltip("Максимальный угол наклона поверхности, чтобы считаться землей")]
     [Range(0f, 90f)]
-    public float maxSlopeAngle = 45f;
+    public float maxSlopeAngle = 45f; // Максимальный угол наклона поверхности, чтобы считаться землей
     
     
     private Rigidbody rb;
@@ -27,12 +23,7 @@ public class GroundCheckComponent : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         if (rb == null)
         {
-            Debug.LogError("GroundCheckComponent требует Rigidbody на том же объекте!");
             enabled = false;
-        }
-        if (playerStateModel == null)
-        {
-            Debug.LogError("PlayerStateModel не прикреплена к GroundCheckComponent!");
         }
     }
     
@@ -53,21 +44,12 @@ public class GroundCheckComponent : MonoBehaviour
     {
         // Немедленно выходим из состояния "на земле" при отрыве, 
         // но с задержкой, чтобы избежать флуктуаций (см. FixedUpdate)
-        // ВНИМАНИЕ: Для более надежного определения лучше использовать Raycast в FixedUpdate.
-        // Здесь мы просто временно обновляем локальное состояние.
         isGrounded = false; 
     }
     
     private void FixedUpdate()
     {
-        // Это важный шаг: Мы используем локальное состояние 'isGrounded' (из Collision)
-        // и записываем его в модель. Это гарантирует, что SetIsGrounded вызывается
-        // только при фактическом изменении состояния.
         playerStateModel?.SetIsGrounded(isGrounded);
-
-        // Если вы используете Raycast для более точного контроля:
-        // isGrounded = PerformRaycastGroundCheck();
-        // playerStateModel?.SetIsGrounded(isGrounded);
     }
     
     /// <summary>

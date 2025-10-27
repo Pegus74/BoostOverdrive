@@ -3,14 +3,11 @@ using System.Collections;
 
 public class DashSystem : MonoBehaviour
 {
-    [Header("Model & Settings")] [Tooltip("Рабочие параметры состояния игрока")]
+    [Header("Model & Settings")]
     public PlayerStateModel playerStateModel;
-    
-    [Tooltip("Неизменяемые настройки игрока")]
     public PlayerSettingsData playerSettingsData;
     
     [Header("Input Listener")]
-    [Tooltip("Событие, вызываемое при попытке игрока сделать рывок")]
     public GameEvent DashAttemptEvent;
     
     private Rigidbody _rb;
@@ -24,7 +21,6 @@ public class DashSystem : MonoBehaviour
         _rb = GetComponent<Rigidbody>();
         if (_rb == null)
         {
-            Debug.LogError("Rigidbody not found on DashSystem! Disabling component.");
             enabled = false;
         }
         playerStateModel.SetIsDashing(false);

@@ -7,24 +7,22 @@ using UnityEngine;
 /// </summary>
 public class StyleManager : MonoBehaviour
 {
-    [Header("Dependencies (Scriptable Objects)")]
-    [Tooltip("Модель состояния игрока для записи нового состояния")]
-    public PlayerStateModel playerStateModel; 
-
+    [Header("Model")]
+    public PlayerStateModel playerStateModel;
+    
     [Tooltip("Массив неизменяемых данных о стилях")]
     public PlayerStyleData[] styleDataAssets; 
-
+    
     [Header("Input Listener")]
-    [Tooltip("Событие для переключения стиля")]
     public GameEvent ToggleStyleAttemptEvent; 
 
+    
     private int currentStyleIndex = 0;
 
     void Awake()
     {
         if (playerStateModel == null || styleDataAssets == null || styleDataAssets.Length == 0)
         {
-            Debug.LogError("StyleManager: Missing required dependencies (Model/StyleData).");
             enabled = false;
         }
     }
@@ -43,8 +41,7 @@ public class StyleManager : MonoBehaviour
     }
     
     /// <summary>
-    /// Вызывается по событию ввода ToggleStyleAttemptEvent.
-    /// Обновляет стиль
+    /// Вызывается по событию ввода ToggleStyleAttemptEvent и обновляет стиль
     /// </summary>
     private void SwitchStyle()
     {
@@ -65,9 +62,7 @@ public class StyleManager : MonoBehaviour
         playerStateModel.SetWalkSpeed(style.walkSpeed);
         playerStateModel.SetJumpPower(style.jumpPower);
         playerStateModel.SetDashPower(style.dashPower);
-        // PlayerMovementController теперь автоматически использует эти значения.
-
-        // 2. Обновляем индекс стиля в Модели
+        
         // SetStyleIndex также автоматически вызывает OnStyleChangedEvent(index)
         playerStateModel.SetStyleIndex(index);
     }

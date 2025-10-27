@@ -4,18 +4,15 @@ using UnityEngine.UI;
 public class PlayerCameraView : MonoBehaviour
 {
     [Header("Model & Settings")]
-    [Tooltip("Рабочие параметры состояния игрока")]
     public PlayerStateModel playerStateModel; 
-    [Tooltip("Неизменяемые настройки игрока")]
     public PlayerSettingsData playerSettingsData;
     
     [Header("Input Listeners (Events)")]
-    [Tooltip("Look Input (Vector2) из PlayerInputController")]
     public Vector2Event LookInputEvent; 
     
-
     [Header("Camera Components")]
     public Camera playerCamera;
+    
     [Header("View Settings")]
     public bool invertCamera = false;
     public bool lockCursor = true;
@@ -28,6 +25,7 @@ public class PlayerCameraView : MonoBehaviour
     // Углы вращения
     private float yaw = 0f;
     private float pitch = 0f;
+    
     // Ввод для обработки в Update()
     private Vector2 currentLookInput = Vector2.zero;
     private Image crosshairObject;
@@ -74,19 +72,6 @@ public class PlayerCameraView : MonoBehaviour
         currentLookInput = input;
     }
 
-    /// <summary>
-    /// Вызывается при смене стиля, чтобы обновить FOV или другие визуальные эффекты.
-    /// </summary>
-    // public void OnStyleChanged(int newStyleIndex)
-    // {
-    //     float targetFov = (newStyleIndex == 0) ? 60f : 80f;
-    //     
-    //     if (playerCamera.fieldOfView != targetFov)
-    //     {
-    //         playerCamera.fieldOfView = targetFov;
-    //     }
-    // }
-
     private void Update()
     {
         // Применяем вращение только если камера может двигаться
@@ -111,33 +96,6 @@ public class PlayerCameraView : MonoBehaviour
         transform.localEulerAngles = new Vector3(0, yaw, 0);
         playerCamera.transform.localEulerAngles = new Vector3(pitch, 0, 0);
     }
-    
-    // public void SmoothlyRotateCameraYaw(float targetYaw, float duration)
-    // {
-    //     if (currentCameraRotationCoroutine != null) StopCoroutine(currentCameraRotationCoroutine);
-    //     currentCameraRotationCoroutine = StartCoroutine(RotateCameraCoroutine(targetYaw, duration));
-    // }
-    
-    // private IEnumerator RotateCameraCoroutine(float targetYaw, float duration)
-    // {
-    //     float startYaw = yaw;
-    //     float timer = 0f;
-    //     
-    //     while (timer < duration)
-    //     {
-    //         timer += Time.deltaTime;
-    //         float progress = timer / duration;
-    //         yaw = Mathf.LerpAngle(startYaw, targetYaw, progress);
-    //         
-    //         // Применяем сразу
-    //         transform.localEulerAngles = new Vector3(0, yaw, 0); 
-    //         
-    //         yield return null;
-    //     }
-    //     yaw = targetYaw;
-    //     transform.localEulerAngles = new Vector3(0, yaw, 0);
-    //     currentCameraRotationCoroutine = null;
-    // }
     
     /// <summary>
     /// Настройка crosshair

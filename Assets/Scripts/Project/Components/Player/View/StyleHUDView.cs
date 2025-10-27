@@ -6,6 +6,7 @@ using UnityEngine.UI;
 /// </summary>
 public class StyleHUDView : MonoBehaviour
 {
+    [Header("Model")]
     public PlayerStateModel playerStateModel; 
 
     [Header("UI Elements")]

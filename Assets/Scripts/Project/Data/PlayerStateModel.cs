@@ -10,37 +10,35 @@ public class PlayerStateModel : ScriptableObject
     private float _currentWalkSpeed;
     private float _currentJumpPower;
     private float _currentDashPower;
+    private float _currentSlamPower;
     private float _movementSpeedModifier;
     
-    private bool _isGrounded = false;
-    private bool _isDashing = false;
-    private bool _isSliding = false;
+    private bool _isGrounded;
+    private bool _isDashing;
+    private bool _isSliding;
+    private bool _isSlamming;
     
     private int _currentStyleIndex = 0;
     
     // Геттеры для чтения состояния извне
-    [Header("Рабочие Параметры (GET-Only)")]
     public float CurrentWalkSpeed => _currentWalkSpeed;
     public float CurrentJumpPower => _currentJumpPower;
     public float CurrentDashPower => _currentDashPower;
+    public float CurrentSlamPower => _currentSlamPower;
     public float MovementSpeedModifier => _movementSpeedModifier;
-
-    [Header("Текущее Состояние (GET-Only)")]
+    
     public bool IsGrounded => _isGrounded;
     public bool IsDashing => _isDashing;
     public bool IsSliding => _isSliding;
+    public bool IsSlamming => _isSlamming;
 
     public int CurrentStyleIndex => _currentStyleIndex;
-
-    // Ссылки на ассеты событий
+    
     [Header("Уведомления об Изменении Состояния")]
     public IntEvent OnStyleChangedEvent; 
     public BoolEvent OnGroundedStateChangedEvent; 
-    // public FloatEventSO OnSpeedChangedEvent;
-
-    /// <summary>
-    /// Устанавливает новую скорость ходьбы и оповещает слушателей, если значение изменилось.
-    /// </summary>
+    
+    
     public void SetWalkSpeed(float newSpeed)
     {
         if (_currentWalkSpeed != newSpeed)
@@ -50,13 +48,11 @@ public class PlayerStateModel : ScriptableObject
             Debug.Log($"[Model] Walk Speed updated to: {newSpeed}");
         }
     }
-
-    /// <summary>
-    /// Устанавливает новую силу прыжка и оповещает слушателей
-    /// </summary>
+    
     public void SetJumpPower(float newPower)
     {
         _currentJumpPower = newPower;
+        Debug.Log($"[Model] Jump Speed updated to: {newPower}");
     }
     
     public void SetDashPower(float newPower)
@@ -64,17 +60,19 @@ public class PlayerStateModel : ScriptableObject
         if (_currentDashPower != newPower)
         {
             _currentDashPower = newPower;
-            // Здесь можно вызвать отдельное событие, если другие системы
-            // должны реагировать на изменение только множителя дэша
-            // Например: OnDashMultiplierChangedEvent.Raise(newMultiplier);
-        
             Debug.Log($"[Model] Dash Multiplier updated to: {newPower}");
         }
     }
+
+    public void SetSlamPower(float newPower)
+    {
+        if (_currentSlamPower != newPower)
+        {
+            _currentSlamPower = newPower;
+            Debug.Log($"[Model] Slam Multiplier updated to: {newPower}");
+        }
+    }
     
-    /// <summary>
-    /// Устанавливает новое состояние нахождения на земле и оповещает слушателей
-    /// </summary>
     public void SetIsGrounded(bool isGrounded)
     {
         if (_isGrounded != isGrounded)
@@ -85,9 +83,6 @@ public class PlayerStateModel : ScriptableObject
         }
     }
     
-    /// <summary>
-    /// Устанавливает новое состояние дэша и оповещает слушателей
-    /// </summary>
     public void SetIsDashing(bool isDashing)
     {
         if (_isDashing != isDashing)
@@ -107,10 +102,16 @@ public class PlayerStateModel : ScriptableObject
             Debug.Log($"[Model] isSliding updated to: {isSliding}");
         }
     }
+
+    public void SetIsSlamming(bool isSlamming)
+    {
+        if (_isSlamming != isSlamming)
+        {
+            _isSlamming = isSlamming;
+            Debug.Log($"[Model] isSlamming updated to: {isSlamming}");
+        }
+    }
     
-    /// <summary>
-    /// Устанавливает новый индекс стиля и оповещает слушателей
-    /// </summary>
     public void SetStyleIndex(int newIndex)
     {
         if (_currentStyleIndex != newIndex)
@@ -121,23 +122,24 @@ public class PlayerStateModel : ScriptableObject
         }
     }
 
-    public void SetMovementSpeedModifier(float newSpeedModifier)
-    {
-        if (_movementSpeedModifier != newSpeedModifier)
-        {
-            _movementSpeedModifier = newSpeedModifier;
-            Debug.Log($"[Model] Movement Speed modifier updated to: {newSpeedModifier}");
-        }
-    }
+    // public void SetMovementSpeedModifier(float newSpeedModifier)
+    // {
+    //     if (_movementSpeedModifier != newSpeedModifier)
+    //     {
+    //         _movementSpeedModifier = newSpeedModifier;
+    //         Debug.Log($"[Model] Movement Speed modifier updated to: {newSpeedModifier}");
+    //     }
+    // }
     
-    /// <summary>
-    /// При инициализации устанавливаем базовые значения из PlayerStyleData
-    /// </summary>
     public void ResetState(PlayerStyleData initialStyle)
     {
         SetWalkSpeed(initialStyle.walkSpeed);
         SetJumpPower(initialStyle.jumpPower);
+        SetDashPower(initialStyle.dashPower);
+        SetSlamPower(initialStyle.slamPower);
         SetStyleIndex(0);
-        SetIsGrounded(true);
+        SetIsGrounded(false);
+        SetIsDashing(false);
+        SetIsSliding(false);
     }
 }
