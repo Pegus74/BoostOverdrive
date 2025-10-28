@@ -57,7 +57,7 @@ public class SlamSystem : MonoBehaviour
 
     private void InitiateSlam()
     {
-        if (_rb == null || !_isSlamAvailable || playerStateModel.IsDashing || playerStateModel.IsSlamming || playerStateModel.IsSliding)
+        if (_rb == null || !_isSlamAvailable || playerStateModel.IsGrounded || playerStateModel.IsDashing || playerStateModel.IsSlamming || playerStateModel.IsSliding)
         {
             return;
         }

@@ -10,10 +10,7 @@ public class PlayerStyleData : ScriptableObject
 
     [Header("Параметры Способностей")]
     public float dashPower = 15f;
-    public bool canBreakWallsWithDash = false;
-    
     public float slamPower = 15f;
-    public bool canBreakWallsWithSlam = false;
     
     public float wallReboundForce = 15f;
     public bool requireVerticalOnWallJump = true;

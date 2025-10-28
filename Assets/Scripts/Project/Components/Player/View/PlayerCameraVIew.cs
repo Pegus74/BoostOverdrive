@@ -72,7 +72,7 @@ public class PlayerCameraView : MonoBehaviour
         currentLookInput = input;
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         // Применяем вращение только если камера может двигаться
         if (cameraCanMove && currentLookInput != Vector2.zero)

@@ -100,8 +100,10 @@ public class PlayerMovementController : MonoBehaviour
 
         if (targetDirection.sqrMagnitude > 1f) targetDirection.Normalize();
 
+        float playerSpeed = playerStateModel.CurrentWalkSpeed * playerStateModel.MovementSpeedModifier;
+
         // Преобразование Vector2 в Vector3 относительно направления игрока
-        Vector3 targetVelocity = transform.TransformDirection(targetDirection) * playerStateModel.CurrentWalkSpeed;
+        Vector3 targetVelocity = transform.TransformDirection(targetDirection) * playerSpeed;
 
         Vector3 velocity = rb.velocity;
         Vector3 velocityChange = (targetVelocity - velocity); 

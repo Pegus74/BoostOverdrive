@@ -4809,7 +4809,7 @@ GameObject:
   - component: {fileID: 1520318387}
   m_Layer: 6
   m_Name: Capsule
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5336,6 +5336,7 @@ GameObject:
   - component: {fileID: 1788064898}
   - component: {fileID: 1788064897}
   - component: {fileID: 1788064896}
+  - component: {fileID: 1788064900}
   m_Layer: 0
   m_Name: BoostFloor (1)
   m_TagString: Untagged
@@ -5398,8 +5399,8 @@ BoxCollider:
   m_ProvidesContacts: 1
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1, y: 1.252273, z: 0.99999946}
+  m_Center: {x: 0, y: 0.07386345, z: 0}
 --- !u!23 &1788064898
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -5452,6 +5453,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1788064893}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1788064900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1788064893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 322350e5b9074597a76ec57e7e2a6a62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  obstaclesSettingsData: {fileID: 11400000, guid: ebe29eef7bdecf5999d2bd28f0e1528c, type: 2}
+  OnPlayerSpeedModifierChange: {fileID: 11400000, guid: c596cd5a1377b0eb9b9ccd462fa4f728, type: 2}
 --- !u!43 &1805283168
 Mesh:
   m_ObjectHideFlags: 0
@@ -7585,11 +7600,13 @@ GameObject:
   - component: {fileID: 1495979090272836309}
   - component: {fileID: 2038806522645163392}
   - component: {fileID: 1916661999614920095}
+  - component: {fileID: 8571536540697160806}
   - component: {fileID: 1015622852}
   - component: {fileID: 8571536540697160802}
   - component: {fileID: 1015622864}
   - component: {fileID: 8571536540697160803}
   - component: {fileID: 8571536540697160804}
+  - component: {fileID: 8571536540697160805}
   m_Layer: 6
   m_Name: FirstPersonController 1
   m_TagString: Player
@@ -7974,6 +7991,34 @@ MonoBehaviour:
   playerStateModel: {fileID: 11400000, guid: a6c1c06db7c8e6b5fb54a26c184a9fa7, type: 2}
   SlamDestructibleHitEvent: {fileID: 11400000, guid: 16d4898338ffa0a6abbd4b4f3a179ff3, type: 2}
   SlamSolidHitEvent: {fileID: 11400000, guid: ee846e24cf148bf2d893937c1c67b156, type: 2}
+--- !u!114 &8571536540697160805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6399314421920762664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 526772972fc94c89926e02a03683c762, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnPlayerSpeedModifierChange: {fileID: 11400000, guid: c596cd5a1377b0eb9b9ccd462fa4f728, type: 2}
+  playerStateModel: {fileID: 11400000, guid: a6c1c06db7c8e6b5fb54a26c184a9fa7, type: 2}
+--- !u!114 &8571536540697160806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6399314421920762664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f211a9a956d67b478a019886c2246ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speedLabel: {fileID: 3617150827131165741}
+  xyzLabel: {fileID: 1689114720975158005}
 --- !u!1 &8792891470539923997
 GameObject:
   m_ObjectHideFlags: 0
@@ -7984,6 +8029,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6359642542559711526}
   - component: {fileID: 3810359460704992626}
+  - component: {fileID: 8792891470539923998}
   m_Layer: 6
   m_Name: DashBar
   m_TagString: Untagged
@@ -7991,6 +8037,20 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &8792891470539923998
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8792891470539923997}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 526772972fc94c89926e02a03683c762, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnPlayerSpeedModifierChange: {fileID: 0}
+  playerStateModel: {fileID: 0}
 --- !u!1 &8984174802430889545
 GameObject:
   m_ObjectHideFlags: 0

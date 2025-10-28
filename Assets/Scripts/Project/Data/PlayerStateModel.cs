@@ -11,7 +11,7 @@ public class PlayerStateModel : ScriptableObject
     private float _currentJumpPower;
     private float _currentDashPower;
     private float _currentSlamPower;
-    private float _movementSpeedModifier;
+    private float _movementSpeedModifier = 1f;
     
     private bool _isGrounded;
     private bool _isDashing;
@@ -44,7 +44,6 @@ public class PlayerStateModel : ScriptableObject
         if (_currentWalkSpeed != newSpeed)
         {
             _currentWalkSpeed = newSpeed;
-            // OnSpeedChangedEvent.Raise(newSpeed);
             Debug.Log($"[Model] Walk Speed updated to: {newSpeed}");
         }
     }
@@ -71,6 +70,11 @@ public class PlayerStateModel : ScriptableObject
             _currentSlamPower = newPower;
             Debug.Log($"[Model] Slam Multiplier updated to: {newPower}");
         }
+    }
+
+    public void SetMovementSpeedModifier(float newSpeedModifier)
+    {
+        _movementSpeedModifier = newSpeedModifier;
     }
     
     public void SetIsGrounded(bool isGrounded)
@@ -120,26 +124,5 @@ public class PlayerStateModel : ScriptableObject
             OnStyleChangedEvent.Raise(newIndex);
             Debug.Log($"[Model] Style Index updated to: {newIndex}");
         }
-    }
-
-    // public void SetMovementSpeedModifier(float newSpeedModifier)
-    // {
-    //     if (_movementSpeedModifier != newSpeedModifier)
-    //     {
-    //         _movementSpeedModifier = newSpeedModifier;
-    //         Debug.Log($"[Model] Movement Speed modifier updated to: {newSpeedModifier}");
-    //     }
-    // }
-    
-    public void ResetState(PlayerStyleData initialStyle)
-    {
-        SetWalkSpeed(initialStyle.walkSpeed);
-        SetJumpPower(initialStyle.jumpPower);
-        SetDashPower(initialStyle.dashPower);
-        SetSlamPower(initialStyle.slamPower);
-        SetStyleIndex(0);
-        SetIsGrounded(false);
-        SetIsDashing(false);
-        SetIsSliding(false);
     }
 }
