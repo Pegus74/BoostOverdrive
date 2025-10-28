@@ -12,18 +12,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e29f413c970d4fd9a006eed13df880bd, type: 3}
   m_Name: DefaultSettings
   m_EditorClassIdentifier: 
-  mouseSensitivity: 20
+  mouseSensitivity: 25
   maxLookAngle: 50
-  cameraRotationDuration: 0.5
   maxVelocityChange: 10
+  enableAirJump: 0
+  playerCanMove: 1
+  enableJump: 1
   dashDuration: 0.15
-  dashPower: 20
   dashCooldown: 1
+  slideBaseImpulse: 10
+  slideDuration: 1.5
+  squatHeightScale: 0.5
+  squatTransitionDuration: 0.3
+  slideCooldown: 0.5
+  slamDuration: 0.15
+  slamCooldown: 1
+  slamSlowdownDuration: 0.5
+  destructibleWallReboundMultiplier: 2
   raycastCheckDistance: 1
   horizontalForceHands: 10
   verticalForceLegs: 15
-  enableAirJump: 0
-  enableDash: 1
-  enableSlam: 1
-  playerCanMove: 1
-  enableJump: 1

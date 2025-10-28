@@ -62,7 +62,7 @@ public class StyleManager : MonoBehaviour
         playerStateModel.SetWalkSpeed(style.walkSpeed);
         playerStateModel.SetJumpPower(style.jumpPower);
         playerStateModel.SetDashPower(style.dashPower);
-        
+        playerStateModel.SetSlamPower(style.slamPower);
         // SetStyleIndex также автоматически вызывает OnStyleChangedEvent(index)
         playerStateModel.SetStyleIndex(index);
     }
