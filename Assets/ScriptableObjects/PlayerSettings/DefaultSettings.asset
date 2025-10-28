@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e29f413c970d4fd9a006eed13df880bd, type: 3}
   m_Name: DefaultSettings
   m_EditorClassIdentifier: 
-  mouseSensitivity: 25
+  mouseSensitivity: 2
   maxLookAngle: 50
   maxVelocityChange: 10
   enableAirJump: 0
@@ -28,7 +28,7 @@ MonoBehaviour:
   slamDuration: 0.15
   slamCooldown: 1
   slamSlowdownDuration: 0.5
-  destructibleWallReboundMultiplier: 2
+  destructibleWallReboundMultiplier: 10
   raycastCheckDistance: 1
   horizontalForceHands: 10
   verticalForceLegs: 15
