@@ -49,7 +49,7 @@ public class DashSystem : MonoBehaviour
     /// </summary>
     private void InitiateDash()
     {
-        if (_rb == null || !_isDashAvailable || playerStateModel.IsDashing)
+        if (_rb == null || !_isDashAvailable || playerStateModel.IsDashing || playerStateModel.IsSliding || playerStateModel.IsSlamming)
         {
             return;
         }

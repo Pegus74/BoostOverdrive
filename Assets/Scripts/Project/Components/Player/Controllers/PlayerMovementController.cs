@@ -64,7 +64,7 @@ public class PlayerMovementController : MonoBehaviour
     /// </summary>
     public void InitiateJumpLogic()
     {
-        if (playerStateModel.IsGrounded)
+        if (playerStateModel.IsGrounded && !playerStateModel.IsSliding && !playerStateModel.IsSlamming)
         {
             Jump();
             Debug.Log("Jump Attempted!");

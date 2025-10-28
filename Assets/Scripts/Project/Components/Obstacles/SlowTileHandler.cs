@@ -5,8 +5,7 @@ using UnityEngine;
 /// </summary>
 public class SlowTileHandler : MonoBehaviour
 {
-    [Header("Game Data References")]
-    // Ссылка на ScriptableObject с константами (для получения множителя)
+    [Header("Settings")]
     public ObstaclesSettingsData obstaclesSettingsData;
 
     [Header("Event to Raise")]
@@ -52,7 +51,7 @@ public class SlowTileHandler : MonoBehaviour
     /// </summary>
     private void RemoveSlowdown()
     {
-        OnPlayerSpeedModifierChange.Raise(NormalSpeed); // <-- Издаем событие (1.0f)
+        OnPlayerSpeedModifierChange.Raise(NormalSpeed);
         Debug.Log($"[Slow Tile] Speed Modifier Change Event: {NormalSpeed}");
     }
 }
