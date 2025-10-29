@@ -4,17 +4,17 @@ using UnityEngine.SceneManagement;
 public class NewGameManager : MonoBehaviour
 {
     [SerializeField] private GameStateEvent OnGameStateChanged; 
+    [SerializeField] private GameEvent OnPauseAttemptEvent;
     
     public static NewGameManager Instance;
 
-    private GameState currentState = GameState.Playing;
-
+    [SerializeField] private GameState currentState = GameState.Playing;
+    
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
             SceneManager.sceneLoaded += OnSceneLoaded;
             
             UpdateGameState();
@@ -26,28 +26,25 @@ public class NewGameManager : MonoBehaviour
         }
     }
 
-    // public void Update()
-    // {
-    //     if (Input.GetKeyDown(KeyCode.F))
-    //     {
-    //         Debug.Log("F PRESSED");
-    //         TogglePause();
-    //     }
-    //     if (Input.GetKeyDown(KeyCode.B))
-    //     {
-    //         Debug.Log("B PRESSED");
-    //         PlayerDied();
-    //     }
-    // }
-
     private void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
+    private void OnEnable()
+    {
+        if (OnPauseAttemptEvent != null)
+            OnPauseAttemptEvent.RegisterListener(TogglePause);
+    }
+
+    private void OnDisable()
+    {
+        if (OnPauseAttemptEvent != null)
+            OnPauseAttemptEvent.UnregisterListener(TogglePause);
+    }
+
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // ...
     }
 
     /// <summary>
@@ -78,8 +75,9 @@ public class NewGameManager : MonoBehaviour
 
     public void RestartLevel()
     {
-        currentState = GameState.Playing;
-        UpdateGameState();
+        // currentState = GameState.Playing;
+        // UpdateGameState();
+        
 
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(currentSceneIndex);
@@ -93,7 +91,14 @@ public class NewGameManager : MonoBehaviour
         bool isPlaying = (currentState == GameState.Playing);
         currentState = isPlaying ? GameState.Paused : GameState.Playing;
         
-        UpdateGameState(); }
+        UpdateGameState(); 
+    }
+
+    public void ContinueGame()
+    {
+        if (currentState == GameState.Paused)
+            TogglePause();
+    }
 
     public void BackToMenu()
     {

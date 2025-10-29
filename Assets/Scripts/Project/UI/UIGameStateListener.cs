@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using UnityEngine.UI;
 /// <summary>
 /// Listener, активирующий/деактивирующий GameObject в зависимости от состояния игры
 /// </summary>
@@ -12,17 +12,26 @@ public class UIGameStateListener : MonoBehaviour
     [SerializeField] private GameState targetGameState;
     
     [SerializeField] CanvasGroup targetCanvasGroup;
+    
 
+    
     private void OnEnable()
     {
         if (GameStateChangedEvent != null)
             GameStateChangedEvent.RegisterListener(HandleGameStateChange);
+
+        if (NewGameManager.Instance != null)
+        {
+            HandleGameStateChange(NewGameManager.Instance.GetCurrentState());
+        }
+        
     }
 
     private void OnDisable()
     {
         if (GameStateChangedEvent != null)
             GameStateChangedEvent.UnregisterListener(HandleGameStateChange);
+        
     }
 
     private void HandleGameStateChange(GameState newState)
@@ -36,4 +45,5 @@ public class UIGameStateListener : MonoBehaviour
             targetCanvasGroup.blocksRaycasts = shouldBeActive;
         }
     }
+    
 }

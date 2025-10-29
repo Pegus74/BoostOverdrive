@@ -12,6 +12,10 @@ public class PlayerInputController : MonoBehaviour
     public GameEvent SlamAttemptEvent;
     public GameEvent SlideAttemptEvent;
     public GameEvent ToggleStyleAttemptEvent;
+    public GameEvent OnPauseAttemptEvent;
+    
+    [Header("GameState")]
+    [SerializeField] private GameStateEvent GameStateChangedEvent;
 
     private PlayerControls playerControls;
 
@@ -30,16 +34,24 @@ public class PlayerInputController : MonoBehaviour
         playerControls.Gameplay.Slide.performed += OnSlide;
         playerControls.Gameplay.Slam.performed += OnSlam;
         playerControls.Gameplay.ToggleStyle.performed += OnToggleStyle;
+        
+        playerControls.Gameplay.Pause.performed += OnPause;
     }
 
     private void OnEnable()
     {
         playerControls.Enable();
+        
+        if (GameStateChangedEvent != null)
+            GameStateChangedEvent.RegisterListener(HandleGameStateChange);
     }
 
     private void OnDisable()
     {
         playerControls.Disable();
+        
+        if (GameStateChangedEvent != null)
+            GameStateChangedEvent.UnregisterListener(HandleGameStateChange);
     }
 
     private void OnDestroy()
@@ -55,6 +67,8 @@ public class PlayerInputController : MonoBehaviour
         playerControls.Gameplay.Slide.performed -= OnSlide;
         playerControls.Gameplay.Slam.performed -= OnSlam;
         playerControls.Gameplay.ToggleStyle.performed -= OnToggleStyle;
+        
+        playerControls.Gameplay.Pause.performed -= OnPause;
         
         playerControls.Dispose();
     }
@@ -94,5 +108,25 @@ public class PlayerInputController : MonoBehaviour
     private void OnToggleStyle(InputAction.CallbackContext context)
     {
         ToggleStyleAttemptEvent?.Raise();
+    }
+
+    private void OnPause(InputAction.CallbackContext context)
+    {
+        OnPauseAttemptEvent?.Raise();
+    }
+    
+    private void HandleGameStateChange(GameState newState)
+    {
+        // Отключаем весь ввод кроме кнопки паузы, если игра не в состоянии Playing
+        bool isPlaying = (newState == GameState.Playing);
+        if (isPlaying)
+        {
+            playerControls.Gameplay.Enable();
+        }
+        else
+        {
+            playerControls.Gameplay.Disable();
+            playerControls.Gameplay.Pause.Enable();
+        }
     }
 }

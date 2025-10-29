@@ -89,6 +89,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Pause"",
+                    ""type"": ""Button"",
+                    ""id"": ""ae30a18a-dc21-42cc-828b-aed08ce8df8f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -267,6 +276,17 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""Slide"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7fa810ac-a5a4-421d-a913-b36f483c82d8"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""K&M"",
+                    ""action"": ""Pause"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -288,6 +308,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Gameplay_Slam = m_Gameplay.FindAction("Slam", throwIfNotFound: true);
         m_Gameplay_Slide = m_Gameplay.FindAction("Slide", throwIfNotFound: true);
         m_Gameplay_ToggleStyle = m_Gameplay.FindAction("ToggleStyle", throwIfNotFound: true);
+        m_Gameplay_Pause = m_Gameplay.FindAction("Pause", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -356,6 +377,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_Slam;
     private readonly InputAction m_Gameplay_Slide;
     private readonly InputAction m_Gameplay_ToggleStyle;
+    private readonly InputAction m_Gameplay_Pause;
     public struct GameplayActions
     {
         private @PlayerControls m_Wrapper;
@@ -367,6 +389,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         public InputAction @Slam => m_Wrapper.m_Gameplay_Slam;
         public InputAction @Slide => m_Wrapper.m_Gameplay_Slide;
         public InputAction @ToggleStyle => m_Wrapper.m_Gameplay_ToggleStyle;
+        public InputAction @Pause => m_Wrapper.m_Gameplay_Pause;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -397,6 +420,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @ToggleStyle.started += instance.OnToggleStyle;
             @ToggleStyle.performed += instance.OnToggleStyle;
             @ToggleStyle.canceled += instance.OnToggleStyle;
+            @Pause.started += instance.OnPause;
+            @Pause.performed += instance.OnPause;
+            @Pause.canceled += instance.OnPause;
         }
 
         private void UnregisterCallbacks(IGameplayActions instance)
@@ -422,6 +448,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @ToggleStyle.started -= instance.OnToggleStyle;
             @ToggleStyle.performed -= instance.OnToggleStyle;
             @ToggleStyle.canceled -= instance.OnToggleStyle;
+            @Pause.started -= instance.OnPause;
+            @Pause.performed -= instance.OnPause;
+            @Pause.canceled -= instance.OnPause;
         }
 
         public void RemoveCallbacks(IGameplayActions instance)
@@ -457,5 +486,6 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         void OnSlam(InputAction.CallbackContext context);
         void OnSlide(InputAction.CallbackContext context);
         void OnToggleStyle(InputAction.CallbackContext context);
+        void OnPause(InputAction.CallbackContext context);
     }
 }
