@@ -4,14 +4,16 @@ using UnityEngine.Events;
 
 public class RDestructibleWall : MonoBehaviour, IRestartable
 {
-    public List<GameObject> wallParts = new List<GameObject>(); 
-    public Collider wallCollider;  
-    public float explosionForce = 10f;  
-    public float explosionRadius = 5f;  
-    public bool isDestroyed = false;
+    [Header("Settings")]
+    public ObstaclesSettingsData obstaclesSettings;
     
-    private List<InitialPartData> initialWallPartsData = new List<InitialPartData>();
+    [Header("Soft Reset Event")]
     [SerializeField] private GameEvent OnLevelResetEvent;
+    
+    [SerializeField] List<InitialPartData> initialWallPartsData = new List<InitialPartData>();
+    [SerializeField] List<GameObject> wallParts = new List<GameObject>(); 
+    [SerializeField] Collider wallCollider;  
+    private bool isDestroyed = false;
     
     void Awake()
     {
@@ -106,7 +108,7 @@ public class RDestructibleWall : MonoBehaviour, IRestartable
                 
                 rb.isKinematic = false;
                 
-                rb.AddExplosionForce(explosionForce * 1.2f, impactPoint, explosionRadius, 2f, ForceMode.Impulse);
+                rb.AddExplosionForce(obstaclesSettings.explosionForce * 1.2f, impactPoint, obstaclesSettings.explosionRadius, 2f, ForceMode.Impulse);
             }
         }
     }

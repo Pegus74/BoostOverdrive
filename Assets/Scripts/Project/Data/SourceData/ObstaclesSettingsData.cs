@@ -11,4 +11,8 @@ public class ObstaclesSettingsData : ScriptableObject
     public float boostTileMultiplier = 1.3f; 
     public float boostTileGroundLingerTime = 0.5f; 
     public float boostTileJumpLingerTime = 0.2f;
+    
+    [Header("Настройки Destructible Wall")]
+    public float explosionForce = 10f;  
+    public float explosionRadius = 5f; 
 }
