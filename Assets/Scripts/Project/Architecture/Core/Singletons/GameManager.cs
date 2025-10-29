@@ -5,10 +5,15 @@ public class NewGameManager : MonoBehaviour
 {
     [SerializeField] private GameStateEvent OnGameStateChanged; 
     [SerializeField] private GameEvent OnPauseAttemptEvent;
+
+    [SerializeField] private GameEvent SoftResetRequestEvent;
+    [SerializeField] private GameEvent SoftResetCompletedEvent;
     
     public static NewGameManager Instance;
-
     [SerializeField] private GameState currentState = GameState.Playing;
+    
+    [SerializeField] private LevelRestarter levelRestarter;
+    
     
     private void Awake()
     {
@@ -35,12 +40,18 @@ public class NewGameManager : MonoBehaviour
     {
         if (OnPauseAttemptEvent != null)
             OnPauseAttemptEvent.RegisterListener(TogglePause);
+        
+        if (SoftResetCompletedEvent != null)
+            SoftResetCompletedEvent.RegisterListener(FinishRestart);
     }
 
     private void OnDisable()
     {
         if (OnPauseAttemptEvent != null)
             OnPauseAttemptEvent.UnregisterListener(TogglePause);
+        
+        if (SoftResetCompletedEvent != null)
+            SoftResetCompletedEvent.UnregisterListener(FinishRestart);
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -75,13 +86,32 @@ public class NewGameManager : MonoBehaviour
 
     public void RestartLevel()
     {
-        // currentState = GameState.Playing;
-        // UpdateGameState();
+        if (SoftResetRequestEvent == null)
+        {
+            Debug.LogWarning("SoftResetRequestEvent не задан. Перезапуск сцены.");
+            int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+            SceneManager.LoadScene(currentSceneIndex);
+            return;
+        }
         
-
-        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(currentSceneIndex);
+        if (currentState == GameState.Playing)
+        {
+            currentState = GameState.Paused;
+            UpdateGameState(); 
+        }
+        
+        SoftResetRequestEvent.Raise(); 
+        
+        Debug.Log("[GameManager]: Soft Reset Requested.");
     }
+    
+    public void FinishRestart()
+    {
+        currentState = GameState.Playing;
+        UpdateGameState();
+        Debug.Log("[GameManager]: Soft Reset Completed.");
+    }
+    
 
     public void TogglePause()
     {

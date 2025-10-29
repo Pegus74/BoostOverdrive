@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// отвечает только за физическое движение игрока
 /// </summary>
-public class PlayerMovementController : MonoBehaviour
+public class PlayerMovementController : MonoBehaviour, IRestartable
 {
     [Header("Model & Settings")]
     public PlayerStateModel playerStateModel;
@@ -12,6 +12,9 @@ public class PlayerMovementController : MonoBehaviour
     [Header("Input Listeners")] 
     public Vector2Event MoveInputEvent;
     public GameEvent JumpAttemptEvent;
+    
+    [Header("Soft Reset Event")]
+    [SerializeField] private GameEvent OnLevelResetEvent;
     
     [HideInInspector] public Rigidbody rb;
 
@@ -41,7 +44,7 @@ public class PlayerMovementController : MonoBehaviour
         // Подписка на события ввода
         MoveInputEvent?.RegisterListener(OnMoveInput);
         JumpAttemptEvent?.RegisterListener(InitiateJumpLogic);
-        
+        OnLevelResetEvent.RegisterListener(SoftReset);
     }
 
     void OnDisable()
@@ -49,6 +52,7 @@ public class PlayerMovementController : MonoBehaviour
         // Отписка от событий
         MoveInputEvent?.UnregisterListener(OnMoveInput);
         JumpAttemptEvent?.UnregisterListener(InitiateJumpLogic);
+        OnLevelResetEvent.UnregisterListener(SoftReset);
     }
     
     /// <summary>
@@ -123,5 +127,14 @@ public class PlayerMovementController : MonoBehaviour
         
         rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         rb.AddForce(Vector3.up * playerStateModel.CurrentJumpPower, ForceMode.Impulse);
+    }
+
+    public void SoftReset()
+    {
+        if (rb != null)
+        {
+            rb.isKinematic = true; 
+            rb.isKinematic = false;
+        }
     }
 }

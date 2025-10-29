@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class DashSystem : MonoBehaviour
+public class DashSystem : MonoBehaviour, IRestartable
 {
     [Header("Model & Settings")]
     public PlayerStateModel playerStateModel;
@@ -9,6 +9,9 @@ public class DashSystem : MonoBehaviour
     
     [Header("Input Listener")]
     public GameEvent DashAttemptEvent;
+    
+    [Header("Soft Reset Event")]
+    [SerializeField] private GameEvent OnLevelResetEvent;
     
     private Rigidbody _rb;
     private bool _isDashAvailable = true;
@@ -29,6 +32,8 @@ public class DashSystem : MonoBehaviour
     void OnEnable()
     {
         DashAttemptEvent?.RegisterListener(InitiateDash);
+        
+        OnLevelResetEvent.RegisterListener(SoftReset);
     }
 
     void OnDisable()
@@ -42,6 +47,7 @@ public class DashSystem : MonoBehaviour
             playerStateModel.SetIsDashing(false); 
             _isDashAvailable = true;
         }
+        OnLevelResetEvent.UnregisterListener(SoftReset);
     }
 
     /// <summary>
@@ -108,5 +114,19 @@ public class DashSystem : MonoBehaviour
 
         _isDashAvailable = true;
         Debug.Log("Dash is now available.");
+    }
+
+    public void SoftReset()
+    {
+        if (_currentDashCoroutine != null)
+        {
+            StopCoroutine(_currentDashCoroutine);
+            _currentDashCoroutine = null;
+        }
+        
+        playerStateModel.SetIsDashing(false); 
+        _isDashAvailable = true;
+        
+        Debug.Log("DashSystem: State has been reset for Soft Reset.");
     }
 }
