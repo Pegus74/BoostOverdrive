@@ -9,7 +9,7 @@ public class SlamCollisionHandler : MonoBehaviour
     public Vector3Event SlamDestructibleHitEvent;
     public GameEvent SlamSolidHitEvent;
 
-    void Awake()
+    private void Awake()
     {
         if (playerStateModel == null)
         {
@@ -17,7 +17,7 @@ public class SlamCollisionHandler : MonoBehaviour
         }
     }
     
-    void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         if (!playerStateModel.IsSlamming)
         {
@@ -31,7 +31,7 @@ public class SlamCollisionHandler : MonoBehaviour
             Vector3 impactPoint = other.ClosestPoint(transform.position);
             
             wall.DestroyWall(impactPoint);
-            Debug.Log("DestructibleWall destroyed by Slam (via Event)");
+            Debug.Log("DestructibleWall destroyed by Slam");
             
             SlamDestructibleHitEvent?.Raise(impactPoint); 
         }

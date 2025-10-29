@@ -2,8 +2,8 @@ using UnityEngine;
 
 /// <summary>
 /// Слушает ввод ToggleStyleAttemptEvent, 
-/// переключает текущий стиль, читает данные из PlayerStyleData 
-/// и записывает рабочие параметры в PlayerStateModel.
+/// переключает стили, читает данные из PlayerStyleData 
+/// и записывает текущие параметры в PlayerStateModel.
 /// </summary>
 public class StyleManager : MonoBehaviour
 {
@@ -19,7 +19,7 @@ public class StyleManager : MonoBehaviour
     
     private int currentStyleIndex = 0;
 
-    void Awake()
+    private void Awake()
     {
         if (playerStateModel == null || styleDataAssets == null || styleDataAssets.Length == 0)
         {
@@ -27,7 +27,7 @@ public class StyleManager : MonoBehaviour
         }
     }
 
-    void OnEnable()
+    private void OnEnable()
     {
         // Подписываемся на событие ввода
         ToggleStyleAttemptEvent?.RegisterListener(SwitchStyle);
@@ -35,7 +35,7 @@ public class StyleManager : MonoBehaviour
         ApplyStyleToModel(currentStyleIndex);
     }
 
-    void OnDisable()
+    private void OnDisable()
     {
         ToggleStyleAttemptEvent?.UnregisterListener(SwitchStyle);
     }

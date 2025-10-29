@@ -8,14 +8,14 @@ public class RDestructibleWall : MonoBehaviour, IRestartable
     public ObstaclesSettingsData obstaclesSettings;
     
     [Header("Soft Reset Event")]
-    [SerializeField] private GameEvent OnLevelResetEvent;
+    public GameEvent OnLevelResetEvent;
     
-    [SerializeField] List<InitialPartData> initialWallPartsData = new List<InitialPartData>();
-    [SerializeField] List<GameObject> wallParts = new List<GameObject>(); 
-    [SerializeField] Collider wallCollider;  
+    [SerializeField] private List<InitialPartData> initialWallPartsData = new List<InitialPartData>();
+    [SerializeField] private List<GameObject> wallParts = new List<GameObject>(); 
+    [SerializeField] private Collider wallCollider;  
     private bool isDestroyed = false;
     
-    void Awake()
+    private void Awake()
     {
         if (wallParts.Count == 0)
         {

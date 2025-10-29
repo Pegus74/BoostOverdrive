@@ -7,6 +7,12 @@ public class PlayerSettingsData : ScriptableObject
     [Header("Настройки Камеры")]
     public float mouseSensitivity = 2f;
     public float maxLookAngle = 50f;
+    public bool invertCamera = false;
+    public bool lockCursor = true;
+    public bool cameraCanMove = true;
+    public bool crosshair = true;
+    public Sprite crosshairImage;
+    public Color crosshairColor = Color.white;
     
     [Header("Настройки Движения")]
     public float maxVelocityChange = 10f;

@@ -13,15 +13,6 @@ public class PlayerCameraView : MonoBehaviour
     [Header("Camera Components")]
     public Camera playerCamera;
     
-    [Header("View Settings")]
-    public bool invertCamera = false;
-    public bool lockCursor = true;
-    public bool cameraCanMove = true;
-    
-    public bool crosshair = true;
-    public Sprite crosshairImage;
-    public Color crosshairColor = Color.white;
-    
     // Углы вращения
     private float yaw = 0f;
     private float pitch = 0f;
@@ -34,12 +25,12 @@ public class PlayerCameraView : MonoBehaviour
 
     private void Awake()
     {
-        if (crosshair)
+        if (playerSettingsData.crosshair)
         {
             SetupCrosshair();
         }
         
-        if (lockCursor)
+        if (playerSettingsData.lockCursor)
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
@@ -47,11 +38,6 @@ public class PlayerCameraView : MonoBehaviour
         
         yaw = transform.localEulerAngles.y;
         pitch = playerCamera.transform.localEulerAngles.x;
-        
-        if (playerCamera != null && playerStateModel != null)
-        {
-            
-        }
     }
 
     private void OnEnable()
@@ -75,7 +61,7 @@ public class PlayerCameraView : MonoBehaviour
     private void LateUpdate()
     {
         // Применяем вращение только если камера может двигаться
-        if (cameraCanMove && currentLookInput != Vector2.zero)
+        if (playerSettingsData.cameraCanMove && currentLookInput != Vector2.zero)
         {
             ApplyLookRotation(currentLookInput);
         }
@@ -90,7 +76,7 @@ public class PlayerCameraView : MonoBehaviour
         float maxAngle = playerSettingsData.maxLookAngle;
         
         yaw += input.x * sensitivity; 
-        pitch += (invertCamera ? 1 : -1) * input.y * sensitivity;
+        pitch += (playerSettingsData.invertCamera ? 1 : -1) * input.y * sensitivity;
         pitch = Mathf.Clamp(pitch, -maxAngle, maxAngle);
         
         transform.localEulerAngles = new Vector3(0, yaw, 0);
@@ -102,13 +88,13 @@ public class PlayerCameraView : MonoBehaviour
     /// </summary>
     private void SetupCrosshair()
     {
-        if (!crosshairImage) return;
+        if (!playerSettingsData.crosshairImage) return;
 
         GameObject crosshairGO = new GameObject("Crosshair");
         crosshairGO.transform.SetParent(transform.root.GetComponentInChildren<Canvas>().transform, false);
         crosshairObject = crosshairGO.AddComponent<Image>();
-        crosshairObject.sprite = crosshairImage;
-        crosshairObject.color = crosshairColor;
+        crosshairObject.sprite = playerSettingsData.crosshairImage;
+        crosshairObject.color = playerSettingsData.crosshairColor;
         
         crosshairObject.rectTransform.sizeDelta = new Vector2(2, 4); 
     }

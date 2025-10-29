@@ -8,24 +8,24 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
     [Header("Model & Settings")]
     public PlayerStateModel playerStateModel;
     public PlayerSettingsData playerSettingsData;
+    public ObstaclesSettingsData obstaclesSettings;
     
     [Header("Input Listeners")] 
     public Vector2Event MoveInputEvent;
     public GameEvent JumpAttemptEvent;
+    public WallJumpEvent OnWallJumpDetectedEvent;
     
     [Header("Soft Reset Event")]
     [SerializeField] private GameEvent OnLevelResetEvent;
     
-    [HideInInspector] public Rigidbody rb;
-
-    // Внутреннее состояние контроллера движения
+    [HideInInspector] private Rigidbody rb;
+    
     private Vector2 currentMoveInput = Vector2.zero; // Текущий ввод для FixedUpdate
-    private bool canAirJump;
-
-    // // old FPC
-    // private Vector3 externalImpulse;
+    
+    private Vector3 externalImpulse = Vector3.zero;
+    private const int LEGS_STYLE_INDEX = 0;
+    private const int HANDS_STYLE_INDEX = 1;
     // private Coroutine lingerCoroutine;
-    // private Component LastWallJumpedFrom = null;
     
     void Awake()
     {
@@ -37,22 +37,24 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
         }
         
         rb.freezeRotation = true;
+        
+        playerStateModel.SetLastWallJumpedFrom(null);
     }
 
     void OnEnable()
     {
-        // Подписка на события ввода
         MoveInputEvent?.RegisterListener(OnMoveInput);
         JumpAttemptEvent?.RegisterListener(InitiateJumpLogic);
         OnLevelResetEvent.RegisterListener(SoftReset);
+        OnWallJumpDetectedEvent?.RegisterListener(HandleWallJump);
     }
 
     void OnDisable()
     {
-        // Отписка от событий
         MoveInputEvent?.UnregisterListener(OnMoveInput);
         JumpAttemptEvent?.UnregisterListener(InitiateJumpLogic);
         OnLevelResetEvent.UnregisterListener(SoftReset);
+        OnWallJumpDetectedEvent?.UnregisterListener(HandleWallJump);
     }
     
     /// <summary>
@@ -72,11 +74,6 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
         {
             Jump();
             Debug.Log("Jump Attempted!");
-        }
-        else if (playerSettingsData.enableAirJump && canAirJump)
-        {
-            Jump();
-            canAirJump = false;
         }
     }
 
@@ -129,6 +126,79 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
         rb.AddForce(Vector3.up * playerStateModel.CurrentJumpPower, ForceMode.Impulse);
     }
 
+    /// <summary>
+    /// Вызывается при обнаружении прыжка от стены (принимает WallJumpData).
+    /// </summary>
+    public void HandleWallJump(WallJumpData data)
+    {
+        Vector3 normal = data.surfaceNormal;
+        Component wall = data.wallComponent;
+        
+        if (playerStateModel.LastWallJumpedFrom == wall) 
+            return;
+
+        playerStateModel.SetLastWallJumpedFrom(wall);
+
+        int currentStyleIndex = playerStateModel.CurrentStyleIndex;
+        Vector3 approachVector = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+        
+        bool specialVerticalCaseTriggered = false;
+        
+        rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+
+        #region HANDS (Стиль Рук)
+        if (currentStyleIndex == HANDS_STYLE_INDEX)
+        {
+            Vector3 V_approach_norm = approachVector.normalized;
+
+            float angle = Vector3.Angle(V_approach_norm, -normal);
+            
+            // 90-градусов
+            bool isSpecialCase = (angle <= 15f || angle >= 165f || (angle >= 75f && angle <= 105f));
+            
+            Vector3 reboundVector = Vector3.zero;
+
+            if (isSpecialCase)
+            {
+                reboundVector = normal;
+                reboundVector.y = 0; 
+                reboundVector.Normalize();
+                specialVerticalCaseTriggered = true; 
+            }
+            else
+            {
+                reboundVector = Vector3.Reflect(V_approach_norm, normal);
+                reboundVector.y = 0;
+                reboundVector.Normalize();
+            }
+            
+            Vector3 impulse = reboundVector * obstaclesSettings.reboundForceHands;
+            impulse += reboundVector * obstaclesSettings.extraAccelerationHands;
+            
+            rb.AddForce(impulse, ForceMode.VelocityChange); 
+            
+        }
+        #endregion
+
+        #region LEGS (Стиль Ног)
+        else if (currentStyleIndex == LEGS_STYLE_INDEX)
+        {
+            Vector3 jumpDirection = transform.forward;
+            jumpDirection.y = 0;
+            jumpDirection.Normalize();
+            
+            Vector3 finalImpulse = jumpDirection * obstaclesSettings.horizontalForceLegs + Vector3.up * obstaclesSettings.verticalForceLegs;
+            
+            rb.AddForce(finalImpulse, ForceMode.Impulse);
+        }
+        #endregion
+        
+        if (specialVerticalCaseTriggered && currentStyleIndex == HANDS_STYLE_INDEX)
+        {
+            rb.AddForce(Vector3.up * playerStateModel.CurrentJumpPower * 0.5f, ForceMode.Impulse);
+        }
+    }
+    
     public void SoftReset()
     {
         if (rb != null)

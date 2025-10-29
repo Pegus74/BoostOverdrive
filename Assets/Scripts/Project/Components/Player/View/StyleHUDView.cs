@@ -13,13 +13,13 @@ public class StyleHUDView : MonoBehaviour
     public Image LegstyleUI;
     public Image HandsStyleUI;
 
-    void OnEnable()
+    private void OnEnable()
     {
         playerStateModel?.OnStyleChangedEvent.RegisterListener(UpdateStyleUI);
         UpdateStyleUI(playerStateModel.CurrentStyleIndex);
     }
 
-    void OnDisable()
+    private void OnDisable()
     {
         playerStateModel?.OnStyleChangedEvent.UnregisterListener(UpdateStyleUI);
     }

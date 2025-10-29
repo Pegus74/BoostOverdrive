@@ -9,7 +9,7 @@ public class DashCollisionHandler : MonoBehaviour
     
     private const int HandStyleIndex = 0;
 
-    void Awake()
+    private void Awake()
     {
         if (playerStateModel == null)
         {
@@ -17,7 +17,7 @@ public class DashCollisionHandler : MonoBehaviour
         }
     }
     
-    void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         if (playerStateModel.IsDashing)
         {

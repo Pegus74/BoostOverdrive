@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -20,6 +21,8 @@ public class PlayerStateModel : ScriptableObject
     
     private int _currentStyleIndex = 0;
     
+    private Component _lastWallJumpedFrom; 
+    
     // Геттеры для чтения состояния извне
     public float CurrentWalkSpeed => _currentWalkSpeed;
     public float CurrentJumpPower => _currentJumpPower;
@@ -34,11 +37,18 @@ public class PlayerStateModel : ScriptableObject
 
     public int CurrentStyleIndex => _currentStyleIndex;
     
+    public Component LastWallJumpedFrom => _lastWallJumpedFrom;
+    
     [Header("Уведомления об Изменении Состояния")]
     public IntEvent OnStyleChangedEvent; 
-    public BoolEvent OnGroundedStateChangedEvent; 
-    
-    
+    public BoolEvent OnGroundedStateChangedEvent;
+
+
+    private void OnEnable()
+    {
+        _lastWallJumpedFrom = null;
+    }
+
     public void SetWalkSpeed(float newSpeed)
     {
         if (_currentWalkSpeed != newSpeed)
@@ -123,6 +133,15 @@ public class PlayerStateModel : ScriptableObject
             _currentStyleIndex = newIndex;
             OnStyleChangedEvent.Raise(newIndex);
             Debug.Log($"[Model] Style Index updated to: {newIndex}");
+        }
+    }
+
+    public void SetLastWallJumpedFrom(Component newWall)
+    {
+        if (_lastWallJumpedFrom != newWall)
+        {
+            _lastWallJumpedFrom = newWall;
+            Debug.Log($"[Model] LastWallJumpedFrom updated to: {newWall}");
         }
     }
 }
