@@ -12,7 +12,7 @@ public class RSpringWall : MonoBehaviour
     public GameEvent JumpAttemptEvent;
     
     [Header("Настройки Стены")]
-    private float activationDistance = 1.0f;
+    private float activationDistance = 2.0f;
     private float raycastCheckDistance = 1.0f;
 
     private const int LEGS_STYLE_INDEX = 0;

@@ -18,14 +18,12 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
     [Header("Soft Reset Event")]
     [SerializeField] private GameEvent OnLevelResetEvent;
     
+    
     [HideInInspector] private Rigidbody rb;
-    
     private Vector2 currentMoveInput = Vector2.zero; // Текущий ввод для FixedUpdate
-    
     private Vector3 externalImpulse = Vector3.zero;
-    private const int LEGS_STYLE_INDEX = 0;
-    private const int HANDS_STYLE_INDEX = 1;
-    // private Coroutine lingerCoroutine;
+    private const int LEGS_STYLE_INDEX = 1;
+    private const int HANDS_STYLE_INDEX = 0;
     
     void Awake()
     {
@@ -76,6 +74,11 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
             Debug.Log("Jump Attempted!");
         }
     }
+    
+    private void SetExternalImpulse(Vector3 impulse)
+    {
+        externalImpulse = impulse;
+    }
 
     // --- ФИЗИЧЕСКАЯ ЛОГИКА ---
 
@@ -104,7 +107,7 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
         float playerSpeed = playerStateModel.CurrentWalkSpeed * playerStateModel.MovementSpeedModifier;
 
         // Преобразование Vector2 в Vector3 относительно направления игрока
-        Vector3 targetVelocity = transform.TransformDirection(targetDirection) * playerSpeed;
+        Vector3 targetVelocity = transform.TransformDirection(targetDirection) * playerSpeed + externalImpulse;
 
         Vector3 velocity = rb.velocity;
         Vector3 velocityChange = (targetVelocity - velocity); 
@@ -116,6 +119,8 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
         velocityChange.y = 0;
 
         rb.AddForce(velocityChange, ForceMode.VelocityChange);
+        
+        externalImpulse = Vector3.Lerp(externalImpulse, Vector3.zero, 5f * Time.fixedDeltaTime);
     }
     
     private void Jump()
@@ -125,11 +130,11 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
         rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         rb.AddForce(Vector3.up * playerStateModel.CurrentJumpPower, ForceMode.Impulse);
     }
-
+    
     /// <summary>
     /// Вызывается при обнаружении прыжка от стены (принимает WallJumpData).
     /// </summary>
-    public void HandleWallJump(WallJumpData data)
+    private void HandleWallJump(WallJumpData data)
     {
         Vector3 normal = data.surfaceNormal;
         Component wall = data.wallComponent;
@@ -149,33 +154,37 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
         #region HANDS (Стиль Рук)
         if (currentStyleIndex == HANDS_STYLE_INDEX)
         {
-            Vector3 V_approach_norm = approachVector.normalized;
-
+            Vector3 V_approach_norm = approachVector;
+            V_approach_norm.y = 0;
+            V_approach_norm.Normalize();
+            
             float angle = Vector3.Angle(V_approach_norm, -normal);
             
-            // 90-градусов
             bool isSpecialCase = (angle <= 15f || angle >= 165f || (angle >= 75f && angle <= 105f));
-            
+
             Vector3 reboundVector = Vector3.zero;
+            float reboundForce = obstaclesSettings.reboundForceHands;
 
             if (isSpecialCase)
             {
                 reboundVector = normal;
-                reboundVector.y = 0; 
-                reboundVector.Normalize();
-                specialVerticalCaseTriggered = true; 
+                reboundVector += Vector3.up; 
+                reboundVector.Normalize(); 
+                
+                specialVerticalCaseTriggered = true;
             }
             else
             {
                 reboundVector = Vector3.Reflect(V_approach_norm, normal);
+
                 reboundVector.y = 0;
                 reboundVector.Normalize();
             }
             
-            Vector3 impulse = reboundVector * obstaclesSettings.reboundForceHands;
+            Vector3 impulse = reboundVector * reboundForce;
             impulse += reboundVector * obstaclesSettings.extraAccelerationHands;
             
-            rb.AddForce(impulse, ForceMode.VelocityChange); 
+            SetExternalImpulse(impulse); 
             
         }
         #endregion
@@ -190,12 +199,14 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
             Vector3 finalImpulse = jumpDirection * obstaclesSettings.horizontalForceLegs + Vector3.up * obstaclesSettings.verticalForceLegs;
             
             rb.AddForce(finalImpulse, ForceMode.Impulse);
+            
+            SetExternalImpulse(Vector3.zero); 
         }
         #endregion
         
         if (specialVerticalCaseTriggered && currentStyleIndex == HANDS_STYLE_INDEX)
         {
-            rb.AddForce(Vector3.up * playerStateModel.CurrentJumpPower * 0.5f, ForceMode.Impulse);
+            rb.AddForce(Vector3.up * playerStateModel.CurrentJumpPower * 0.75f, ForceMode.Impulse);
         }
     }
     
