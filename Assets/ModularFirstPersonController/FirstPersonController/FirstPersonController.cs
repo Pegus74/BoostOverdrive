@@ -91,7 +91,7 @@ public class FirstPersonController : MonoBehaviour
     [Header("Slam")]
     [SerializeField] private bool enableSlam = true;
     [SerializeField] private KeyCode slamKey = KeyCode.F;
-    [SerializeField] private float slamPower = 15f;
+    [SerializeField] private float slamPower = 10f;
     [SerializeField] private float slamCooldown = 1f;
     [SerializeField] private float reboundMultiplier = 0.5f;
     [SerializeField] private GameObject slamIndicatorPrefab;
