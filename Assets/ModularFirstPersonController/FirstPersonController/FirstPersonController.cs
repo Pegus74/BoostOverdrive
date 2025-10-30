@@ -9,6 +9,12 @@ public class FirstPersonController : MonoBehaviour
     private StyleController styleManager;
     private float speedModifier = 1f;
     private Coroutine lingerCoroutine;
+    private Coroutine speedLerpCoroutine;
+    private float targetSpeedModifier = 1f;
+    private float speedLerpDuration = 0f;
+    private float speedLerpTimer = 0f;
+    private float initialSpeedModifier = 1f;
+
 
     [HideInInspector]
     public Component LastWallJumpedFrom { get; private set; } = null;
@@ -82,16 +88,20 @@ public class FirstPersonController : MonoBehaviour
     #endregion
 
     #region Slam 
+    [Header("Slam")]
     [SerializeField] private bool enableSlam = true;
-    [SerializeField] private KeyCode slamKey = KeyCode.F;  
-    [SerializeField] private float slamPower = 15f;  
-    [SerializeField] private float slamDuration = 0.2f;  
-    [SerializeField] private float slamCooldown = 1f;  
+    [SerializeField] private KeyCode slamKey = KeyCode.F;
+    [SerializeField] private float slamPower = 10f;
+    [SerializeField] private float slamCooldown = 1f;
+    [SerializeField] private float reboundMultiplier = 0.5f;
+    [SerializeField] private GameObject slamIndicatorPrefab;
+    private GameObject slamIndicatorInstance;
     private bool isSlamming = false;
-    private float slamTimer = 0f;
     private float slamCooldownTimer = 0f;
+    private bool slamImpactOccurred = false;
+    private bool isReboundingFromSlam = false;
     #endregion
-    
+
     #region SpringWallVariables
     [Header("Настройки отталкивания")]
     [Header("Ноги")]
@@ -144,6 +154,11 @@ public class FirstPersonController : MonoBehaviour
         jointOriginalPos = joint.localPosition;
 
         originalScale = transform.localScale;
+        if (slamIndicatorPrefab != null)
+        {
+            slamIndicatorInstance = Instantiate(slamIndicatorPrefab);
+            slamIndicatorInstance.SetActive(false);  
+        }
     }
 
     private void Start()
@@ -226,12 +241,15 @@ public class FirstPersonController : MonoBehaviour
 
                 isDashing = true;
                 dashTimer = dashDuration;
-                rb.AddForce(dashDirection * dashPower, ForceMode.Impulse);
+                Vector3 currentVelocity = rb.velocity;
+                Vector3 dashVelocity = dashDirection * dashPower;
+                dashVelocity.y = currentVelocity.y;
+                rb.velocity = dashVelocity;
             }
             if (isDashing)
             {
                 dashTimer -= Time.deltaTime;
-                rb.AddForce(dashDirection * (dashPower * 0.5f) * (dashTimer / dashDuration), ForceMode.Acceleration);
+                // Убирано дополнительное ускорение во время дэша чтобы не накапливалась скорость от предыдущих импульсов
                 if (dashTimer <= 0)
                 {
                     isDashing = false;
@@ -248,27 +266,47 @@ public class FirstPersonController : MonoBehaviour
         #endregion
 
         #region Slam
-        if (enableSlam)
+        if (enableSlam && !isGrounded && !isSlamming && slamCooldownTimer <= 0)
         {
-            if (slamCooldownTimer > 0) slamCooldownTimer -= Time.deltaTime;
-            if (Input.GetKeyDown(slamKey) && slamCooldownTimer <= 0 && !isSlamming && !isGrounded)  
+            Ray ray = new Ray(transform.position, Vector3.down);
+            if (Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask("Default")))
             {
-                isSlamming = true;
-                slamTimer = slamDuration;
-                rb.AddForce(Vector3.down * slamPower, ForceMode.Impulse); 
-            }
-            if (isSlamming)
-            {
-                slamTimer -= Time.deltaTime;
-                rb.AddForce(Vector3.down * (slamPower * 0.5f) * (slamTimer / slamDuration), ForceMode.Acceleration);
-                if (slamTimer <= 0)
+                if (slamIndicatorInstance != null)
                 {
-                    isSlamming = false;
-                    slamCooldownTimer = slamCooldown;
+                    slamIndicatorInstance.transform.position = hit.point + Vector3.up * 0.01f;
+                    slamIndicatorInstance.transform.rotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
+                    slamIndicatorInstance.SetActive(true);
                 }
             }
         }
-            #endregion
+        else
+        {
+            if (slamIndicatorInstance != null)
+            {
+                slamIndicatorInstance.SetActive(false);
+            }
+        }
+
+        if (enableSlam)
+        {
+            if (slamCooldownTimer > 0) slamCooldownTimer -= Time.deltaTime;
+            if (Input.GetKeyDown(slamKey) && slamCooldownTimer <= 0 && !isSlamming && !isGrounded)
+            {
+                StartSlam();
+            }
+
+            if (isSlamming && !slamImpactOccurred && !isReboundingFromSlam)
+            {
+                Vector3 currentVelocity = rb.velocity;
+                currentVelocity.x = 0f;
+                currentVelocity.z = 0f;
+                rb.velocity = currentVelocity;
+
+                rb.AddForce(Vector3.down * (slamPower * 0.8f), ForceMode.Acceleration);
+            }
+        }
+        #endregion
+
         #region Crawlslide
         if (enableCrawlSlide && Input.GetKeyDown(crawlSlideKey) && !isSliding && !isDashing)
         {
@@ -278,6 +316,10 @@ public class FirstPersonController : MonoBehaviour
         #endregion
 
         CheckGround();
+        if (isGrounded && isSlamming)
+        {
+            EndSlam();
+        }
         if (isGrounded) canAirJump = true;
 
         if (enableHeadBob) HeadBob();
@@ -315,7 +357,7 @@ public class FirstPersonController : MonoBehaviour
         #endregion
 
         #region Movement
-       if (playerCanMove && !isDashing && !isSlamming)
+        if (playerCanMove && !isDashing && (!isSlamming || isReboundingFromSlam))
         {
             Vector3 target = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
@@ -336,7 +378,42 @@ public class FirstPersonController : MonoBehaviour
         #endregion
 
         externalImpulse = Vector3.Lerp(externalImpulse, Vector3.zero, 5f * Time.fixedDeltaTime);
+        if (isSlamming && !slamImpactOccurred && !isReboundingFromSlam)
+        {
+            Vector3 currentVelocity = rb.velocity;
+            currentVelocity.x = 0f;
+            currentVelocity.z = 0f;
+            rb.velocity = currentVelocity;
+
+            rb.AddForce(Vector3.down * slamPower * 0.5f, ForceMode.Acceleration);
+        }
     }
+
+    private void StartSlam()
+    {
+        isSlamming = true;
+        slamImpactOccurred = false;
+        isReboundingFromSlam = false; 
+        Vector3 currentVelocity = rb.velocity;
+        currentVelocity.x = 0f;
+        currentVelocity.z = 0f;
+        rb.velocity = currentVelocity;
+        rb.AddForce(Vector3.down * slamPower, ForceMode.Impulse);
+    }
+
+    private void EndSlam()
+    {
+        isSlamming = false;
+        isReboundingFromSlam = false; 
+        slamCooldownTimer = slamCooldown;
+        slamImpactOccurred = false;
+        Vector3 currentVelocity = rb.velocity;
+        currentVelocity.y = Mathf.Min(currentVelocity.y, 0f);
+        rb.velocity = currentVelocity;
+    }
+
+    public bool IsSlamming() => isSlamming;
+
 
     private void CheckGround()
     {
@@ -427,19 +504,35 @@ public class FirstPersonController : MonoBehaviour
             if (wall != null)
             {
                 Vector3 horizontalVelocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-                wall.DestroyWall(); 
-                rb.velocity = new Vector3(horizontalVelocity.x, rb.velocity.y, horizontalVelocity.z);// восстанавливаем  скорость и добавляем дополнительный толчок в направлении дэша
-                rb.AddForce(dashDirection * dashPower * 0.5f, ForceMode.Impulse);  // для частичной компенсации
+                wall.DestroyWall();
+                rb.velocity = new Vector3(horizontalVelocity.x, rb.velocity.y, horizontalVelocity.z);
+                rb.AddForce(dashDirection * dashPower * 0.5f, ForceMode.Impulse);
+            }
+        }
+        if (isSlamming && styleManager != null && styleManager.CurrentStyle.canBreakWallsWithSlam && !slamImpactOccurred)
+        {
+            DestructibleWall wall = collision.gameObject.GetComponent<DestructibleWall>();
+            if (wall != null)
+            {
+                slamImpactOccurred = true;
+                isReboundingFromSlam = true; 
+                Vector3 impactPoint = collision.contacts[0].point;
+                wall.DestroyWallFromSlam(impactPoint);
+                rb.AddForce(Vector3.up * slamPower * reboundMultiplier, ForceMode.Impulse);
             }
         }
     }
+
     public void SetSpeedModifier(float modifier)
     {
-        speedModifier = modifier;
-        if (lingerCoroutine != null)
+        if (speedLerpCoroutine != null)
         {
-            StopCoroutine(lingerCoroutine);  
+            StopCoroutine(speedLerpCoroutine);
+            speedLerpCoroutine = null;
         }
+
+        speedModifier = modifier;
+        targetSpeedModifier = modifier;
     }
 
     public void ResetSpeedModifier()
@@ -449,20 +542,32 @@ public class FirstPersonController : MonoBehaviour
 
     public void StartLingerSpeedModifier(float lingerTime)
     {
-        if (lingerCoroutine != null)
+        if (speedLerpCoroutine != null)
         {
-            StopCoroutine(lingerCoroutine);
+            StopCoroutine(speedLerpCoroutine);
         }
-        lingerCoroutine = StartCoroutine(LingerSpeedModifierCoroutine(lingerTime));
+        speedLerpCoroutine = StartCoroutine(LerpSpeedModifierOverTime(lingerTime));
     }
 
-    private IEnumerator LingerSpeedModifierCoroutine(float lingerTime)
+    private IEnumerator LerpSpeedModifierOverTime(float duration)
     {
-        yield return new WaitForSeconds(lingerTime);
-        ResetSpeedModifier();
+        initialSpeedModifier = speedModifier;
+        targetSpeedModifier = 1f;
+        speedLerpDuration = duration;
+        speedLerpTimer = 0f;
+
+        while (speedLerpTimer < speedLerpDuration)
+        {
+            speedLerpTimer += Time.deltaTime;
+            float t = speedLerpTimer / speedLerpDuration;
+            speedModifier = Mathf.Lerp(initialSpeedModifier, targetSpeedModifier, t);
+            yield return null;
+        }
+        speedModifier = targetSpeedModifier;
+        speedLerpCoroutine = null;
     }
 
-   
+
     #region LastWallJumpedFrom
     public void SetLastWallJumpedFrom(Component wallComponent)
     {
