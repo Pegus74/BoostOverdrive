@@ -85,12 +85,6 @@ public class FirstPersonController : MonoBehaviour
 
     private bool dashInCameraDirection = true; 
     private bool allowHorizontalDashOnly = true;
-
-    [Header("Dash Collision")]
-    public float dashCollisionCheckRadius = 0.7f;
-    public float dashCollisionCheckDistance = 1.5f;
-    public LayerMask wallCheckLayerMask = 1;
-
     #endregion
 
     #region Slam 
@@ -255,6 +249,7 @@ public class FirstPersonController : MonoBehaviour
             if (isDashing)
             {
                 dashTimer -= Time.deltaTime;
+                // Убирано дополнительное ускорение во время дэша чтобы не накапливалась скорость от предыдущих импульсов
                 if (dashTimer <= 0)
                 {
                     isDashing = false;
@@ -295,10 +290,6 @@ public class FirstPersonController : MonoBehaviour
         if (enableSlam)
         {
             if (slamCooldownTimer > 0) slamCooldownTimer -= Time.deltaTime;
-            if (isSlamming && enableDash && Input.GetKeyDown(dashKey) && dashCooldownTimer <= 0 && !isDashing)
-            {
-                InterruptSlamWithDash();
-            }
             if (Input.GetKeyDown(slamKey) && slamCooldownTimer <= 0 && !isSlamming && !isGrounded)
             {
                 StartSlam();
@@ -386,10 +377,6 @@ public class FirstPersonController : MonoBehaviour
         }
         #endregion
 
-        if (isDashing)
-        {
-            CheckDashCollisions();
-        }
         externalImpulse = Vector3.Lerp(externalImpulse, Vector3.zero, 5f * Time.fixedDeltaTime);
         if (isSlamming && !slamImpactOccurred && !isReboundingFromSlam)
         {
@@ -699,63 +686,5 @@ public class FirstPersonController : MonoBehaviour
 
         ResetSpeedModifier();
         isSliding = false;
-    }
-    private void CheckDashCollisions()
-    {
-        if (!isDashing || styleManager == null || !styleManager.CurrentStyle.canBreakWallsWithDash)
-            return;
-        Vector3 checkStart = transform.position + Vector3.up * 0.5f;
-        Vector3 checkDirection = dashDirection.normalized;
-        CheckDirectionWithOffset(checkStart, checkDirection, Vector3.zero); 
-        CheckDirectionWithOffset(checkStart, checkDirection, Vector3.up * 0.3f); 
-        CheckDirectionWithOffset(checkStart, checkDirection, Vector3.down * 0.3f); 
-
-    }
-    private void CheckDirectionWithOffset(Vector3 start, Vector3 direction, Vector3 offset)
-    {
-        RaycastHit[] hits = Physics.SphereCastAll(start + offset, dashCollisionCheckRadius,
-            direction, dashCollisionCheckDistance, wallCheckLayerMask);
-
-        foreach (RaycastHit hit in hits)
-        {
-            if (hit.collider.isTrigger || hit.collider.transform.IsChildOf(transform))
-                continue;
-
-            DestructibleWall wall = hit.collider.GetComponent<DestructibleWall>();
-            if (wall != null && !wall.isDestroyed)
-            {
-                ProcessDashWallBreak(wall, hit.point);
-                return; 
-            }
-        }
-    }
-    private void ProcessDashWallBreak(DestructibleWall wall, Vector3 hitPoint)
-    {
-        wall.DestroyWall();
-        Vector3 reboundDirection = -dashDirection.normalized * 0.3f;
-        rb.AddForce(reboundDirection * dashPower, ForceMode.Impulse);
-    }
-    private void InterruptSlamWithDash()
-    {
-        isSlamming = false;
-        slamImpactOccurred = false;
-        isReboundingFromSlam = false;
-        dashDirection = playerCamera.transform.forward;
-        if (allowHorizontalDashOnly)
-        {
-            dashDirection.y = 0f;
-        }
-        dashDirection.Normalize();
-        isDashing = true;
-        dashTimer = dashDuration;
-        Vector3 currentVelocity = rb.velocity;
-        Vector3 dashVelocity = dashDirection * dashPower;
-        dashVelocity.y = currentVelocity.y * 0.5f;
-        rb.velocity = dashVelocity;
-        dashCooldownTimer = dashCooldown;
-        if (slamIndicatorInstance != null)
-        {
-            slamIndicatorInstance.SetActive(false);
-        }
     }
 }
