@@ -209,40 +209,26 @@ public class SpringWall : MonoBehaviour
         #region LEGS
         else if (currentStyleIndex == LEGS_STYLE_INDEX)
         {
-            // 1. Определяем желаемое направление (по вектору камеры/взгляда)
             Vector3 jumpDirection = playerController.GetForwardVector();
             jumpDirection.y = 0;
             jumpDirection.Normalize();
 
-            // 2. Рассчитываем полный вектор импульса: Горизонтальный толчок + Вертикальный прыжок
             float horizontalForce = playerController.horizontalForceLegs;
             float verticalForce = playerController.verticalForceLegs;
 
             Vector3 finalImpulse = jumpDirection * horizontalForce + Vector3.up * verticalForce;
 
-            // 3. ПРИМЕНЯЕМ ЕДИНЫЙ ИМПУЛЬС (ForceMode.Impulse)
             playerController.rb.AddForce(finalImpulse, ForceMode.Impulse);
 
-            // Если игрок в воздухе, инициируем логику прыжка
-            if (!(playerController.IsGrounded()))
-            {
-                playerController.InitiateJumpLogic();
-            }
-
             playerController.SetExternalImpulse(Vector3.zero);
-
-            //Debug.Log($"Финальный импульс (НОГИ): {finalImpulse}");
-            //Debug.Log($"Горизонтальная сила: {horizontalForce}, Вертикальная сила: {verticalForce}");
         }
         #endregion
 
         if (specialVerticalCaseTriggered)
         {
             playerController.rb.AddForce(Vector3.up * playerController.jumpPower * 0.5f, ForceMode.Impulse);
-            //Debug.Log($"Добавлен дополнительный вертикальный импульс: {playerController.jumpPower * 0.5f}");
         }
 
-        //Debug.Log("-----------------------------------------------------");
     }
 
     private void OnDrawGizmosSelected()
