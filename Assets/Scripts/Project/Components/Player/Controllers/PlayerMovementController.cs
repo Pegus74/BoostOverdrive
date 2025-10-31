@@ -109,6 +109,8 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
         // Преобразование Vector2 в Vector3 относительно направления игрока
         Vector3 targetVelocity = transform.TransformDirection(targetDirection) * playerSpeed + externalImpulse;
 
+        playerStateModel.SetIsWalking(targetDirection.x != 0 || targetDirection.z != 0 && playerStateModel.IsGrounded) ;
+        
         Vector3 velocity = rb.velocity;
         Vector3 velocityChange = (targetVelocity - velocity); 
         

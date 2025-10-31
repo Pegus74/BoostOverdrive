@@ -18,6 +18,7 @@ public class PlayerStateModel : ScriptableObject
     private bool _isDashing;
     private bool _isSliding;
     private bool _isSlamming;
+    private bool _isWalking;
     
     private int _currentStyleIndex = 0;
     
@@ -34,6 +35,7 @@ public class PlayerStateModel : ScriptableObject
     public bool IsDashing => _isDashing;
     public bool IsSliding => _isSliding;
     public bool IsSlamming => _isSlamming;
+    public bool IsWalking =>  _isWalking;
 
     public int CurrentStyleIndex => _currentStyleIndex;
     
@@ -85,6 +87,15 @@ public class PlayerStateModel : ScriptableObject
     public void SetMovementSpeedModifier(float newSpeedModifier)
     {
         _movementSpeedModifier = newSpeedModifier;
+    }
+
+    public void SetIsWalking(bool isWalking)
+    {
+        if (_isWalking != isWalking)
+        {
+            _isWalking = isWalking;
+            Debug.Log($"[Model] IsWalking changed to: {isWalking}");
+        }
     }
     
     public void SetIsGrounded(bool isGrounded)

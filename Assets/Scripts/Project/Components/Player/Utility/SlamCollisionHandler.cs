@@ -38,6 +38,7 @@ public class SlamCollisionHandler : MonoBehaviour
         else if (other.CompareTag("Ground") || other.CompareTag("Untagged")) 
         {
             SlamSolidHitEvent?.Raise(); 
+            Debug.Log("SolidHitEvent");
         }
     }
 }

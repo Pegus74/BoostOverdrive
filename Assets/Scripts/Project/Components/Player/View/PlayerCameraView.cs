@@ -98,4 +98,5 @@ public class PlayerCameraView : MonoBehaviour
         
         crosshairObject.rectTransform.sizeDelta = new Vector2(2, 4); 
     }
+    
 }

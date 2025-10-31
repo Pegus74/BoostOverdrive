@@ -111,6 +111,7 @@ public class RDestructibleWall : MonoBehaviour, IRestartable
                 rb.AddExplosionForce(obstaclesSettings.explosionForce * 1.2f, impactPoint, obstaclesSettings.explosionRadius, 2f, ForceMode.Impulse);
             }
         }
+        Debug.Log("___________________________________________________________");
     }
 
     public void SoftReset()

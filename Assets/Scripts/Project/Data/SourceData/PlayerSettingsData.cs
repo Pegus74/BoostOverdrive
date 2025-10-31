@@ -10,13 +10,17 @@ public class PlayerSettingsData : ScriptableObject
     public bool invertCamera = false;
     public bool lockCursor = true;
     public bool cameraCanMove = true;
+    [Header("Настройки Камеры - Crosshair")]
     public bool crosshair = true;
     public Sprite crosshairImage;
     public Color crosshairColor = Color.white;
+    [Header("Настройки Камеры - HeadBob")]
+    public bool enableHeadBob = true;
+    public float bobSpeed = 10f;
+    public Vector3 bobAmount = new Vector3(.15f, .05f, 0f);
     
     [Header("Настройки Движения")]
     public float maxVelocityChange = 10f;
-    public bool enableAirJump = false;
     public bool playerCanMove = true;
     public bool enableJump = true;
     
