@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Canvas pauseCanvas;
 
     public MusicManager musicManager;
+    private string currentLevelName;
     public List<string> levelNames = new List<string>();
 
     public static GameManager Instance;
@@ -93,10 +94,16 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForEndOfFrame();
 
+        if (scene.name != "MainMenu" && !levelNames.Contains(scene.name))
+        {
+            levelNames.Add(scene.name);
+        }
+
         if (scene.name == "MainMenu")
         {
+            currentLevelName = null;
             currentState = State.Playing;
-            InitializeUI(); 
+            InitializeUI();
             StopAllTimers();
             HideTimerUI();
             Time.timeScale = 1f;
@@ -105,11 +112,29 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            InitializeUI(); 
+            currentLevelName = scene.name;
+            InitializeUI();
+
+            InitializeTimer();
             StartTimerOnSceneLoad();
             ShowTimerUI();
         }
+
     }
+    private void InitializeTimer()
+    {
+        TimerManager timerManager = FindObjectOfType<TimerManager>();
+        if (timerManager != null)
+        {
+            timerManager.InitializeTimer();
+        }
+        else
+        {
+            Debug.LogError("TimerManager not found in scene!");
+        }
+
+    }
+
 
     #region Timer
 
@@ -150,6 +175,7 @@ public class GameManager : MonoBehaviour
     }
     public void ResetAllBestTimes()
     {
+        string currentSceneName = SceneManager.GetActiveScene().name;
         foreach (string levelName in levelNames)
         {
             if (!string.IsNullOrEmpty(levelName))
@@ -164,16 +190,11 @@ public class GameManager : MonoBehaviour
 
         PlayerPrefs.Save();
 
-        Scene currentScene = SceneManager.GetActiveScene();
-        if (currentScene.name != "MainMenu")
+        if (currentSceneName != "MainMenu")
         {
             TimerManager timerManager = FindObjectOfType<TimerManager>();
-            if (timerManager != null)
-            {
-                timerManager.ResetBestTime();
-            }
+            if (timerManager != null) timerManager.ResetBestTime();
         }
-
     }
 
 
@@ -195,8 +216,11 @@ public class GameManager : MonoBehaviour
 
     public static string GetBestTimeKeyForCurrentLevel()
     {
-        string currentSceneName = SceneManager.GetActiveScene().name;
-        return "BestTime_" + currentSceneName;
+        if (Instance.currentLevelName != null)
+        {
+            return "BestTime_" + Instance.currentLevelName;
+        }
+        return "BestTime_Unknown";
     }
 
     public static string GetBestTimeKeyForLevel(string levelName)
@@ -209,17 +233,17 @@ public class GameManager : MonoBehaviour
 
 
     #region Win
-    public void PlayerWin()
+    public void PlayerWin(string levelName = null)
     {
         currentState = State.GameWin;
-        if (gameWinCanvas != null)
+        if (levelName != null)
         {
-            gameWinCanvas.gameObject.SetActive(true);
-            Debug.Log("GameWin activ");
+            this.currentLevelName = levelName;
         }
+
+        if (gameWinCanvas != null) gameWinCanvas.gameObject.SetActive(true);
         TimerManager timer = FindObjectOfType<TimerManager>();
-        if (timer != null)
-            timer.StopTimerAndSaveBestTime();
+        if (timer != null) timer.StopTimerAndSaveBestTime();
         UpdateGameState();
     }
 
@@ -230,28 +254,19 @@ public class GameManager : MonoBehaviour
     public void PlayerDied()
     {
         currentState = State.GameOver;
-        if (gameOverCanvas != null)
-        {
-            gameOverCanvas.gameObject.SetActive(true);
-        }
+        if (gameOverCanvas != null) gameOverCanvas.gameObject.SetActive(true);
         TimerManager timer = FindObjectOfType<TimerManager>();
-        if (timer != null)
-            timer.StopTimerWithoutSaving();
+        if (timer != null) timer.StopTimerWithoutSaving();
         UpdateGameState();
     }
 
     public void RestartLevel()
     {
-        if (gameOverCanvas != null)
-            gameOverCanvas.gameObject.SetActive(false);
-        if (gameWinCanvas != null)
-            gameWinCanvas.gameObject.SetActive(false);
+        if (gameOverCanvas != null) gameOverCanvas.gameObject.SetActive(false);
+        if (gameWinCanvas != null) gameWinCanvas.gameObject.SetActive(false);
         currentState = State.Playing;
-
         UpdateGameState();
-
-        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(currentSceneIndex);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     #endregion
@@ -260,39 +275,24 @@ public class GameManager : MonoBehaviour
 
     public void TogglePause()
     {
-        if (currentState != State.Playing && currentState != State.Paused)
-            return;
-        if (SceneManager.GetActiveScene().name == "MainMenu")
-            return;
+        if (currentState != State.Playing && currentState != State.Paused) return;
+        if (SceneManager.GetActiveScene().name == "MainMenu") return;
 
         bool isPausing = (currentState == State.Playing);
         currentState = isPausing ? State.Paused : State.Playing;
 
-        if (pauseCanvas != null)
-        {
-            pauseCanvas.gameObject.SetActive(isPausing);
-
-        }
-
+        if (pauseCanvas != null) pauseCanvas.gameObject.SetActive(isPausing);
         UpdateGameState();
     }
 
     public void BackToMenu()
     {
         currentState = State.Playing;
-
-        if (pauseCanvas != null)
-            pauseCanvas.gameObject.SetActive(false);
-        if (gameOverCanvas != null)
-            gameOverCanvas.gameObject.SetActive(false);
-        if (gameWinCanvas != null)
-            gameWinCanvas.gameObject.SetActive(false);
+        InitializeUI();
         StopAllTimers();
         HideTimerUI();
         Time.timeScale = 1f;
-        if (musicManager != null)
-            musicManager.StopMusic();
-
+        if (musicManager != null) musicManager.StopMusic();
         SceneManager.LoadScene("MainMenu");
     }
 

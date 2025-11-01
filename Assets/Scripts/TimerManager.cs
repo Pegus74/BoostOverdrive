@@ -15,23 +15,20 @@ public class TimerManager : MonoBehaviour
     private float bestTime = Mathf.Infinity;
     private string currentLevelKey;
 
-    private void Start()
+    public void InitializeTimer()
     {
         currentLevelKey = GameManager.GetBestTimeKeyForCurrentLevel();
+        Debug.Log($"TimerManager initialized for level key: {currentLevelKey}");
+
         if (PlayerPrefs.HasKey(currentLevelKey))
         {
             bestTime = PlayerPrefs.GetFloat(currentLevelKey);
             UpdateBestTimeUI();
         }
-
-        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "MainMenu")
-        {
-            HideTimer();
-        }
         else
         {
-            ShowTimer();
-            StartTimer();
+            bestTime = Mathf.Infinity;
+            UpdateBestTimeUI();
         }
     }
 
@@ -60,7 +57,12 @@ public class TimerManager : MonoBehaviour
             bestTime = currentTime;
             PlayerPrefs.SetFloat(currentLevelKey, bestTime);
             PlayerPrefs.Save();
+            Debug.Log($"Saved new best time: {bestTime} for key: {currentLevelKey}");
             UpdateBestTimeUI();
+        }
+        else
+        {
+            Debug.Log($"Current time {currentTime} is not better than best time {bestTime} for key: {currentLevelKey}");
         }
     }
     public void StopTimerWithoutSaving()

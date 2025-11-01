@@ -1959,17 +1959,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: db7b130835e110c4b8ae4810f9ca968c, type: 3}
---- !u!114 &754617041 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2658010086653583010, guid: db7b130835e110c4b8ae4810f9ca968c, type: 3}
-  m_PrefabInstance: {fileID: 754617040}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f5ddd0f96d3c3541a8f880980d77f40, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &813984319
 GameObject:
   m_ObjectHideFlags: 0
@@ -2208,13 +2197,14 @@ GameObject:
   - component: {fileID: 864573477}
   - component: {fileID: 864573476}
   - component: {fileID: 864573475}
+  - component: {fileID: 864573478}
   m_Layer: 5
   m_Name: ResetRecordsButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &864573474
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2232,7 +2222,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -694.0592, y: -172.43997}
+  m_AnchoredPosition: {x: -694.0592, y: -36}
   m_SizeDelta: {x: 141.941, y: 57.56}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &864573475
@@ -2279,8 +2269,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 754617041}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+      - m_Target: {fileID: 864573478}
+        m_TargetAssemblyTypeName: ResetBestTimesButton, Assembly-CSharp
         m_MethodName: ResetAllBestTimes
         m_Mode: 1
         m_Arguments:
@@ -2329,6 +2319,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 864573473}
   m_CullTransparentMesh: 1
+--- !u!114 &864573478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 864573473}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eed3995e71aad1b4da80cd2be47890c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &985145454
 GameObject:
   m_ObjectHideFlags: 0
