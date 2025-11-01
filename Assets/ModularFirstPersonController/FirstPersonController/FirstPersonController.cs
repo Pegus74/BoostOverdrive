@@ -315,10 +315,18 @@ public class FirstPersonController : MonoBehaviour
         #endregion
 
         #region Crawlslide
-        if (enableCrawlSlide && Input.GetKeyDown(crawlSlideKey) && !isSliding && !isDashing)
+        if (enableCrawlSlide)
         {
-            if (slideCoroutine != null) StopCoroutine(slideCoroutine);
-            slideCoroutine = StartCoroutine(CrawlSlideCoroutine());
+            if (Input.GetKey(crawlSlideKey) && !isSliding && !isDashing)
+            {
+                if (slideCoroutine != null) StopCoroutine(slideCoroutine);
+                slideCoroutine = StartCoroutine(CrawlSlideCoroutine());
+            }
+            else if (Input.GetKeyUp(crawlSlideKey) && isSliding)
+            {
+                if (slideCoroutine != null) StopCoroutine(slideCoroutine);
+                slideCoroutine = StartCoroutine(StopCrawlSlideCoroutine());
+            }
         }
         #endregion
 
@@ -590,115 +598,7 @@ public class FirstPersonController : MonoBehaviour
         LastWallJumpedFrom = null;
     }
     #endregion
-
-    private IEnumerator CrawlSlideCoroutine()
-    {
-        isSliding = true;
-        float timer = 0f;
-        Vector3 targetScale = originalScale;
-        targetScale.y *= squatHeightScale;
-
-        int currentStyleIndex = styleManager?.GetCurrentStyleIndex() ?? 0;
-
-        Vector3 originalPos = transform.localPosition;
-        Vector3 targetPos = originalPos;
-
-        if (currentStyleIndex == 0)
-        {
-            targetPos.y = originalPos.y - (originalScale.y - targetScale.y) * 0.5f;
-        }
-        else
-        {
-            targetPos.y = originalPos.y + (originalScale.y - targetScale.y) * 0.5f;
-        }
-
-        if (currentStyleIndex == 1 && isGrounded)
-            rb.useGravity = false;
-
-        float t = 0f;
-        while (t < squatTransitionDuration)
-        {
-            t += Time.deltaTime;
-            float progress = t / squatTransitionDuration;
-            transform.localScale = Vector3.Lerp(originalScale, targetScale, progress);
-            transform.localPosition = Vector3.Lerp(originalPos, targetPos, progress);
-            yield return null;
-        }
-        transform.localScale = targetScale;
-        transform.localPosition = targetPos;
-
-        if (currentStyleIndex == 1)
-        {
-            rb.useGravity = true;
-        }
-
-        float initialSpeed = walkSpeed * initialSpeedMultiplier;
-        Vector3 slideDirection = GetForwardVector();
-        slideDirection.y = 0;
-        slideDirection.Normalize();
-
-        Vector3 currentHorizontalVelocity = GetCurrentHorizontalVelocity();
-        float requiredForce = initialSpeed - currentHorizontalVelocity.magnitude;
-
-        if (requiredForce > 0)
-        {
-            rb.AddForce(slideDirection * requiredForce, ForceMode.VelocityChange);
-        }
-        else
-        {
-            SetSpeedModifier(initialSpeedMultiplier);
-        }
-
-        float finalSpeed = walkSpeed * finalSpeedMultiplier;
-
-        timer = 0f;
-        while (timer < slideDuration)
-        {
-            timer += Time.deltaTime;
-
-            float currentSpeedLerp = Mathf.Lerp(initialSpeedMultiplier, 1.0f, timer / (slideDuration * 0.25f));
-            float finalSpeedLerp = Mathf.Lerp(1.0f, finalSpeedMultiplier, (timer - slideDuration * 0.25f) / (slideDuration * 0.75f));
-
-            if (timer < slideDuration * 0.25f)
-            {
-                SetSpeedModifier(currentSpeedLerp);
-            }
-            else
-            {
-                SetSpeedModifier(finalSpeedLerp);
-            }
-
-            yield return null;
-        }
-
-        t = 0f;
-        originalPos = transform.localPosition;
-        targetPos = originalPos;
-
-        if (currentStyleIndex == 0)
-        {
-            targetPos.y = originalPos.y + (originalScale.y - targetScale.y) * 0.5f;
-        }
-        else
-        {
-            targetPos.y = originalPos.y - (originalScale.y - targetScale.y) * 0.5f;
-        }
-
-        while (t < squatTransitionDuration)
-        {
-            t += Time.deltaTime;
-            float progress = t / squatTransitionDuration;
-            transform.localScale = Vector3.Lerp(targetScale, originalScale, progress);
-            transform.localPosition = Vector3.Lerp(originalPos, originalPos, progress);
-            yield return null;
-        }
-        transform.localScale = originalScale;
-        transform.localPosition = originalPos;
-
-        ResetSpeedModifier();
-        isSliding = false;
-    }
-
+    
     private void CheckDashCollisions()
     {
         if (!isDashing || styleManager == null || !styleManager.CurrentStyle.canBreakWallsWithDash)
@@ -757,5 +657,123 @@ public class FirstPersonController : MonoBehaviour
         {
             slamIndicatorInstance.SetActive(false);
         }
+    }
+    
+    private IEnumerator CrawlSlideCoroutine()
+    {
+        isSliding = true;
+        float timer = 0f;
+        Vector3 targetScale = originalScale;
+        targetScale.y *= squatHeightScale;
+
+        int currentStyleIndex = styleManager?.GetCurrentStyleIndex() ?? 0;
+        
+        Vector3 originalPos = transform.localPosition;
+        Vector3 targetPos = originalPos;
+
+        if (currentStyleIndex == 0)
+        {
+            targetPos.y = originalPos.y - (originalScale.y - targetScale.y) * 0.5f;
+        }
+        else
+        {
+            targetPos.y = originalPos.y + (originalScale.y - targetScale.y) * 0.5f;
+        }
+
+        if (currentStyleIndex == 1 && isGrounded)
+            rb.useGravity = false;
+
+        float t = 0f;
+        while (t < squatTransitionDuration)
+        {
+            t += Time.deltaTime;
+            float progress = t / squatTransitionDuration;
+            transform.localScale = Vector3.Lerp(originalScale, targetScale, progress);
+            transform.localPosition = Vector3.Lerp(originalPos, targetPos, progress);
+            yield return null;
+        }
+        transform.localScale = targetScale;
+        transform.localPosition = targetPos;
+
+        if (currentStyleIndex == 1)
+        {
+            rb.useGravity = true;
+        }
+
+        float initialSpeed = walkSpeed * initialSpeedMultiplier;
+        Vector3 slideDirection = GetForwardVector();
+        slideDirection.y = 0;
+        slideDirection.Normalize();
+
+        Vector3 currentHorizontalVelocity = GetCurrentHorizontalVelocity();
+        float requiredForce = initialSpeed - currentHorizontalVelocity.magnitude;
+
+        if (requiredForce > 0)
+        {
+            rb.AddForce(slideDirection * requiredForce, ForceMode.VelocityChange);
+        }
+        else
+        {
+            SetSpeedModifier(initialSpeedMultiplier);
+        }
+        
+        timer = 0f;
+        while (isSliding)
+        {
+            timer += Time.deltaTime;
+
+            float currentSpeedLerp = Mathf.Lerp(initialSpeedMultiplier, 1.0f, timer / (slideDuration * 0.25f));
+            float finalSpeedLerp = Mathf.Lerp(1.0f, finalSpeedMultiplier, (timer - slideDuration * 0.25f) / (slideDuration * 0.75f));
+
+            if (timer < slideDuration * 0.25f)
+            {
+                SetSpeedModifier(currentSpeedLerp);
+            }
+            else
+            {
+                SetSpeedModifier(finalSpeedMultiplier);
+            }
+
+            yield return null;
+        }
+    }
+    
+    private IEnumerator StopCrawlSlideCoroutine()
+    {
+        isSliding = false; 
+        
+        Vector3 targetScale = originalScale;
+        targetScale.y *= squatHeightScale;
+        
+        int currentStyleIndex = styleManager?.GetCurrentStyleIndex() ?? 0;
+
+        float t = 0f;
+        Vector3 originalPos = transform.localPosition;
+        Vector3 targetPos = transform.localPosition;
+
+        if (currentStyleIndex == 0)
+        {
+            targetPos.y = originalPos.y + (originalScale.y - targetScale.y) * 0.5f;
+        }
+        else
+        {
+            targetPos.y = originalPos.y - (originalScale.y - targetScale.y) * 0.5f;
+        }
+        
+        while (t < squatTransitionDuration)
+        {
+            t += Time.deltaTime;
+            float progress = t / squatTransitionDuration;
+            transform.localScale = Vector3.Lerp(targetScale, originalScale, progress);
+            
+            transform.localPosition = Vector3.Lerp(originalPos, originalPos, progress); 
+            
+            yield return null;
+        }
+        
+        transform.localScale = originalScale;
+        transform.localPosition = originalPos;
+
+        ResetSpeedModifier();
     }
 }
