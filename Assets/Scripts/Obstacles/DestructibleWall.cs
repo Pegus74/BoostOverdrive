@@ -107,26 +107,6 @@ public class DestructibleWall : MonoBehaviour
     }
 
 
-    [ContextMenu("Test")]  
-    private void TestDestroyWall()
-    {
-        DestroyWall();
-    }
-
-    [CustomEditor(typeof(DestructibleWall))]
-    public class DestructibleWallEditor : Editor
-    {
-        public override void OnInspectorGUI()
-        {
-            DrawDefaultInspector();
-
-            DestructibleWall wall = (DestructibleWall)target;
-
-            if (GUILayout.Button("test"))
-            {
-                wall.DestroyWall();
-            }
-        }
-    }
+   
 
 }
