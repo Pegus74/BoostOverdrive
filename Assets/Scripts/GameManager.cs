@@ -1,13 +1,18 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject gameOverCanvas;
-    public GameObject gameWinCanvas;
-    public GameObject pauseCanvas;
+    [Header("UI")]
+    [SerializeField] private Canvas gameOverCanvas;
+    [SerializeField] private Canvas gameWinCanvas;
+    [SerializeField] private Canvas pauseCanvas;
 
     public MusicManager musicManager;
+    private string currentLevelName;
+    public List<string> levelNames = new List<string>();
 
     public static GameManager Instance;
 
@@ -26,15 +31,14 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            if (gameOverCanvas != null) DontDestroyOnLoad(gameOverCanvas.gameObject);
+            if (gameWinCanvas != null) DontDestroyOnLoad(gameWinCanvas.gameObject);
+            if (pauseCanvas != null) DontDestroyOnLoad(pauseCanvas.gameObject);
 
             SceneManager.sceneLoaded += OnSceneLoaded;
 
-            if (pauseCanvas != null)
-                pauseCanvas.SetActive(false);
-            if (gameOverCanvas != null)
-                gameOverCanvas.SetActive(false);
-            if (gameWinCanvas != null)
-                gameWinCanvas.SetActive(false);
+            InitializeUI();
+
             if (musicManager != null)
                 musicManager.PlayMusic();
 
@@ -42,51 +46,97 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            SceneManager.sceneLoaded -= OnSceneLoaded;
             Destroy(gameObject);
         }
     }
 
+    private void InitializeUI()
+    {
+        if (gameOverCanvas != null) gameOverCanvas.gameObject.SetActive(false);
+        if (gameWinCanvas != null) gameWinCanvas.gameObject.SetActive(false);
+        if (pauseCanvas != null) pauseCanvas.gameObject.SetActive(false);
+
+        Debug.Log($" GameOver: {gameOverCanvas != null}, GameWin: {gameWinCanvas != null}, Pause: {pauseCanvas != null}");
+    }
     private void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
+
     }
+
 
     private void UpdateGameState()
     {
+
         bool shouldTimeStop = (currentState != State.Playing);
         bool allowCursor = (currentState != State.Playing);
         bool changeMusicToGameOver = (currentState == State.GameOver);
 
         Time.timeScale = shouldTimeStop ? 0f : 1f;
 
-        musicManager.SetVolume(changeMusicToGameOver ? 0.25f : 0.5f);
-        musicManager.SetPitch(changeMusicToGameOver ? 0.7f : 1.0f);
+        if (musicManager != null)
+        {
+            musicManager.SetVolume(changeMusicToGameOver ? 0.25f : 0.5f);
+            musicManager.SetPitch(changeMusicToGameOver ? 0.7f : 1.0f);
+        }
 
         Cursor.lockState = allowCursor ? CursorLockMode.None : CursorLockMode.Locked;
         Cursor.visible = allowCursor;
+
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        StartCoroutine(DelayedSceneSetup(scene));
+    }
+
+    private IEnumerator DelayedSceneSetup(Scene scene)
+    {
+        yield return new WaitForEndOfFrame();
+
+        if (scene.name != "MainMenu" && !levelNames.Contains(scene.name))
+        {
+            levelNames.Add(scene.name);
+        }
+
         if (scene.name == "MainMenu")
         {
+            currentLevelName = null;
             currentState = State.Playing;
-
-            if (pauseCanvas != null)
-                pauseCanvas.SetActive(false);
-            if (gameOverCanvas != null)
-                gameOverCanvas.SetActive(false);
-
+            InitializeUI();
+            StopAllTimers();
+            HideTimerUI();
             Time.timeScale = 1f;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
         else
         {
+            currentLevelName = scene.name;
+            InitializeUI();
+
+            InitializeTimer();
             StartTimerOnSceneLoad();
+            ShowTimerUI();
         }
+
     }
+    private void InitializeTimer()
+    {
+        TimerManager timerManager = FindObjectOfType<TimerManager>();
+        if (timerManager != null)
+        {
+            timerManager.InitializeTimer();
+        }
+        else
+        {
+            Debug.LogError("TimerManager not found in scene!");
+        }
+
+    }
+
+
+    #region Timer
 
     private void StartTimerOnSceneLoad()
     {
@@ -97,12 +147,103 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void StopAllTimers()
+    {
+        TimerManager timerManager = FindObjectOfType<TimerManager>();
+        if (timerManager != null)
+        {
+            timerManager.StopTimerWithoutSaving(); 
+        }
+    }
+
+    private void HideTimerUI()
+    {
+        TimerManager timerManager = FindObjectOfType<TimerManager>();
+        if (timerManager != null)
+        {
+            timerManager.HideTimer();
+        }
+    }
+
+    private void ShowTimerUI()
+    {
+        TimerManager timerManager = FindObjectOfType<TimerManager>();
+        if (timerManager != null)
+        {
+            timerManager.ShowTimer();
+        }
+    }
+    public void ResetAllBestTimes()
+    {
+        string currentSceneName = SceneManager.GetActiveScene().name;
+        foreach (string levelName in levelNames)
+        {
+            if (!string.IsNullOrEmpty(levelName))
+            {
+                string bestTimeKey = "BestTime_" + levelName;
+                if (PlayerPrefs.HasKey(bestTimeKey))
+                {
+                    PlayerPrefs.DeleteKey(bestTimeKey);
+                }
+            }
+        }
+
+        PlayerPrefs.Save();
+
+        if (currentSceneName != "MainMenu")
+        {
+            TimerManager timerManager = FindObjectOfType<TimerManager>();
+            if (timerManager != null) timerManager.ResetBestTime();
+        }
+    }
+
+
+    public void AddLevelToResetList(string levelName)
+    {
+        if (!string.IsNullOrEmpty(levelName) && !levelNames.Contains(levelName))
+        {
+            levelNames.Add(levelName);
+        }
+    }
+
+    public void RemoveLevelFromResetList(string levelName)
+    {
+        if (levelNames.Contains(levelName))
+        {
+            levelNames.Remove(levelName);
+        }
+    }
+
+    public static string GetBestTimeKeyForCurrentLevel()
+    {
+        if (Instance.currentLevelName != null)
+        {
+            return "BestTime_" + Instance.currentLevelName;
+        }
+        return "BestTime_Unknown";
+    }
+
+    public static string GetBestTimeKeyForLevel(string levelName)
+    {
+        return "BestTime_" + levelName;
+    }
+
+    #endregion
+
+
+
     #region Win
-    public void PlayerWin()
+    public void PlayerWin(string levelName = null)
     {
         currentState = State.GameWin;
-        gameWinCanvas.SetActive(true);
-        FindObjectOfType<TimerManager>().StopTimer();
+        if (levelName != null)
+        {
+            this.currentLevelName = levelName;
+        }
+
+        if (gameWinCanvas != null) gameWinCanvas.gameObject.SetActive(true);
+        TimerManager timer = FindObjectOfType<TimerManager>();
+        if (timer != null) timer.StopTimerAndSaveBestTime();
         UpdateGameState();
     }
 
@@ -113,20 +254,19 @@ public class GameManager : MonoBehaviour
     public void PlayerDied()
     {
         currentState = State.GameOver;
-        gameOverCanvas.SetActive(true);
+        if (gameOverCanvas != null) gameOverCanvas.gameObject.SetActive(true);
+        TimerManager timer = FindObjectOfType<TimerManager>();
+        if (timer != null) timer.StopTimerWithoutSaving();
         UpdateGameState();
     }
 
     public void RestartLevel()
     {
-        gameOverCanvas.SetActive(false);
-        gameWinCanvas.SetActive(false);
+        if (gameOverCanvas != null) gameOverCanvas.gameObject.SetActive(false);
+        if (gameWinCanvas != null) gameWinCanvas.gameObject.SetActive(false);
         currentState = State.Playing;
-
         UpdateGameState();
-
-        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(currentSceneIndex);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     #endregion
@@ -135,27 +275,24 @@ public class GameManager : MonoBehaviour
 
     public void TogglePause()
     {
-        if (currentState != State.Playing && currentState != State.Paused && currentState != State.GameWin)
-            return;
+        if (currentState != State.Playing && currentState != State.Paused) return;
+        if (SceneManager.GetActiveScene().name == "MainMenu") return;
 
-        bool isPlaying = (currentState == State.Playing);
+        bool isPausing = (currentState == State.Playing);
+        currentState = isPausing ? State.Paused : State.Playing;
 
-        currentState = isPlaying ? State.Paused : State.Playing;
-
-        pauseCanvas.SetActive(isPlaying);
+        if (pauseCanvas != null) pauseCanvas.gameObject.SetActive(isPausing);
         UpdateGameState();
     }
 
     public void BackToMenu()
     {
+        currentState = State.Playing;
+        InitializeUI();
+        StopAllTimers();
+        HideTimerUI();
         Time.timeScale = 1f;
-        musicManager.StopMusic();
-
-        if (pauseCanvas != null && pauseCanvas.activeInHierarchy)
-            pauseCanvas.SetActive(false);
-        if (gameOverCanvas != null && gameOverCanvas.activeInHierarchy)
-            gameOverCanvas.SetActive(false);
-
+        if (musicManager != null) musicManager.StopMusic();
         SceneManager.LoadScene("MainMenu");
     }
 

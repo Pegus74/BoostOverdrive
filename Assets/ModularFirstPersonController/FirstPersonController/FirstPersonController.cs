@@ -56,10 +56,16 @@ public class FirstPersonController : MonoBehaviour
     public bool enableJump = true;
     public KeyCode jumpKey = KeyCode.Space;
     public float jumpPower = 5f;
-    public bool enableAirJump = true;
-
+    
+    public float jumpBufferTime = 0.15f;
+    private float jumpBufferTimer = 0f;
+    
+    public float coyoteTime = 0.15f;
+    private float coyoteTimer = 0f;
+    
     public bool isGrounded = false;
-    private bool canAirJump = true;
+    public bool isJumping = false;
+    private int jumpDelayFrames = 60;
     #endregion
 
     #region Dash
@@ -85,6 +91,10 @@ public class FirstPersonController : MonoBehaviour
 
     private bool dashInCameraDirection = true; 
     private bool allowHorizontalDashOnly = true;
+    [Header("Dash Collision")]
+    public float dashCollisionCheckRadius = 0.7f;
+    public float dashCollisionCheckDistance = 1.5f;
+    public LayerMask wallCheckLayerMask = 1;
     #endregion
 
     #region Slam 
@@ -217,18 +227,34 @@ public class FirstPersonController : MonoBehaviour
         #endregion
 
         #region Jump
-        if (enableJump && Input.GetKeyDown(jumpKey))
+        if (enableJump)
         {
-            if (isGrounded) { Jump(); }
-            else if (enableAirJump && canAirJump) { Jump(); canAirJump = false; }
+            if (Input.GetKeyDown(jumpKey))
+            {
+                jumpBufferTimer = jumpBufferTime; 
+            }
+            if (jumpBufferTimer > 0)
+            {
+                jumpBufferTimer -= Time.deltaTime;
+            }
+            if (jumpBufferTimer > 0f)
+            {
+                bool canJumpFromCoyote = coyoteTimer > 0f && !isJumping;
+
+                if (isGrounded || canJumpFromCoyote)
+                {
+                    JumpWithCleanup();
+                }
+            }
         }
+        
         #endregion
 
         #region Dash
         if (enableDash)
         {
             if (dashCooldownTimer > 0) dashCooldownTimer -= Time.deltaTime;
-            if (Input.GetKeyDown(dashKey) && dashCooldownTimer <= 0 && !isDashing)
+            if (Input.GetKeyDown(dashKey) && dashCooldownTimer <= 0 && !isDashing &&  !isSliding)
             {
                 dashDirection = playerCamera.transform.forward;
 
@@ -249,7 +275,6 @@ public class FirstPersonController : MonoBehaviour
             if (isDashing)
             {
                 dashTimer -= Time.deltaTime;
-                // Убирано дополнительное ускорение во время дэша чтобы не накапливалась скорость от предыдущих импульсов
                 if (dashTimer <= 0)
                 {
                     isDashing = false;
@@ -290,6 +315,10 @@ public class FirstPersonController : MonoBehaviour
         if (enableSlam)
         {
             if (slamCooldownTimer > 0) slamCooldownTimer -= Time.deltaTime;
+            if (isSlamming && enableDash && Input.GetKeyDown(dashKey) && dashCooldownTimer <= 0 && !isDashing)
+            {
+                InterruptSlamWithDash();
+            }
             if (Input.GetKeyDown(slamKey) && slamCooldownTimer <= 0 && !isSlamming && !isGrounded)
             {
                 StartSlam();
@@ -308,21 +337,52 @@ public class FirstPersonController : MonoBehaviour
         #endregion
 
         #region Crawlslide
-        if (enableCrawlSlide && Input.GetKeyDown(crawlSlideKey) && !isSliding && !isDashing)
+        if (enableCrawlSlide)
         {
-            if (slideCoroutine != null) StopCoroutine(slideCoroutine);
-            slideCoroutine = StartCoroutine(CrawlSlideCoroutine());
+            if (Input.GetKey(crawlSlideKey) && !isSliding && !isDashing)
+            {
+                if (slideCoroutine != null) StopCoroutine(slideCoroutine);
+                slideCoroutine = StartCoroutine(CrawlSlideCoroutine());
+            }
+            else if (Input.GetKeyUp(crawlSlideKey) && isSliding)
+            {
+                if (slideCoroutine != null) StopCoroutine(slideCoroutine);
+                slideCoroutine = StartCoroutine(StopCrawlSlideCoroutine());
+            }
         }
         #endregion
 
         CheckGround();
+        
+        if (jumpDelayFrames > 0)
+        {
+            jumpDelayFrames--;
+        }
+        else
+        {
+            if (isGrounded) 
+            {
+                coyoteTimer = coyoteTime;
+                isJumping = false;
+            }
+            else
+            {
+                if (coyoteTimer > 0)
+                {
+                    coyoteTimer -= Time.deltaTime;
+                }
+            }
+        }
+        
+        
         if (isGrounded && isSlamming)
         {
             EndSlam();
         }
-        if (isGrounded) canAirJump = true;
 
         if (enableHeadBob) HeadBob();
+        
+        
     }
 
     private void FixedUpdate()
@@ -376,7 +436,11 @@ public class FirstPersonController : MonoBehaviour
             rb.AddForce(velocityChange, ForceMode.VelocityChange);
         }
         #endregion
-
+        
+        if (isDashing)
+        {
+            CheckDashCollisions();
+        }
         externalImpulse = Vector3.Lerp(externalImpulse, Vector3.zero, 5f * Time.fixedDeltaTime);
         if (isSlamming && !slamImpactOccurred && !isReboundingFromSlam)
         {
@@ -425,6 +489,8 @@ public class FirstPersonController : MonoBehaviour
     {
         rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
         isGrounded = false;
+        isJumping = true;
+        Debug.Log(isJumping);
     }
 
     private void HeadBob()
@@ -483,19 +549,16 @@ public class FirstPersonController : MonoBehaviour
     }
 
     public bool IsGrounded() => isGrounded;
-
-    public void InitiateJumpLogic()
+    
+    private void JumpWithCleanup()
     {
-        if (isGrounded)
-        {
-            Jump();
-        }
-        else if (enableAirJump && canAirJump)
-        {
-            Jump();
-            canAirJump = false;
-        }
+        Jump(); 
+        jumpBufferTimer = 0f; 
+        coyoteTimer = 0f;
+        jumpDelayFrames = 30;
     }
+    
+    
     private void OnCollisionEnter(Collision collision)
     {
         if (isDashing && styleManager != null && styleManager.CurrentStyle.canBreakWallsWithDash)
@@ -579,7 +642,67 @@ public class FirstPersonController : MonoBehaviour
         LastWallJumpedFrom = null;
     }
     #endregion
+    
+    private void CheckDashCollisions()
+    {
+        if (!isDashing || styleManager == null || !styleManager.CurrentStyle.canBreakWallsWithDash)
+            return;
+        Vector3 checkStart = transform.position + Vector3.up * 0.5f;
+        Vector3 checkDirection = dashDirection.normalized;
+        CheckDirectionWithOffset(checkStart, checkDirection, Vector3.zero);
+        CheckDirectionWithOffset(checkStart, checkDirection, Vector3.up * 0.3f);
+        CheckDirectionWithOffset(checkStart, checkDirection, Vector3.down * 0.3f);
 
+    }
+    private void CheckDirectionWithOffset(Vector3 start, Vector3 direction, Vector3 offset)
+    {
+        RaycastHit[] hits = Physics.SphereCastAll(start + offset, dashCollisionCheckRadius,
+            direction, dashCollisionCheckDistance, wallCheckLayerMask);
+
+        foreach (RaycastHit hit in hits)
+        {
+            if (hit.collider.isTrigger || hit.collider.transform.IsChildOf(transform))
+                continue;
+
+            DestructibleWall wall = hit.collider.GetComponent<DestructibleWall>();
+            if (wall != null && !wall.isDestroyed)
+            {
+                ProcessDashWallBreak(wall, hit.point);
+                return;
+            }
+        }
+    }
+    private void ProcessDashWallBreak(DestructibleWall wall, Vector3 hitPoint)
+    {
+        wall.DestroyWall();
+        Vector3 reboundDirection = -dashDirection.normalized * 0.3f;
+        rb.AddForce(reboundDirection * dashPower, ForceMode.Impulse);
+    }
+
+    private void InterruptSlamWithDash()
+    {
+        isSlamming = false;
+        slamImpactOccurred = false;
+        isReboundingFromSlam = false;
+        dashDirection = playerCamera.transform.forward;
+        if (allowHorizontalDashOnly)
+        {
+            dashDirection.y = 0f;
+        }
+        dashDirection.Normalize();
+        isDashing = true;
+        dashTimer = dashDuration;
+        Vector3 currentVelocity = rb.velocity;
+        Vector3 dashVelocity = dashDirection * dashPower;
+        dashVelocity.y = currentVelocity.y * 0.5f;
+        rb.velocity = dashVelocity;
+        dashCooldownTimer = dashCooldown;
+        if (slamIndicatorInstance != null)
+        {
+            slamIndicatorInstance.SetActive(false);
+        }
+    }
+    
     private IEnumerator CrawlSlideCoroutine()
     {
         isSliding = true;
@@ -588,7 +711,7 @@ public class FirstPersonController : MonoBehaviour
         targetScale.y *= squatHeightScale;
 
         int currentStyleIndex = styleManager?.GetCurrentStyleIndex() ?? 0;
-
+        
         Vector3 originalPos = transform.localPosition;
         Vector3 targetPos = originalPos;
 
@@ -637,11 +760,9 @@ public class FirstPersonController : MonoBehaviour
         {
             SetSpeedModifier(initialSpeedMultiplier);
         }
-
-        float finalSpeed = walkSpeed * finalSpeedMultiplier;
-
+        
         timer = 0f;
-        while (timer < slideDuration)
+        while (isSliding)
         {
             timer += Time.deltaTime;
 
@@ -654,15 +775,25 @@ public class FirstPersonController : MonoBehaviour
             }
             else
             {
-                SetSpeedModifier(finalSpeedLerp);
+                SetSpeedModifier(finalSpeedMultiplier);
             }
 
             yield return null;
         }
+    }
+    
+    private IEnumerator StopCrawlSlideCoroutine()
+    {
+        isSliding = false; 
+        
+        Vector3 targetScale = originalScale;
+        targetScale.y *= squatHeightScale;
+        
+        int currentStyleIndex = styleManager?.GetCurrentStyleIndex() ?? 0;
 
-        t = 0f;
-        originalPos = transform.localPosition;
-        targetPos = originalPos;
+        float t = 0f;
+        Vector3 originalPos = transform.localPosition;
+        Vector3 targetPos = transform.localPosition;
 
         if (currentStyleIndex == 0)
         {
@@ -672,19 +803,21 @@ public class FirstPersonController : MonoBehaviour
         {
             targetPos.y = originalPos.y - (originalScale.y - targetScale.y) * 0.5f;
         }
-
+        
         while (t < squatTransitionDuration)
         {
             t += Time.deltaTime;
             float progress = t / squatTransitionDuration;
             transform.localScale = Vector3.Lerp(targetScale, originalScale, progress);
-            transform.localPosition = Vector3.Lerp(originalPos, originalPos, progress);
+            
+            transform.localPosition = Vector3.Lerp(originalPos, originalPos, progress); 
+            
             yield return null;
         }
+        
         transform.localScale = originalScale;
         transform.localPosition = originalPos;
 
         ResetSpeedModifier();
-        isSliding = false;
     }
 }
