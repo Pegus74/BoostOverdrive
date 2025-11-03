@@ -10,8 +10,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Canvas gameWinCanvas;
     [SerializeField] private Canvas pauseCanvas;
 
-    [Header("Level Manager")]
-    [SerializeField] private string nextLevelName;
 
     public MusicManager musicManager;
     private string currentLevelName;
@@ -252,17 +250,21 @@ public class GameManager : MonoBehaviour
 
     public void LoadNextLevel()
     {
-        if (string.IsNullOrEmpty(nextLevelName))
+        int currentBuildIndex = SceneManager.GetActiveScene().buildIndex;
+        int nextBuildIndex = currentBuildIndex + 1;
+        if (nextBuildIndex < SceneManager.sceneCountInBuildSettings)
+        {
+            currentState = State.Playing;
+            InitializeUI();
+            StopAllTimers();
+            HideTimerUI();
+            Time.timeScale = 1f;
+            SceneManager.LoadScene(nextBuildIndex);
+        }
+        else
         {
             BackToMenu();
-            return;
         }
-        currentState = State.Playing;
-        InitializeUI();
-        StopAllTimers();
-        HideTimerUI();
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(nextLevelName);
     }
     #endregion
 
