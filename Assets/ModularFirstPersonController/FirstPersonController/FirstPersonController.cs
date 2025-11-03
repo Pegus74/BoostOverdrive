@@ -654,6 +654,7 @@ public class FirstPersonController : MonoBehaviour
         CheckDirectionWithOffset(checkStart, checkDirection, Vector3.down * 0.3f);
 
     }
+
     private void CheckDirectionWithOffset(Vector3 start, Vector3 direction, Vector3 offset)
     {
         RaycastHit[] hits = Physics.SphereCastAll(start + offset, dashCollisionCheckRadius,
