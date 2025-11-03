@@ -10,6 +10,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Canvas gameWinCanvas;
     [SerializeField] private Canvas pauseCanvas;
 
+    [Header("Level Manager")]
+    [SerializeField] private string nextLevelName;
+
     public MusicManager musicManager;
     private string currentLevelName;
     public List<string> levelNames = new List<string>();
@@ -247,6 +250,20 @@ public class GameManager : MonoBehaviour
         UpdateGameState();
     }
 
+    public void LoadNextLevel()
+    {
+        if (string.IsNullOrEmpty(nextLevelName))
+        {
+            BackToMenu();
+            return;
+        }
+        currentState = State.Playing;
+        InitializeUI();
+        StopAllTimers();
+        HideTimerUI();
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(nextLevelName);
+    }
     #endregion
 
     #region GameOver

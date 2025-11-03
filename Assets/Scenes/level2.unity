@@ -153,6 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1a26f3c95c015844ab2ab07939866f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  levelName: 
 --- !u!64 &19865638
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -15182,10 +15183,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f5ddd0f96d3c3541a8f880980d77f40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameOverCanvas: {fileID: 834129375}
+  gameOverCanvas: {fileID: 834129378}
   gameWinCanvas: {fileID: 1346734597}
-  pauseCanvas: {fileID: 1385501749}
+  pauseCanvas: {fileID: 1385501752}
+  nextLevelName: 
   musicManager: {fileID: 135659327}
+  levelNames: []
 --- !u!4 &1057137560
 Transform:
   m_ObjectHideFlags: 0
@@ -15219,6 +15222,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timerText: {fileID: 2060419046}
   bestTimeText: {fileID: 1488494316}
+  timerContainer: {fileID: 0}
 --- !u!43 &1065673387
 Mesh:
   m_ObjectHideFlags: 0
@@ -21682,6 +21686,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1492534925}
   - component: {fileID: 1492534924}
+  - component: {fileID: 1492534926}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -21765,6 +21770,29 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!114 &1492534926
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1492534923}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_LightLayerMask: 1
+  m_RenderingLayers: 1
+  m_CustomShadowLayers: 0
+  m_ShadowLayerMask: 1
+  m_ShadowRenderingLayers: 1
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
 --- !u!1001 &1514966890
 PrefabInstance:
   m_ObjectHideFlags: 0
