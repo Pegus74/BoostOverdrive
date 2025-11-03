@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Canvas gameWinCanvas;
     [SerializeField] private Canvas pauseCanvas;
 
+
     public MusicManager musicManager;
     private string currentLevelName;
     public List<string> levelNames = new List<string>();
@@ -247,6 +248,24 @@ public class GameManager : MonoBehaviour
         UpdateGameState();
     }
 
+    public void LoadNextLevel()
+    {
+        int currentBuildIndex = SceneManager.GetActiveScene().buildIndex;
+        int nextBuildIndex = currentBuildIndex + 1;
+        if (nextBuildIndex < SceneManager.sceneCountInBuildSettings)
+        {
+            currentState = State.Playing;
+            InitializeUI();
+            StopAllTimers();
+            HideTimerUI();
+            Time.timeScale = 1f;
+            SceneManager.LoadScene(nextBuildIndex);
+        }
+        else
+        {
+            BackToMenu();
+        }
+    }
     #endregion
 
     #region GameOver
