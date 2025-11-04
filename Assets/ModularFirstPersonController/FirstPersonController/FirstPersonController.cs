@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class FirstPersonController : MonoBehaviour
@@ -14,8 +15,9 @@ public class FirstPersonController : MonoBehaviour
     private float speedLerpDuration = 0f;
     private float speedLerpTimer = 0f;
     private float initialSpeedModifier = 1f;
-
-
+    
+    private Scene currentScene;
+    
     [HideInInspector]
     public Component LastWallJumpedFrom { get; private set; } = null;
 
@@ -139,10 +141,7 @@ public class FirstPersonController : MonoBehaviour
     private Vector3 originalScale;
     private Coroutine slideCoroutine;
     #endregion
-
     
-
-
     #region Head Bob
     [Header("Head Bob")]
     public bool enableHeadBob = true;
@@ -162,7 +161,8 @@ public class FirstPersonController : MonoBehaviour
 
         playerCamera.fieldOfView = fov;
         jointOriginalPos = joint.localPosition;
-
+        
+        currentScene = SceneManager.GetActiveScene();
         originalScale = transform.localScale;
         if (slamIndicatorPrefab != null)
         {
@@ -207,6 +207,25 @@ public class FirstPersonController : MonoBehaviour
             if (dashCircle) dashCircle.gameObject.SetActive(false);
         }
         #endregion
+        
+        #region EnablePower
+        if (currentScene.name == "level1")
+        {
+            enableSlam = false;
+            enableCrawlSlide = false;
+            enableDash = false;
+        }
+        else if (currentScene.name == "level2")
+        {
+            enableSlam = false;
+            enableCrawlSlide = false;
+        }
+        else
+        {
+            enableCrawlSlide = false;
+        }
+        #endregion
+
     }
 
     private void Update()
@@ -490,7 +509,6 @@ public class FirstPersonController : MonoBehaviour
         rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
         isGrounded = false;
         isJumping = true;
-        Debug.Log(isJumping);
     }
 
     private void HeadBob()
