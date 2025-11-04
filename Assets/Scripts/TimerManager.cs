@@ -6,7 +6,7 @@ using TMPro;
 
 public class TimerManager : MonoBehaviour
 {
-    [Header("Настройки")]
+    [Header("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")]
     [SerializeField] private TextMeshProUGUI timerText;
     [SerializeField] private TextMeshProUGUI bestTimeText;
     [SerializeField] private GameObject timerContainer;
@@ -39,6 +39,9 @@ public class TimerManager : MonoBehaviour
             currentTime += Time.deltaTime;
             UpdateTimerUI();
         }
+        
+        if (Input.GetKeyDown(KeyCode.R))
+            ResetCurrentTimer();
     }
     public void StartTimer()
     {
@@ -91,8 +94,11 @@ public class TimerManager : MonoBehaviour
         }
     }
 
-
-
+    private void ResetCurrentTimer()
+    {
+        currentTime = 0f;
+    }
+    
     private void UpdateTimerUI()
     {
         if (timerText != null)
