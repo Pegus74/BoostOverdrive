@@ -5,7 +5,8 @@ using UnityEditor;
 
 public class DestructibleWall : MonoBehaviour
 {
-    public List<GameObject> wallParts = new List<GameObject>(); 
+    public List<GameObject> wallParts = new List<GameObject>();
+    private List<WallPartData> initPartData = new List<WallPartData>();
     public Collider wallCollider;  
     public float explosionForce = 10f;  
     public float explosionRadius = 5f;  
@@ -23,11 +24,32 @@ public class DestructibleWall : MonoBehaviour
                 }
             }
         }
+        if (wallParts.Count > 0 && initPartData.Count == 0)
+        {
+            foreach (GameObject part in wallParts)
+            {
+                WallPartData data = new WallPartData
+                {
+                    part = part,
+                    initPosition = part.transform.localPosition,
+                    rotation = part.transform.localRotation
+                };
+                initPartData.Add(data);
+            }
+        }
+        
         if (wallCollider != null)
         {
             wallCollider.enabled = true;
         }
         ResetWall();
+    }
+
+    void Update()
+    {
+        if (isDestroyed)
+            if (Input.GetKeyDown(KeyCode.R))
+                ResetWall();
     }
 
     private void ResetWall()
@@ -37,17 +59,25 @@ public class DestructibleWall : MonoBehaviour
         {
             wallCollider.enabled = true;
         }
-        foreach (GameObject part in wallParts)
+
+        foreach (WallPartData data in initPartData)
         {
-            Rigidbody rb = part.GetComponent<Rigidbody>();
-            if (rb != null)
+            GameObject part = data.part;
+            if (part != null)
             {
-                rb.velocity = Vector3.zero;
-                rb.angularVelocity = Vector3.zero;
-                rb.isKinematic = true;                                 
+                Rigidbody rb = part.GetComponent<Rigidbody>();
+                if (rb != null)
+                {
+                    rb.velocity = Vector3.zero;
+                    rb.angularVelocity = Vector3.zero;
+                    rb.isKinematic = true;
+                }
+                
+                part.transform.localPosition = data.initPosition;
+                part.transform.localRotation = data.rotation;
+
+                part.layer = LayerMask.NameToLayer("Default");
             }
-            part.transform.localRotation = Quaternion.identity;
-            part.layer = LayerMask.NameToLayer("Default");
         }
     }
 
