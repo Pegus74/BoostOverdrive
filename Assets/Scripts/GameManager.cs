@@ -9,7 +9,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Canvas gameOverCanvas;
     [SerializeField] private Canvas gameWinCanvas;
     [SerializeField] private Canvas pauseCanvas;
-
+    private string tempScene;
+    public string lastSceneName;
 
     public MusicManager musicManager;
     private string currentLevelName;
@@ -41,7 +42,8 @@ public class GameManager : MonoBehaviour
             InitializeUI();
 
             if (musicManager != null)
-                musicManager.PlayMusic();
+                musicManager.PlayMenuMusic();
+            
 
             UpdateGameState();
         }
@@ -62,7 +64,6 @@ public class GameManager : MonoBehaviour
     private void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
-
     }
 
 
@@ -88,18 +89,18 @@ public class GameManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        tempScene = SceneManager.GetActiveScene().name;
         StartCoroutine(DelayedSceneSetup(scene));
     }
 
     private IEnumerator DelayedSceneSetup(Scene scene)
     {
         yield return new WaitForEndOfFrame();
-
+        
         if (scene.name != "MainMenu" && !levelNames.Contains(scene.name))
         {
             levelNames.Add(scene.name);
         }
-
         if (scene.name == "MainMenu")
         {
             currentLevelName = null;
@@ -110,15 +111,18 @@ public class GameManager : MonoBehaviour
             Time.timeScale = 1f;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+            musicManager.PlayMenuMusic();
         }
         else
         {
             currentLevelName = scene.name;
+            Debug.Log(tempScene);
             InitializeUI();
-
+            musicManager.PlayGameMusic();
             InitializeTimer();
             StartTimerOnSceneLoad();
             ShowTimerUI();
+            tempScene = scene.name;
         }
 
     }
@@ -311,7 +315,6 @@ public class GameManager : MonoBehaviour
         StopAllTimers();
         HideTimerUI();
         Time.timeScale = 1f;
-        if (musicManager != null) musicManager.StopMusic();
         SceneManager.LoadScene("MainMenu");
     }
 

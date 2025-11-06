@@ -4,6 +4,9 @@ public class MusicManager : MonoBehaviour
 {
     public static MusicManager Instance;
 
+    public AudioClip menuMusic;
+    public AudioClip gameMusic;
+
     private AudioSource audioSource;
 
     private void Awake()
@@ -21,11 +24,7 @@ public class MusicManager : MonoBehaviour
         }
 
         audioSource = GetComponent<AudioSource>();
-
-        if (!audioSource.isPlaying)
-        {
-            audioSource.Play();
-        }
+        
     }
 
     public void SetVolume(float volume)
@@ -51,4 +50,25 @@ public class MusicManager : MonoBehaviour
         if (audioSource != null && audioSource.isPlaying)
             audioSource.Play();
     }
+
+    public void PlayMenuMusic()
+    {
+        if (audioSource != null)
+        {
+            audioSource.Stop();
+            audioSource.resource = menuMusic;
+            audioSource.Play();
+        }
+    }
+    
+    public void PlayGameMusic()
+    {
+        if (audioSource.resource != gameMusic)
+        {
+            audioSource.Stop();
+            audioSource.resource = gameMusic;
+            audioSource.Play();
+        }
+    }
+    
 }
