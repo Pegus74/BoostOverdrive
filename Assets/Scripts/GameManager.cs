@@ -78,7 +78,7 @@ public class GameManager : MonoBehaviour
 
         if (musicManager != null)
         {
-            musicManager.SetVolume(changeMusicToGameOver ? 0.25f : 0.5f);
+            musicManager.SetVolume(changeMusicToGameOver ? 0.1f : 0.25f);
             musicManager.SetPitch(changeMusicToGameOver ? 0.7f : 1.0f);
         }
 
