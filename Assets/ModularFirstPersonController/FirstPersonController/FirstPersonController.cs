@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Palmmedia.ReportGenerator.Core.Parser.Analysis;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -17,6 +18,8 @@ public class FirstPersonController : MonoBehaviour
     private float initialSpeedModifier = 1f;
     
     private Scene currentScene;
+
+    public MetricsMaster mm;
     
     [HideInInspector]
     public Component LastWallJumpedFrom { get; private set; } = null;
@@ -285,9 +288,9 @@ public class FirstPersonController : MonoBehaviour
                 dashDirection.Normalize();
 
                 isDashing = true;
-                dashTimer = dashDuration;
+                dashTimer = mm.dashDuration;
                 Vector3 currentVelocity = rb.velocity;
-                Vector3 dashVelocity = dashDirection * dashPower;
+                Vector3 dashVelocity = dashDirection * mm.dashPower;
                 dashVelocity.y = currentVelocity.y;
                 rb.velocity = dashVelocity;
             }
@@ -297,12 +300,12 @@ public class FirstPersonController : MonoBehaviour
                 if (dashTimer <= 0)
                 {
                     isDashing = false;
-                    dashCooldownTimer = dashCooldown;
+                    dashCooldownTimer = mm.dashCooldown;
                 }
             }
             if (useDashCircle && dashCircle)
             {
-                dashCircle.fillAmount = 1f - (dashCooldownTimer / dashCooldown);
+                dashCircle.fillAmount = 1f - (dashCooldownTimer / mm.dashCooldown);
                 if (hideCircleWhenReady && dashCircleCG)
                     dashCircleCG.alpha = dashCooldownTimer > 0 ? 1f : 0f;
             }
@@ -350,7 +353,7 @@ public class FirstPersonController : MonoBehaviour
                 currentVelocity.z = 0f;
                 rb.velocity = currentVelocity;
 
-                rb.AddForce(Vector3.down * (slamPower * 0.8f), ForceMode.Acceleration);
+                rb.AddForce(Vector3.down * (mm.slamPower * 0.8f), ForceMode.Acceleration);
             }
         }
         #endregion
@@ -468,7 +471,7 @@ public class FirstPersonController : MonoBehaviour
             currentVelocity.z = 0f;
             rb.velocity = currentVelocity;
 
-            rb.AddForce(Vector3.down * slamPower * 0.5f, ForceMode.Acceleration);
+            rb.AddForce(Vector3.down * mm.slamPower * 0.5f, ForceMode.Acceleration);
         }
     }
 
@@ -481,14 +484,14 @@ public class FirstPersonController : MonoBehaviour
         currentVelocity.x = 0f;
         currentVelocity.z = 0f;
         rb.velocity = currentVelocity;
-        rb.AddForce(Vector3.down * slamPower, ForceMode.Impulse);
+        rb.AddForce(Vector3.down * mm.slamPower, ForceMode.Impulse);
     }
 
     private void EndSlam()
     {
         isSlamming = false;
         isReboundingFromSlam = false; 
-        slamCooldownTimer = slamCooldown;
+        slamCooldownTimer = mm.slamCooldown;
         slamImpactOccurred = false;
         Vector3 currentVelocity = rb.velocity;
         currentVelocity.y = Mathf.Min(currentVelocity.y, 0f);
@@ -587,7 +590,7 @@ public class FirstPersonController : MonoBehaviour
                 Vector3 horizontalVelocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
                 wall.DestroyWall();
                 rb.velocity = new Vector3(horizontalVelocity.x, rb.velocity.y, horizontalVelocity.z);
-                rb.AddForce(dashDirection * dashPower * 0.5f, ForceMode.Impulse);
+                rb.AddForce(dashDirection * mm.dashPower * 0.5f, ForceMode.Impulse);
             }
         }
         if (isSlamming && styleManager != null && styleManager.CurrentStyle.canBreakWallsWithSlam && !slamImpactOccurred)
@@ -599,7 +602,7 @@ public class FirstPersonController : MonoBehaviour
                 isReboundingFromSlam = true; 
                 Vector3 impactPoint = collision.contacts[0].point;
                 wall.DestroyWallFromSlam(impactPoint);
-                rb.AddForce(Vector3.up * slamPower * reboundMultiplier, ForceMode.Impulse);
+                rb.AddForce(Vector3.up * mm.slamPower * reboundMultiplier, ForceMode.Impulse);
             }
         }
     }
@@ -695,7 +698,7 @@ public class FirstPersonController : MonoBehaviour
     {
         wall.DestroyWall();
         Vector3 reboundDirection = -dashDirection.normalized * 0.3f;
-        rb.AddForce(reboundDirection * dashPower, ForceMode.Impulse);
+        rb.AddForce(reboundDirection * mm.dashPower, ForceMode.Impulse);
     }
 
     private void InterruptSlamWithDash()
@@ -710,12 +713,12 @@ public class FirstPersonController : MonoBehaviour
         }
         dashDirection.Normalize();
         isDashing = true;
-        dashTimer = dashDuration;
+        dashTimer = mm.dashDuration;
         Vector3 currentVelocity = rb.velocity;
-        Vector3 dashVelocity = dashDirection * dashPower;
+        Vector3 dashVelocity = dashDirection * mm.dashPower;
         dashVelocity.y = currentVelocity.y * 0.5f;
         rb.velocity = dashVelocity;
-        dashCooldownTimer = dashCooldown;
+        dashCooldownTimer = mm.dashCooldown;
         if (slamIndicatorInstance != null)
         {
             slamIndicatorInstance.SetActive(false);

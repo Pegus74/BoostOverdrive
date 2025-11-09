@@ -2,11 +2,11 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-// TODO: проверка на ближайший
+// TODO: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 public class SpringWall : MonoBehaviour
 {
-    [Header("Настройки Стены")]
+    [Header("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")]
     public float activationDistance = 1.0f;
     public LayerMask playerLayer;
     public float raycastCheckDistance = 1.0f;
@@ -15,6 +15,7 @@ public class SpringWall : MonoBehaviour
     private const int HANDS_STYLE_INDEX = 1;
 
     private FirstPersonController playerController;
+    public MetricsMaster mm;
     private StyleController styleController;
     private KeyCode jumpKey;
     private Collider wallCollider;
@@ -51,31 +52,31 @@ public class SpringWall : MonoBehaviour
             Vector3[] checkDirections;
             if (currentStyleIndex == HANDS_STYLE_INDEX)
             {
-                // Стиль РУК: Raycast вперед + Raycast по скорости для Wall Climb
+                // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ: Raycast пїЅпїЅпїЅпїЅпїЅпїЅ + Raycast пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ Wall Climb
                 Vector3 forward = playerController.GetForwardVector();
                 forward.y = 0; forward.Normalize();
 
-                // Добавляем Raycast по вектору скорости, если игрок движется достаточно быстро
+                // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ Raycast пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
                 Vector3 velocityDirection = playerController.GetCurrentHorizontalVelocity().normalized;
                 float currentSpeed = playerController.GetCurrentHorizontalVelocity().magnitude;
 
-                // Проверка, движется ли игрок быстрее половины скорости ходьбы
-                if (currentSpeed > playerController.walkSpeed * 0.5f) // Предполагаем walkSpeed доступен
+                // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+                if (currentSpeed > playerController.walkSpeed * 0.5f) // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ walkSpeed пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                 {
-                    // Если игрок движется, проверяем и по направлению взгляда, и по направлению движения
+                    // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                     checkDirections = new Vector3[] { forward, velocityDirection };
-                    // Debug.Log($"Стиль РУК: Используется Raycast вперед и по направлению скорости ({velocityDirection}) для Wall Climb.");
+                    // Debug.Log($"пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ Raycast пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ ({velocityDirection}) пїЅпїЅпїЅ Wall Climb.");
                 }
                 else
                 {
-                    // Иначе, только вперед
+                    // пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
                     checkDirections = new Vector3[] { forward };
-                    // Debug.Log("Стиль РУК: Используется одиночный Raycast вперед.");
+                    // Debug.Log("пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ Raycast пїЅпїЅпїЅпїЅпїЅпїЅ.");
                 }
             }
             else // LEGS_STYLE_INDEX
             {
-                // Стиль НОГ: Множественные Raycast'ы для гибкого обнаружения с боков.
+                // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ Raycast'пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ.
                 Vector3 forward = playerController.GetForwardVector();
                 forward.y = 0; forward.Normalize();
                 Vector3 right = playerController.transform.right;
@@ -88,7 +89,7 @@ public class SpringWall : MonoBehaviour
                     right,
                     -right
                 };
-                //Debug.Log("Стиль НОГ: Используется 4 Raycast'а для гибкости.");
+                //Debug.Log("пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 4 Raycast'пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.");
             }
 
             if (TryCheckWallContact(checkDirections, out surfaceNormal))
@@ -103,11 +104,11 @@ public class SpringWall : MonoBehaviour
         normal = Vector3.up;
         Vector3 rayStart = playerController.transform.position;
 
-        // Проверка Raycast'ами по заданным направлениям
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ Raycast'пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         foreach (Vector3 direction in directions)
         {
             RaycastHit hit;
-            // Raycast от позиции игрока в одном из заданных направлений
+            // Raycast пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             if (Physics.Raycast(rayStart, direction, out hit, raycastCheckDistance))
             {
                 if (hit.collider == wallCollider)
@@ -121,13 +122,13 @@ public class SpringWall : MonoBehaviour
             }
         }
 
-        // Проверка по ближайшей точке
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
         Vector3 closestPointToWall = wallCollider.ClosestPoint(rayStart);
         float distanceToWall = Vector3.Distance(rayStart, closestPointToWall);
 
         if (distanceToWall <= activationDistance + 0.05f)
         {
-            // Используем нормаль от ближайшей точки
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
             normal = (rayStart - closestPointToWall).normalized;
             normal.y = 0;
             normal.Normalize();
@@ -142,7 +143,7 @@ public class SpringWall : MonoBehaviour
 
         if (playerController.IsGrounded())
         {
-            //Debug.Log("Игрок стоит на месте. Выполняется обычный прыжок.");
+            //Debug.Log("пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.");
             return;
         }
 
@@ -157,51 +158,51 @@ public class SpringWall : MonoBehaviour
         #region HANDS
         if (currentStyleIndex == HANDS_STYLE_INDEX)
         {
-            // Вектор приближения (скорость игрока)
+            // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ)
             Vector3 V_approach_norm = approachVector;
             V_approach_norm.y = 0;
             V_approach_norm.Normalize();
 
-            // Расчет угла приближения: угол между V_пад и вектором от стены к игроку (-surfaceNormal).
+            // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ V_пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (-surfaceNormal).
             float angle = Vector3.Angle(V_approach_norm, -surfaceNormal);
-            //Debug.Log($"Угол между V_пад и -N (приближение): {angle:F2} градусов");
+            //Debug.Log($"пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ V_пїЅпїЅпїЅ пїЅ -N (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ): {angle:F2} пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
             bool isSpecialCase = (angle <= 15f || angle >= 165f || (angle >= 75f && angle <= 105f));
 
             if (isSpecialCase)
             {
-                // отскок строго назад + подброс
+                // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ + пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                 reboundVector = surfaceNormal;
-                reboundForce = playerController.reboundForceHands;
+                reboundForce = mm.reboundForceHands;
 
                 reboundVector += Vector3.up;
                 reboundVector.Normalize();
                 specialVerticalCaseTriggered = true;
-                // Debug.Log($"Срабатывание '90-градусного отскока");
+                // Debug.Log($"пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ '90-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
             }
             else
             {
                 reboundVector = Vector3.Reflect(V_approach_norm, surfaceNormal);
-                reboundForce = playerController.reboundForceHands;
+                reboundForce = mm.reboundForceHands;
 
                 reboundVector.y = 0;
                 reboundVector.Normalize();
-                // Debug.Log($"Срабатывание стандартного отскока");
+                // Debug.Log($"пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
             }
 
-            // 2. Применяем импульс и ускорение
+            // 2. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             Vector3 impulse = reboundVector * reboundForce;
-            impulse += reboundVector * playerController.extraAccelerationHands; // Дополнительное ускорение
+            impulse += reboundVector * mm.extraAccelerationHands; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
             playerController.SetExternalImpulse(impulse);
-            // Debug.Log($"Финальный импульс (РУКИ): {impulse}");
+            // Debug.Log($"пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅ): {impulse}");
 
             if (Input.GetKey(playerController.cameraRotateKey))
             {
-                // 3. Поворот камеры
+                // 3. пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
                 float targetYaw = Quaternion.LookRotation(reboundVector).eulerAngles.y;
                 playerController.SmoothlyRotateCameraYaw(targetYaw, playerController.cameraRotationDuration);
-                // Debug.Log($"Поворот камеры: {targetYaw:F2} градусов.");
+                // Debug.Log($"пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: {targetYaw:F2} пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.");
             }
         }
         #endregion
@@ -213,8 +214,8 @@ public class SpringWall : MonoBehaviour
             jumpDirection.y = 0;
             jumpDirection.Normalize();
 
-            float horizontalForce = playerController.horizontalForceLegs;
-            float verticalForce = playerController.verticalForceLegs;
+            float horizontalForce = mm.horizontalForceLegs;
+            float verticalForce = mm.verticalForceLegs;
 
             Vector3 finalImpulse = jumpDirection * horizontalForce + Vector3.up * verticalForce;
 

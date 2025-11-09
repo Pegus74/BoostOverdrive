@@ -13653,6 +13653,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e64c45d7dda75614795726c493ac7e60, type: 3}
   m_PrefabInstance: {fileID: 1323380619}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1383631323
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1383631324}
+  m_Layer: 0
+  m_Name: Metrics
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1383631324
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1383631323}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 259.71622, y: 61.95413, z: 80.66125}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1389578608 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e64c45d7dda75614795726c493ac7e60, type: 3}
@@ -20148,6 +20179,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: FirstPersonController (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 4686420120980115813, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
+      propertyPath: mm
+      value: 
+      objectReference: {fileID: 11400000, guid: 3d5d607f94ab2b68da80c8bc30880b61, type: 2}
+    - target: {fileID: 4686420120980115813, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
+      propertyPath: metrics
+      value: 
+      objectReference: {fileID: 11400000, guid: 3d5d607f94ab2b68da80c8bc30880b61, type: 2}
     - target: {fileID: 4686420120980115813, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
       propertyPath: styles.Array.data[0].jumpPower
       value: 6
@@ -27369,3 +27408,4 @@ SceneRoots:
   - {fileID: 3358274552289239581}
   - {fileID: 7291657819796261118}
   - {fileID: 152090297}
+  - {fileID: 1383631324}
