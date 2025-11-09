@@ -16,10 +16,13 @@ public class PlayerStyle
 
 
     public class StyleController : MonoBehaviour
-{
-    public PlayerStyle[] styles = new PlayerStyle[2]; 
+    {
+        public PlayerStyle[] styles = new PlayerStyle[2];
+    
     public KeyCode switchStyleKey = KeyCode.Tab; 
     private int currentStyleIndex = 0;
+    
+     public MetricsMaster mm;
 
     [Header("UI Elements")]
     public Image LegstyleUI;    
@@ -39,11 +42,9 @@ public class PlayerStyle
         controller = GetComponent<FirstPersonController>();
         playerCamera = controller.playerCamera;  
 
-        if (styles.Length == 0)
+        if (mm != null && mm.Styles != null && mm.Styles.Length > 0)
         {
-            styles = new PlayerStyle[2];
-            styles[0] = new PlayerStyle { styleName = "Legs style", walkSpeed = 10f, jumpPower = 10f, fov = 60f, canBreakWallsWithDash = false, canBreakWallsWithSlam = false };
-            styles[1] = new PlayerStyle { styleName = "Hands style", walkSpeed = 6f,  jumpPower = 6f, fov = 80f, canBreakWallsWithDash = true, canBreakWallsWithSlam = true };
+            styles = mm.Styles;
         }
 
         ApplyStyle(currentStyleIndex);
@@ -60,7 +61,8 @@ public class PlayerStyle
         if (Input.GetKeyDown(switchStyleKey))
         {
             SwitchStyle();
-        }        
+        }
+        ApplyStyle(currentStyleIndex);
         UpdateAirbornState();
     }
 
@@ -140,4 +142,17 @@ public class PlayerStyle
     }
 
     public int GetCurrentStyleIndex() => currentStyleIndex;
+    
+// #if UNITY_EDITOR
+//     void OnValidate()
+//     {
+//         if (!Application.isPlaying) return;
+//
+//         if (mm != null && mm.Styles != null && mm.Styles.Length > 0)
+//         {
+//             styles = mm.Styles;
+//             ApplyStyle(currentStyleIndex);
+//         }
+//     }
+// #endif
 }
