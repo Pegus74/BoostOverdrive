@@ -839,7 +839,7 @@ GameObject:
   m_Component:
   - component: {fileID: 103199048}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: RespawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20164,6 +20164,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4459864850019384740, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
+      propertyPath: mm
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 4459864850019384740, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
       propertyPath: dashPower
       value: 35
       objectReference: {fileID: 0}
@@ -20210,7 +20214,7 @@ PrefabInstance:
     - target: {fileID: 7806049255009064623, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
       propertyPath: targetPoint
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 103199048}
     - target: {fileID: 8792636544598214514, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
       propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
       value: 1801810542
@@ -27394,7 +27398,6 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1492534925}
-  - {fileID: 103199048}
   - {fileID: 1243429492}
   - {fileID: 235411984584556320}
   - {fileID: 1673390545}
@@ -27409,3 +27412,4 @@ SceneRoots:
   - {fileID: 7291657819796261118}
   - {fileID: 152090297}
   - {fileID: 1383631324}
+  - {fileID: 103199048}

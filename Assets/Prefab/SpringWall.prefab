@@ -60,6 +60,8 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -123,8 +125,4 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   raycastCheckDistance: 1
-  reboundForceLegs: 15
-  reboundForceHands: 10
-  extraAccelerationHands: 50
-  verticalBounceOn90Degree: 2
-  cameraRotationDuration: 0.3
+  mm: {fileID: 11400000, guid: 3d5d607f94ab2b68da80c8bc30880b61, type: 2}
