@@ -19,8 +19,8 @@ public class MetricsMaster: ScriptableObject
     public float horizontalForceLegs = 14f;
     public float verticalForceLegs = 10f;
     [Header("Cтиль рук")]
-    public float reboundForceHands = 20f;
-    public float extraAccelerationHands = 5f;
+    public float horizontalForceHands = 14f;
+    public float verticalForceHands = 10f;
     
     
 }

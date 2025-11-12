@@ -64,8 +64,7 @@ public class PlayerStyle
         }
         
         UpdateAirbornState();
-        if (!isInAir)
-            ApplyStyle(currentStyleIndex);
+        ApplyStyleAirborn(currentStyleIndex);
     }
 
     private void SwitchStyle()
