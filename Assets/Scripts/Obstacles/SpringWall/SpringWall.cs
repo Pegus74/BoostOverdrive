@@ -50,47 +50,20 @@ public class SpringWall : MonoBehaviour
             int currentStyleIndex = styleController.GetCurrentStyleIndex();
 
             Vector3[] checkDirections;
-            if (currentStyleIndex == HANDS_STYLE_INDEX)
+            // ����� ���: ������������� Raycast'� ��� ������� ����������� � �����.
+            Vector3 forward = playerController.GetForwardVector();
+            forward.y = 0; forward.Normalize();
+            Vector3 right = playerController.transform.right;
+            right.y = 0; right.Normalize();
+
+            checkDirections = new Vector3[]
             {
-                // ����� ���: Raycast ������ + Raycast �� �������� ��� Wall Climb
-                Vector3 forward = playerController.GetForwardVector();
-                forward.y = 0; forward.Normalize();
-
-                // ��������� Raycast �� ������� ��������, ���� ����� �������� ���������� ������
-                Vector3 velocityDirection = playerController.GetCurrentHorizontalVelocity().normalized;
-                float currentSpeed = playerController.GetCurrentHorizontalVelocity().magnitude;
-
-                // ��������, �������� �� ����� ������� �������� �������� ������
-                if (currentSpeed > playerController.walkSpeed * 0.5f) // ������������ walkSpeed ��������
-                {
-                    // ���� ����� ��������, ��������� � �� ����������� �������, � �� ����������� ��������
-                    checkDirections = new Vector3[] { forward, velocityDirection };
-                    // Debug.Log($"����� ���: ������������ Raycast ������ � �� ����������� �������� ({velocityDirection}) ��� Wall Climb.");
-                }
-                else
-                {
-                    // �����, ������ ������
-                    checkDirections = new Vector3[] { forward };
-                    // Debug.Log("����� ���: ������������ ��������� Raycast ������.");
-                }
-            }
-            else // LEGS_STYLE_INDEX
-            {
-                // ����� ���: ������������� Raycast'� ��� ������� ����������� � �����.
-                Vector3 forward = playerController.GetForwardVector();
-                forward.y = 0; forward.Normalize();
-                Vector3 right = playerController.transform.right;
-                right.y = 0; right.Normalize();
-
-                checkDirections = new Vector3[]
-                {
-                    forward,
-                    -forward,
-                    right,
-                    -right
-                };
-                //Debug.Log("����� ���: ������������ 4 Raycast'� ��� ��������.");
-            }
+                forward,
+                -forward,
+                right,
+                -right
+            };
+            //Debug.Log("����� ���: ������������ 4 Raycast'� ��� ��������.");
 
             if (TryCheckWallContact(checkDirections, out surfaceNormal))
             {
@@ -150,60 +123,25 @@ public class SpringWall : MonoBehaviour
         playerController.SetLastWallJumpedFrom(this);
 
         int currentStyleIndex = styleController.GetCurrentStyleIndex();
-
-        Vector3 reboundVector = Vector3.zero;
+        
         float reboundForce = 0f;
         bool specialVerticalCaseTriggered = false;
 
         #region HANDS
         if (currentStyleIndex == HANDS_STYLE_INDEX)
         {
-            // ������ ����������� (�������� ������)
-            Vector3 V_approach_norm = approachVector;
-            V_approach_norm.y = 0;
-            V_approach_norm.Normalize();
+            Vector3 jumpDirection = playerController.GetForwardVector();
+            jumpDirection.y = 0;
+            jumpDirection.Normalize();
 
-            // ������ ���� �����������: ���� ����� V_��� � �������� �� ����� � ������ (-surfaceNormal).
-            float angle = Vector3.Angle(V_approach_norm, -surfaceNormal);
-            //Debug.Log($"���� ����� V_��� � -N (�����������): {angle:F2} ��������");
+            float horizontalForce = mm.horizontalForceHands;
+            float verticalForce = mm.verticalForceHands;
 
-            bool isSpecialCase = (angle <= 15f || angle >= 165f || (angle >= 75f && angle <= 105f));
+            Vector3 finalImpulse = jumpDirection * horizontalForce + Vector3.up * verticalForce;
 
-            if (isSpecialCase)
-            {
-                // ������ ������ ����� + �������
-                reboundVector = surfaceNormal;
-                reboundForce = mm.reboundForceHands;
+            playerController.rb.AddForce(finalImpulse, ForceMode.Impulse);
 
-                reboundVector += Vector3.up;
-                reboundVector.Normalize();
-                specialVerticalCaseTriggered = true;
-                // Debug.Log($"������������ '90-���������� �������");
-            }
-            else
-            {
-                reboundVector = Vector3.Reflect(V_approach_norm, surfaceNormal);
-                reboundForce = mm.reboundForceHands;
-
-                reboundVector.y = 0;
-                reboundVector.Normalize();
-                // Debug.Log($"������������ ������������ �������");
-            }
-
-            // 2. ��������� ������� � ���������
-            Vector3 impulse = reboundVector * reboundForce;
-            impulse += reboundVector * mm.extraAccelerationHands; // �������������� ���������
-
-            playerController.SetExternalImpulse(impulse);
-            // Debug.Log($"��������� ������� (����): {impulse}");
-
-            if (Input.GetKey(playerController.cameraRotateKey))
-            {
-                // 3. ������� ������
-                float targetYaw = Quaternion.LookRotation(reboundVector).eulerAngles.y;
-                playerController.SmoothlyRotateCameraYaw(targetYaw, playerController.cameraRotationDuration);
-                // Debug.Log($"������� ������: {targetYaw:F2} ��������.");
-            }
+            playerController.SetExternalImpulse(Vector3.zero);
         }
         #endregion
 
@@ -224,12 +162,6 @@ public class SpringWall : MonoBehaviour
             playerController.SetExternalImpulse(Vector3.zero);
         }
         #endregion
-
-        if (specialVerticalCaseTriggered)
-        {
-            playerController.rb.AddForce(Vector3.up * playerController.jumpPower * 0.5f, ForceMode.Impulse);
-        }
-
     }
 
     private void OnDrawGizmosSelected()
