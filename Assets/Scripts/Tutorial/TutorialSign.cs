@@ -17,11 +17,19 @@ public class TutorialSign : MonoBehaviour
     [SerializeField] private TextMeshProUGUI descriptionText;
     [SerializeField] private GameObject arrowIndicator;
 
+
+    [Header("Collider Settings")]
+    [SerializeField] private Collider triggerCollider;
+    [SerializeField] private bool hideOnTouch = true;
+
     public bool IsActive { get; private set; }
     public bool WasShown { get; private set; }
     public float CurrentDistanceToPlayer { get; private set; }
 
     private Coroutine activationCoroutine;
+    private Vector3 initialPosition;
+    private Quaternion initialRotation;
+    private bool isHiddenByTouch = false;
 
     public enum TutorialType
     {
@@ -34,6 +42,21 @@ public class TutorialSign : MonoBehaviour
     void Start()
     {
         InitializeSign();
+        SaveInitialState();
+        if (triggerCollider == null)
+        {
+            triggerCollider = GetComponent<Collider>();
+            if (triggerCollider == null)
+            {
+                BoxCollider boxCollider = gameObject.AddComponent<BoxCollider>();
+                boxCollider.isTrigger = true;
+                triggerCollider = boxCollider;
+            }
+        }
+        if (triggerCollider != null)
+        {
+            triggerCollider.isTrigger = true;
+        }
     }
 
     void Update()
@@ -44,8 +67,17 @@ public class TutorialSign : MonoBehaviour
         if (player != null)
         {
             HandleRotation();
-            HandleActivation();
+            if (!isHiddenByTouch) 
+            {
+                HandleActivation();
+            }
         }
+    }
+
+    private void SaveInitialState()
+    {
+        initialPosition = transform.position;
+        initialRotation = transform.rotation;
     }
 
     public void Activate()
@@ -56,6 +88,43 @@ public class TutorialSign : MonoBehaviour
         WasShown = true;
         StartActivationAnimation(true);
     }
+
+
+    public void ResetSign()
+    {
+        isHiddenByTouch = false;
+        WasShown = false;
+        transform.position = initialPosition;
+        transform.rotation = initialRotation;
+        SetSignActive(true, true);
+        if (triggerCollider != null)
+        {
+            triggerCollider.enabled = true;
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!hideOnTouch) return;
+
+        if (other.CompareTag("Player"))
+        {
+            HideOnTouch();
+        }
+    }
+
+    private void HideOnTouch()
+    {
+        if (isHiddenByTouch) return;
+
+        isHiddenByTouch = true;
+        Deactivate();
+        if (triggerCollider != null)
+        {
+            triggerCollider.enabled = false;
+        }
+    }
+
 
     public void Deactivate()
     {

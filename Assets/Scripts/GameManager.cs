@@ -254,6 +254,10 @@ public class GameManager : MonoBehaviour
 
     public void LoadNextLevel()
     {
+        if (TutorialManager.Instance != null)
+        {
+            TutorialManager.Instance.ResetAllSigns();
+        }
         int currentBuildIndex = SceneManager.GetActiveScene().buildIndex;
         int nextBuildIndex = currentBuildIndex + 1;
         if (nextBuildIndex < SceneManager.sceneCountInBuildSettings)
@@ -285,6 +289,11 @@ public class GameManager : MonoBehaviour
 
     public void RestartLevel()
     {
+        if (TutorialManager.Instance != null)
+        {
+            TutorialManager.Instance.ResetAllSigns();
+        }
+
         if (gameOverCanvas != null) gameOverCanvas.gameObject.SetActive(false);
         if (gameWinCanvas != null) gameWinCanvas.gameObject.SetActive(false);
         currentState = State.Playing;
@@ -310,6 +319,10 @@ public class GameManager : MonoBehaviour
 
     public void BackToMenu()
     {
+        if (TutorialManager.Instance != null)
+        {
+            TutorialManager.Instance.ResetAllSigns();
+        }
         currentState = State.Playing;
         InitializeUI();
         StopAllTimers();
