@@ -19,7 +19,7 @@ public class FirstPersonController : MonoBehaviour
     
     private Scene currentScene;
 
-    public MetricsMaster mm;
+    [SerializeField] private MetricsMaster mm;
     
     [HideInInspector]
     public Component LastWallJumpedFrom { get; private set; } = null;
