@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
     private string tempScene;
     public string lastSceneName;
 
-    public MusicManager musicManager;
+    [SerializeField] private MusicManager musicManager;
     private string currentLevelName;
     public List<string> levelNames = new List<string>();
 
@@ -38,7 +38,7 @@ public class GameManager : MonoBehaviour
             if (pauseCanvas != null) DontDestroyOnLoad(pauseCanvas.gameObject);
 
             SceneManager.sceneLoaded += OnSceneLoaded;
-
+            FindMusicManager();
             InitializeUI();
 
             if (musicManager != null)
@@ -50,6 +50,27 @@ public class GameManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+        }
+    }
+
+    private void FindMusicManager()
+    {
+        if (musicManager != null)
+        {
+            Debug.Log("MusicManager assigned ");
+            return;
+        }
+        musicManager = FindObjectOfType<MusicManager>();
+
+        if (musicManager != null)
+        {
+            Debug.Log("MusicManager found automatically ");
+        }
+        else
+        {
+
+            Debug.LogWarning("MusicManager not found, creating new one");
+            
         }
     }
 
@@ -73,7 +94,6 @@ public class GameManager : MonoBehaviour
         bool shouldTimeStop = (currentState != State.Playing);
         bool allowCursor = (currentState != State.Playing);
         bool changeMusicToGameOver = (currentState == State.GameOver);
-
         Time.timeScale = shouldTimeStop ? 0f : 1f;
 
         if (musicManager != null)
@@ -93,10 +113,16 @@ public class GameManager : MonoBehaviour
         StartCoroutine(DelayedSceneSetup(scene));
     }
 
+
     private IEnumerator DelayedSceneSetup(Scene scene)
     {
         yield return new WaitForEndOfFrame();
-        
+
+        if (musicManager == null)
+        {
+            FindMusicManager();
+        }
+
         if (scene.name != "MainMenu" && !levelNames.Contains(scene.name))
         {
             levelNames.Add(scene.name);
@@ -111,14 +137,16 @@ public class GameManager : MonoBehaviour
             Time.timeScale = 1f;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
-            musicManager.PlayMenuMusic();
+            if (musicManager != null)
+                musicManager.PlayMenuMusic();
         }
         else
         {
             currentLevelName = scene.name;
             Debug.Log(tempScene);
             InitializeUI();
-            musicManager.PlayGameMusic();
+            if (musicManager != null)
+                musicManager.PlayMenuMusic();
             InitializeTimer();
             StartTimerOnSceneLoad();
             ShowTimerUI();
@@ -249,6 +277,7 @@ public class GameManager : MonoBehaviour
         if (gameWinCanvas != null) gameWinCanvas.gameObject.SetActive(true);
         TimerManager timer = FindObjectOfType<TimerManager>();
         if (timer != null) timer.StopTimerAndSaveBestTime();
+    
         UpdateGameState();
     }
 
@@ -321,4 +350,5 @@ public class GameManager : MonoBehaviour
     #endregion
 
     public State GetCurrentState() => currentState;
+    public MusicManager MusicManager => musicManager;
 }
