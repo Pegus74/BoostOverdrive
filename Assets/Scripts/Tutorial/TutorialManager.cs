@@ -22,6 +22,19 @@ public class TutorialManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+    public void ResetAllSigns()
+    {
+        foreach (var sign in allTutorialSigns)
+        {
+            if (sign != null)
+            {
+                sign.ResetSign();
+            }
+        }
+        currentlyActiveSign = null;
+    }
+
     public void RegisterSign(TutorialSign sign)
     {
         if (!allTutorialSigns.Contains(sign))
