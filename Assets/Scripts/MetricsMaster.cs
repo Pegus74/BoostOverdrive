@@ -21,6 +21,6 @@ public class MetricsMaster: ScriptableObject
     [Header("Cтиль рук")]
     public float horizontalForceHands = 14f;
     public float verticalForceHands = 10f;
-    
-    
+    public float HandsSpeedModifier = 0.3f;
+    public float HandsSpeedModifierDuration = 2f;
 }
