@@ -25102,6 +25102,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2363525493615118129, guid: 7d81c099ea7e2cf40a29ed139fab0d71, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 3182432588721895993, guid: 7d81c099ea7e2cf40a29ed139fab0d71, type: 3}
       propertyPath: m_Name
       value: point (18)
@@ -29030,6 +29034,8 @@ MonoBehaviour:
   titleText: {fileID: 0}
   descriptionText: {fileID: 0}
   arrowIndicator: {fileID: 0}
+  triggerCollider: {fileID: 0}
+  hideOnTouch: 1
 --- !u!224 &2235905912336568414
 RectTransform:
   m_ObjectHideFlags: 0
@@ -29381,6 +29387,8 @@ MonoBehaviour:
   titleText: {fileID: 0}
   descriptionText: {fileID: 0}
   arrowIndicator: {fileID: 0}
+  triggerCollider: {fileID: 0}
+  hideOnTouch: 1
 --- !u!114 &3437449790765771920
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29757,6 +29765,8 @@ MonoBehaviour:
   titleText: {fileID: 0}
   descriptionText: {fileID: 0}
   arrowIndicator: {fileID: 0}
+  triggerCollider: {fileID: 0}
+  hideOnTouch: 1
 --- !u!114 &4446407980409839463
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32042,6 +32052,8 @@ MonoBehaviour:
   titleText: {fileID: 0}
   descriptionText: {fileID: 0}
   arrowIndicator: {fileID: 0}
+  triggerCollider: {fileID: 0}
+  hideOnTouch: 1
 --- !u!224 &8995890402850994033
 RectTransform:
   m_ObjectHideFlags: 0
