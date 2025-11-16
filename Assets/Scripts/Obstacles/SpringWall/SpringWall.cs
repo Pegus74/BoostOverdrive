@@ -142,6 +142,7 @@ public class SpringWall : MonoBehaviour
             playerController.rb.AddForce(finalImpulse, ForceMode.Impulse);
 
             playerController.SetExternalImpulse(Vector3.zero);
+            StartCoroutine(SlowdownCoroutine());
         }
         #endregion
 
@@ -162,6 +163,20 @@ public class SpringWall : MonoBehaviour
             playerController.SetExternalImpulse(Vector3.zero);
         }
         #endregion
+    }
+
+
+    private IEnumerator SlowdownCoroutine()
+    {
+        playerController.SetSpeedModifier(mm.HandsSpeedModifier);
+        float timer = 0f;
+        
+        while (timer < mm.HandsSpeedModifierDuration && !playerController.IsGrounded())
+        {
+            timer += Time.deltaTime;
+            yield return null;
+        }
+        playerController.ResetSpeedModifier();
     }
 
     private void OnDrawGizmosSelected()
