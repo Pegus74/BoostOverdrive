@@ -22464,7 +22464,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1840943403}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 4a61d35838be56c4fbb37063f605d3a5, type: 2}
   m_CullingMode: 0
@@ -28155,6 +28155,8 @@ MonoBehaviour:
   titleText: {fileID: 0}
   descriptionText: {fileID: 0}
   arrowIndicator: {fileID: 0}
+  triggerCollider: {fileID: 0}
+  hideOnTouch: 1
 --- !u!224 &8539817092887027775
 RectTransform:
   m_ObjectHideFlags: 0

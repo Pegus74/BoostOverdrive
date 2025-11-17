@@ -29034,7 +29034,7 @@ MonoBehaviour:
   titleText: {fileID: 0}
   descriptionText: {fileID: 0}
   arrowIndicator: {fileID: 0}
-  triggerCollider: {fileID: 0}
+  triggerCollider: {fileID: 7291657819796261119}
   hideOnTouch: 1
 --- !u!224 &2235905912336568414
 RectTransform:
@@ -29387,7 +29387,7 @@ MonoBehaviour:
   titleText: {fileID: 0}
   descriptionText: {fileID: 0}
   arrowIndicator: {fileID: 0}
-  triggerCollider: {fileID: 0}
+  triggerCollider: {fileID: 7914542930363433061}
   hideOnTouch: 1
 --- !u!114 &3437449790765771920
 MonoBehaviour:
@@ -29765,7 +29765,7 @@ MonoBehaviour:
   titleText: {fileID: 0}
   descriptionText: {fileID: 0}
   arrowIndicator: {fileID: 0}
-  triggerCollider: {fileID: 0}
+  triggerCollider: {fileID: 9124301429986849288}
   hideOnTouch: 1
 --- !u!114 &4446407980409839463
 MonoBehaviour:
@@ -30487,6 +30487,7 @@ GameObject:
   - component: {fileID: 7914542930363433060}
   - component: {fileID: 3373991175359356909}
   - component: {fileID: 7860810444456218699}
+  - component: {fileID: 7914542930363433061}
   m_Layer: 0
   m_Name: "\u041E\u0431\u0443\u0447\u0435\u043D\u0438\u0435 \u043F\u0440\u044B\u0436\u043E\u043A"
   m_TagString: Untagged
@@ -30692,6 +30693,7 @@ GameObject:
   - component: {fileID: 7291657819796261118}
   - component: {fileID: 2192202905884236352}
   - component: {fileID: 3437449790765771920}
+  - component: {fileID: 7291657819796261119}
   m_Layer: 0
   m_Name: "\u041E\u0431\u0443\u0447\u0435\u043D\u0438\u0435 \u043F\u0440\u0443\u0436\u0438\u043D\u043D\u0430\u044F
     \u0441\u0442\u0435\u043D\u0430"
@@ -31208,6 +31210,27 @@ Transform:
   - {fileID: 8995890402850994033}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &7291657819796261119
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6277390124073690673}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 4, y: 2, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!222 &7338157460351092130
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -31479,6 +31502,27 @@ Transform:
   - {fileID: 6687890847984068877}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &7914542930363433061
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5926384982180802343}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 4, y: 2, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7951924129401737614
 GameObject:
   m_ObjectHideFlags: 0
@@ -31647,6 +31691,7 @@ GameObject:
   - component: {fileID: 7657880833524312927}
   - component: {fileID: 8962825445766584338}
   - component: {fileID: 5363195022995590423}
+  - component: {fileID: 8962825445766584339}
   m_Layer: 0
   m_Name: "\u041E\u0431\u0443\u0447\u0435\u043D\u0438\u0435 \u0421\u0442\u0438\u043B\u044C
     \u0410\u0433\u0440"
@@ -32052,8 +32097,29 @@ MonoBehaviour:
   titleText: {fileID: 0}
   descriptionText: {fileID: 0}
   arrowIndicator: {fileID: 0}
-  triggerCollider: {fileID: 0}
+  triggerCollider: {fileID: 8962825445766584339}
   hideOnTouch: 1
+--- !u!65 &8962825445766584339
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8395630946429715022}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 4, y: 2, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!224 &8995890402850994033
 RectTransform:
   m_ObjectHideFlags: 0
@@ -32194,6 +32260,7 @@ GameObject:
   - component: {fileID: 3358274552289239581}
   - component: {fileID: 4390684066396356529}
   - component: {fileID: 7701279126716193183}
+  - component: {fileID: 9124301429986849288}
   m_Layer: 0
   m_Name: "\u041E\u0431\u0443\u0447\u0435\u043D\u0438\u0435 \u0441\u0442\u0438\u043B\u044C
     \u0441\u043A\u043E\u0440\u043E\u0441\u0442\u044C"
@@ -32202,6 +32269,27 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!65 &9124301429986849288
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9124301429986849287}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 4, y: 2, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &9144623244293201440
 MonoBehaviour:
   m_ObjectHideFlags: 0
