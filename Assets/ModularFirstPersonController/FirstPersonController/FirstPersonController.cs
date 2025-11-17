@@ -71,6 +71,23 @@ public class FirstPersonController : MonoBehaviour
     public bool isGrounded = false;
     public bool isJumping = false;
     private int jumpDelayFrames = 60;
+
+    [Header("Charged Jump")]
+    public bool enableChargedJump = false;
+    public float chargeSpeed = 2f;
+    public float minJumpPowerPercent = 0.35f; 
+    public Image chargedJumpUI;
+    public Image chargedJumpBackground;
+
+    public Color minChargeColor = Color.green;
+    public Color maxChargeColor = Color.red;
+    public bool useColorGradient = true;
+
+    private bool isChargingJump = false;
+    private float currentCharge = 0f;
+    private float chargeStartTime = 0f;
+    private StyleController styleController;
+
     #endregion
 
     #region Dash
@@ -161,7 +178,7 @@ public class FirstPersonController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         styleManager = GetComponent<StyleController>();
         crosshairObject = GetComponentInChildren<Image>();
-
+       
         playerCamera.fieldOfView = fov;
         jointOriginalPos = joint.localPosition;
         
@@ -210,7 +227,9 @@ public class FirstPersonController : MonoBehaviour
             if (dashCircle) dashCircle.gameObject.SetActive(false);
         }
         #endregion
-        
+
+        InitializeChargedJumpUI();
+
         #region EnablePower
         if (currentScene.name == "level1")
         {
@@ -251,15 +270,23 @@ public class FirstPersonController : MonoBehaviour
         #region Jump
         if (enableJump)
         {
-            if (Input.GetKeyDown(jumpKey))
+            if (enableChargedJump)
             {
-                jumpBufferTimer = jumpBufferTime; 
+                HandleChargedJump();
+            }
+            else
+            {
+                if (Input.GetKeyDown(jumpKey))
+                {
+                    jumpBufferTimer = jumpBufferTime;
+                }
             }
             if (jumpBufferTimer > 0)
             {
                 jumpBufferTimer -= Time.deltaTime;
             }
-            if (jumpBufferTimer > 0f)
+
+            if (!isChargingJump && jumpBufferTimer > 0f)
             {
                 bool canJumpFromCoyote = coyoteTimer > 0f && !isJumping;
 
@@ -269,7 +296,6 @@ public class FirstPersonController : MonoBehaviour
                 }
             }
         }
-        
         #endregion
 
         #region Dash
@@ -475,6 +501,127 @@ public class FirstPersonController : MonoBehaviour
         }
     }
 
+    private float GetMinJumpPower()
+    {
+        if (styleManager != null && styleManager.CurrentStyle != null)
+        {
+            return styleManager.CurrentStyle.jumpPower * minJumpPowerPercent;
+        }
+        return jumpPower * minJumpPowerPercent; 
+    }
+
+    private float GetMaxJumpPower()
+    {
+        if (styleManager != null && styleManager.CurrentStyle != null)
+        {
+            return styleManager.CurrentStyle.jumpPower;
+        }
+        return jumpPower; 
+    }
+
+    private void HandleChargedJump()
+    {
+        if (!enableChargedJump) return;
+
+        if (Input.GetKeyDown(jumpKey) && isGrounded && !isChargingJump)
+        {
+            StartChargingJump();
+        }
+        if (isChargingJump)
+        {
+            if (Input.GetKey(jumpKey))
+            {
+                currentCharge += chargeSpeed * Time.deltaTime;
+                currentCharge = Mathf.Clamp01(currentCharge);
+
+                UpdateChargedJumpUI();
+                if (currentCharge >= 1f)
+                {
+                    ExecuteChargedJump();
+                }
+            }
+            if (Input.GetKeyUp(jumpKey) && isChargingJump)
+            {
+                ExecuteChargedJump();
+            }
+            if (!isGrounded)
+            {
+                CancelChargingJump();
+            }
+        }
+    }
+
+    private void StartChargingJump()
+    {
+        isChargingJump = true;
+        currentCharge = 0f;
+        chargeStartTime = Time.time;
+        if (chargedJumpUI != null)
+        {
+            chargedJumpUI.gameObject.SetActive(true);
+            chargedJumpUI.fillAmount = 0f;
+            if (useColorGradient)
+            {
+                chargedJumpUI.color = minChargeColor;
+            }
+        }
+
+        if (chargedJumpBackground != null)
+        {
+            chargedJumpBackground.gameObject.SetActive(true);
+        }
+    }
+
+    private void ExecuteChargedJump()
+    {
+        if (!isChargingJump) return;
+        float minPower = GetMinJumpPower();
+        float maxPower = GetMaxJumpPower();
+        float jumpForce = Mathf.Lerp(minPower, maxPower, currentCharge);
+        JumpWithPower(jumpForce);
+        CancelChargingJump();
+    }
+
+    private void JumpWithPower(float power)
+    {
+        rb.AddForce(Vector3.up * power, ForceMode.Impulse);
+        isGrounded = false;
+        isJumping = true;
+        jumpBufferTimer = 0f;
+        coyoteTimer = 0f;
+        jumpDelayFrames = 30;
+    }
+
+    private void UpdateChargedJumpUI()
+    {
+        if (chargedJumpUI != null)
+        {
+            chargedJumpUI.fillAmount = currentCharge;
+            if (useColorGradient)
+            {
+                chargedJumpUI.color = Color.Lerp(minChargeColor, maxChargeColor, currentCharge);
+            }
+        }
+    }
+
+    private void CancelChargingJump()
+    {
+        isChargingJump = false;
+        currentCharge = 0f;
+        if (chargedJumpUI != null)
+        {
+            chargedJumpUI.gameObject.SetActive(false);
+            chargedJumpUI.fillAmount = 0f;
+        }
+
+        if (chargedJumpBackground != null)
+        {
+            chargedJumpBackground.gameObject.SetActive(false);
+        }
+    }
+
+
+
     private void StartSlam()
     {
         isSlamming = true;
@@ -509,9 +656,34 @@ public class FirstPersonController : MonoBehaviour
 
     private void Jump()
     {
-        rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
+        float currentJumpPower = jumpPower;
+        if (styleManager != null && styleManager.CurrentStyle != null)
+        {
+            currentJumpPower = styleManager.CurrentStyle.jumpPower;
+        }
         isGrounded = false;
         isJumping = true;
+    }
+
+    private void InitializeChargedJumpUI()
+    {
+        if (chargedJumpUI != null)
+        {
+            chargedJumpUI.type = Image.Type.Filled;
+            chargedJumpUI.fillMethod = Image.FillMethod.Vertical;
+            chargedJumpUI.fillOrigin = (int)Image.OriginVertical.Bottom;
+            chargedJumpUI.fillAmount = 0f;
+            chargedJumpUI.gameObject.SetActive(false);
+
+            if (useColorGradient)
+            {
+                chargedJumpUI.color = minChargeColor;
+            }
+        }
+        if (chargedJumpBackground != null)
+        {
+            chargedJumpBackground.gameObject.SetActive(false);
+        }
     }
 
     private void HeadBob()
