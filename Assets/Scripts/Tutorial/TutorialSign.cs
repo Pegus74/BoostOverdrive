@@ -74,7 +74,7 @@ public class TutorialSign : MonoBehaviour
             if (!isHiddenByTouch)
             {
                 HandleActivation();
-                HandleFadeOut(); // Добавляем обработку исчезновения
+                HandleFadeOut(); 
             }
         }
     }
@@ -180,37 +180,30 @@ public class TutorialSign : MonoBehaviour
         }
     }
 
-    // Новый метод для обработки исчезновения
     private void HandleFadeOut()
     {
         if (!enableFadeOut || !IsActive || canvasGroup == null) return;
 
         CurrentDistanceToPlayer = Vector3.Distance(transform.position, player.position);
 
-        // Если игрок находится в зоне исчезновения
         if (CurrentDistanceToPlayer <= fadeOutStartDistance)
         {
             float fadeProgress = 0f;
 
             if (CurrentDistanceToPlayer <= fadeOutEndDistance)
             {
-                // Полностью прозрачный
                 fadeProgress = 1f;
             }
             else
             {
-                // Плавное исчезновение между fadeOutStartDistance и fadeOutEndDistance
                 fadeProgress = 1f - ((CurrentDistanceToPlayer - fadeOutEndDistance) /
                                    (fadeOutStartDistance - fadeOutEndDistance));
                 fadeProgress = Mathf.Clamp01(fadeProgress);
             }
-
-            // Устанавливаем прозрачность
             canvasGroup.alpha = 1f - fadeProgress;
         }
         else
         {
-            // Восстанавливаем полную непрозрачность
             canvasGroup.alpha = 1f;
         }
     }
