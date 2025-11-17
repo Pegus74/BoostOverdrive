@@ -17,10 +17,14 @@ public class TutorialSign : MonoBehaviour
     [SerializeField] private TextMeshProUGUI descriptionText;
     [SerializeField] private GameObject arrowIndicator;
 
-
     [Header("Collider Settings")]
     [SerializeField] private Collider triggerCollider;
     [SerializeField] private bool hideOnTouch = true;
+
+    [Header("Fade Out Settings")]
+    [SerializeField] private bool enableFadeOut = false;
+    [SerializeField] private float fadeOutStartDistance = 1.5f;
+    [SerializeField] private float fadeOutEndDistance = 0.5f;
 
     public bool IsActive { get; private set; }
     public bool WasShown { get; private set; }
@@ -67,9 +71,10 @@ public class TutorialSign : MonoBehaviour
         if (player != null)
         {
             HandleRotation();
-            if (!isHiddenByTouch) 
+            if (!isHiddenByTouch)
             {
                 HandleActivation();
+                HandleFadeOut(); // Добавляем обработку исчезновения
             }
         }
     }
@@ -88,7 +93,6 @@ public class TutorialSign : MonoBehaviour
         WasShown = true;
         StartActivationAnimation(true);
     }
-
 
     public void ResetSign()
     {
@@ -124,7 +128,6 @@ public class TutorialSign : MonoBehaviour
             triggerCollider.enabled = false;
         }
     }
-
 
     public void Deactivate()
     {
@@ -177,6 +180,41 @@ public class TutorialSign : MonoBehaviour
         }
     }
 
+    // Новый метод для обработки исчезновения
+    private void HandleFadeOut()
+    {
+        if (!enableFadeOut || !IsActive || canvasGroup == null) return;
+
+        CurrentDistanceToPlayer = Vector3.Distance(transform.position, player.position);
+
+        // Если игрок находится в зоне исчезновения
+        if (CurrentDistanceToPlayer <= fadeOutStartDistance)
+        {
+            float fadeProgress = 0f;
+
+            if (CurrentDistanceToPlayer <= fadeOutEndDistance)
+            {
+                // Полностью прозрачный
+                fadeProgress = 1f;
+            }
+            else
+            {
+                // Плавное исчезновение между fadeOutStartDistance и fadeOutEndDistance
+                fadeProgress = 1f - ((CurrentDistanceToPlayer - fadeOutEndDistance) /
+                                   (fadeOutStartDistance - fadeOutEndDistance));
+                fadeProgress = Mathf.Clamp01(fadeProgress);
+            }
+
+            // Устанавливаем прозрачность
+            canvasGroup.alpha = 1f - fadeProgress;
+        }
+        else
+        {
+            // Восстанавливаем полную непрозрачность
+            canvasGroup.alpha = 1f;
+        }
+    }
+
     private void StartActivationAnimation(bool activate)
     {
         if (activationCoroutine != null)
@@ -226,7 +264,6 @@ public class TutorialSign : MonoBehaviour
             arrowIndicator.SetActive(active);
     }
 
-   
     private void TryFindPlayer()
     {
         if (player != null) return;
@@ -239,18 +276,25 @@ public class TutorialSign : MonoBehaviour
         }
     }
 
-    
-
-
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = IsActive ? Color.green : new Color(1f, 0.5f, 0f, 0.5f);
         Gizmos.DrawWireSphere(transform.position, activationDistance);
+
+       
+        if (enableFadeOut)
+        {
+            Gizmos.color = new Color(1f, 0f, 0f, 0.3f);
+            Gizmos.DrawWireSphere(transform.position, fadeOutStartDistance);
+
+            Gizmos.color = new Color(1f, 0f, 0f, 0.6f);
+            Gizmos.DrawWireSphere(transform.position, fadeOutEndDistance);
+        }
+
         if (player != null)
         {
             Gizmos.color = Color.white;
             Gizmos.DrawLine(transform.position, player.position);
         }
     }
-
 }
