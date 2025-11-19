@@ -3,8 +3,7 @@ using UnityEngine.SceneManagement;
 
 public class NewGameManager : MonoBehaviour
 {
-    [SerializeField] private GameStateEvent OnGameStateChanged; 
-    [SerializeField] private GameEvent OnPauseAttemptEvent;
+    public GameStateEvent OnGameStateChanged = new GameStateEvent(); 
 
     [SerializeField] private GameEvent SoftResetRequestEvent;
     [SerializeField] private GameEvent SoftResetCompletedEvent;
@@ -13,10 +12,11 @@ public class NewGameManager : MonoBehaviour
     [SerializeField] private GameState currentState = GameState.Playing;
     
     [SerializeField] private LevelRestarter levelRestarter;
-    
+    private PlayerInputController playerInputController;
     
     private void Awake()
     {
+        playerInputController = FindObjectOfType<PlayerInputController>();
         if (Instance == null)
         {
             Instance = this;
@@ -38,8 +38,7 @@ public class NewGameManager : MonoBehaviour
 
     private void OnEnable()
     {
-        if (OnPauseAttemptEvent != null)
-            OnPauseAttemptEvent.RegisterListener(TogglePause);
+        playerInputController.OnPauseAttemptEvent.AddListener(TogglePause);
         
         if (SoftResetCompletedEvent != null)
             SoftResetCompletedEvent.RegisterListener(FinishRestart);
@@ -47,8 +46,7 @@ public class NewGameManager : MonoBehaviour
 
     private void OnDisable()
     {
-        if (OnPauseAttemptEvent != null)
-            OnPauseAttemptEvent.UnregisterListener(TogglePause);
+        playerInputController.OnPauseAttemptEvent.RemoveListener(TogglePause);
         
         if (SoftResetCompletedEvent != null)
             SoftResetCompletedEvent.UnregisterListener(FinishRestart);
@@ -65,7 +63,7 @@ public class NewGameManager : MonoBehaviour
     {
         if (OnGameStateChanged != null)
         {
-            OnGameStateChanged.Raise(currentState);
+            OnGameStateChanged.Invoke(currentState);
             Debug.Log($"GameManager gameState Changed to: {currentState}");
         }
     }

@@ -13,8 +13,7 @@ public class CrawlSlideSystem : MonoBehaviour, IRestartable
     public Transform visualModelTransform; 
     public Camera playerCamera; 
     
-    [Header("Input Listener")]
-    public GameEvent SlideAttemptEvent;
+    private PlayerInputController playerInputController;
     
     [Header("Soft Reset Event")]
     [SerializeField] private GameEvent OnLevelResetEvent;
@@ -34,6 +33,7 @@ public class CrawlSlideSystem : MonoBehaviour, IRestartable
 
     void Awake()
     {
+        playerInputController = GetComponent<PlayerInputController>();
         _rb = GetComponent<Rigidbody>();
         _capsuleCollider = GetComponent<CapsuleCollider>();
 
@@ -63,12 +63,12 @@ public class CrawlSlideSystem : MonoBehaviour, IRestartable
 
     void OnEnable()
     {
-        SlideAttemptEvent?.RegisterListener(InitiateCrawlSlide);
+        playerInputController.SlideAttemptEvent.AddListener(InitiateCrawlSlide);
     }
 
     void OnDisable()
     {
-        SlideAttemptEvent?.UnregisterListener(InitiateCrawlSlide);
+        playerInputController.SlideAttemptEvent.AddListener(InitiateCrawlSlide);
         
         if (_currentSlideCoroutine != null)
         {

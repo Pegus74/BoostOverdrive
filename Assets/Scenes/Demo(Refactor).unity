@@ -2707,6 +2707,7 @@ GameObject:
   m_Component:
   - component: {fileID: 705507995}
   - component: {fileID: 705507994}
+  - component: {fileID: 705507996}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -2790,6 +2791,29 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!114 &705507996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 705507993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_LightLayerMask: 1
+  m_RenderingLayers: 1
+  m_CustomShadowLayers: 0
+  m_ShadowLayerMask: 1
+  m_ShadowRenderingLayers: 1
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
 --- !u!43 &708318508
 Mesh:
   m_ObjectHideFlags: 0
@@ -4051,7 +4075,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerStateModel: {fileID: 11400000, guid: a6c1c06db7c8e6b5fb54a26c184a9fa7, type: 2}
   playerSettingsData: {fileID: 11400000, guid: a6eba25996664712bac54a95ef35a652, type: 2}
-  DashAttemptEvent: {fileID: 11400000, guid: d9b7a04b1bda7c0f2921bfcde1ce0c58, type: 2}
   OnLevelResetEvent: {fileID: 11400000, guid: 2b0bcb8c7e46c11ff94b6ebe33a356c2, type: 2}
 --- !u!114 &1015622864
 MonoBehaviour:
@@ -4069,7 +4092,6 @@ MonoBehaviour:
   playerSettingsData: {fileID: 11400000, guid: a6eba25996664712bac54a95ef35a652, type: 2}
   visualModelTransform: {fileID: 1135952862549686186}
   playerCamera: {fileID: 4164208336333350519}
-  SlideAttemptEvent: {fileID: 11400000, guid: 77e1484793f906393bbba36b3e6a43ab, type: 2}
   OnLevelResetEvent: {fileID: 11400000, guid: 2b0bcb8c7e46c11ff94b6ebe33a356c2, type: 2}
 --- !u!1 &1039753630
 GameObject:
@@ -5720,31 +5742,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1254656026}
   m_CullTransparentMesh: 1
---- !u!1 &1256056246 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7197009612212104142, guid: 8bae701bd5d856140b28e9842e12871e, type: 3}
-  m_PrefabInstance: {fileID: 1907286561}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1256056247 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9054840367771348372, guid: 8bae701bd5d856140b28e9842e12871e, type: 3}
   m_PrefabInstance: {fileID: 1907286561}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1256056248
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1256056246}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 697f36e8e09e4395b28b51a8252fe4d1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerStateModel: {fileID: 11400000, guid: a6c1c06db7c8e6b5fb54a26c184a9fa7, type: 2}
-  OnWallJumpDetectedEvent: {fileID: 11400000, guid: e6fc3f5bbe71ba30899976696740e287, type: 2}
-  JumpAttemptEvent: {fileID: 11400000, guid: 1eaeecda99b7d11ea97088391f7f221c, type: 2}
 --- !u!1 &1262314899
 GameObject:
   m_ObjectHideFlags: 0
@@ -7041,7 +7043,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 232fefae5f0e41ac88017269db97bab7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GameStateChangedEvent: {fileID: 11400000, guid: 2af9cf882094ff02cb8a6110f0ca4210, type: 2}
   targetGameState: 3
   targetCanvasGroup: {fileID: 1587210935}
 --- !u!225 &1587210935
@@ -8675,10 +8676,7 @@ PrefabInstance:
     - {fileID: 6600262101757903433, guid: 8bae701bd5d856140b28e9842e12871e, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 7197009612212104142, guid: 8bae701bd5d856140b28e9842e12871e, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1256056248}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8bae701bd5d856140b28e9842e12871e, type: 3}
 --- !u!1 &1908420665
 GameObject:
@@ -8725,7 +8723,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 232fefae5f0e41ac88017269db97bab7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GameStateChangedEvent: {fileID: 11400000, guid: 2af9cf882094ff02cb8a6110f0ca4210, type: 2}
   targetGameState: 2
   targetCanvasGroup: {fileID: 1908420666}
 --- !u!114 &1908420668
@@ -9025,7 +9022,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93387a8e38cd49c09b83d4c9d825fedc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GameStateChangedEvent: {fileID: 11400000, guid: 2af9cf882094ff02cb8a6110f0ca4210, type: 2}
+  gameManager: {fileID: 0}
 --- !u!43 &2117137680
 Mesh:
   m_ObjectHideFlags: 0
@@ -9470,7 +9467,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerStateModel: {fileID: 11400000, guid: a6c1c06db7c8e6b5fb54a26c184a9fa7, type: 2}
   playerSettingsData: {fileID: 11400000, guid: a6eba25996664712bac54a95ef35a652, type: 2}
-  LookInputEvent: {fileID: 11400000, guid: 8cd2d1d18b6505998bdb42c2cfeb64ce, type: 2}
   playerCamera: {fileID: 4164208336333350519}
 --- !u!114 &1573506294349146447
 MonoBehaviour:
@@ -9666,7 +9662,6 @@ MonoBehaviour:
   styleDataAssets:
   - {fileID: 11400000, guid: 87eb25c8cc0aa7db8a8d6c5e0f46ffa3, type: 2}
   - {fileID: 11400000, guid: b533809eb98bac9f3813aa72f903394a, type: 2}
-  ToggleStyleAttemptEvent: {fileID: 11400000, guid: 0b807ff9bf2ffa338b6f04d39c04868c, type: 2}
 --- !u!114 &2046992256110326455
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10144,9 +10139,6 @@ MonoBehaviour:
   playerStateModel: {fileID: 11400000, guid: a6c1c06db7c8e6b5fb54a26c184a9fa7, type: 2}
   playerSettingsData: {fileID: 11400000, guid: a6eba25996664712bac54a95ef35a652, type: 2}
   obstaclesSettings: {fileID: 11400000, guid: ebe29eef7bdecf5999d2bd28f0e1528c, type: 2}
-  MoveInputEvent: {fileID: 11400000, guid: 4a38259e69a2c5d56948f0251bbf8c02, type: 2}
-  JumpAttemptEvent: {fileID: 11400000, guid: 1eaeecda99b7d11ea97088391f7f221c, type: 2}
-  OnWallJumpDetectedEvent: {fileID: 11400000, guid: e6fc3f5bbe71ba30899976696740e287, type: 2}
   OnLevelResetEvent: {fileID: 11400000, guid: 2b0bcb8c7e46c11ff94b6ebe33a356c2, type: 2}
 --- !u!20 &4164208336333350519
 Camera:
@@ -10984,7 +10976,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 232fefae5f0e41ac88017269db97bab7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GameStateChangedEvent: {fileID: 11400000, guid: 2af9cf882094ff02cb8a6110f0ca4210, type: 2}
   targetGameState: 1
   targetCanvasGroup: {fileID: 7266871428665474164}
 --- !u!224 &7275592991199218192
@@ -11468,15 +11459,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74b7d511ca03dc77c906aa3f441953a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveInputEvent: {fileID: 11400000, guid: 4a38259e69a2c5d56948f0251bbf8c02, type: 2}
-  LookInputEvent: {fileID: 11400000, guid: 8cd2d1d18b6505998bdb42c2cfeb64ce, type: 2}
-  JumpAttemptEvent: {fileID: 11400000, guid: 1eaeecda99b7d11ea97088391f7f221c, type: 2}
-  DashAttemptEvent: {fileID: 11400000, guid: d9b7a04b1bda7c0f2921bfcde1ce0c58, type: 2}
-  SlamAttemptEvent: {fileID: 11400000, guid: 7fc7738845896e62a9d3c7b297b98ff9, type: 2}
-  SlideAttemptEvent: {fileID: 11400000, guid: 77e1484793f906393bbba36b3e6a43ab, type: 2}
-  ToggleStyleAttemptEvent: {fileID: 11400000, guid: 0b807ff9bf2ffa338b6f04d39c04868c, type: 2}
-  OnPauseAttemptEvent: {fileID: 11400000, guid: 26a59c70c224bb4eb9294ca5f6151e0a, type: 2}
-  GameStateChangedEvent: {fileID: 11400000, guid: 2af9cf882094ff02cb8a6110f0ca4210, type: 2}
+  JumpAttemptEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  DashAttemptEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  SlamAttemptEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  SlideAttemptEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  ToggleStyleAttemptEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnPauseAttemptEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &8571536540697160802
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11504,7 +11504,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerStateModel: {fileID: 11400000, guid: a6c1c06db7c8e6b5fb54a26c184a9fa7, type: 2}
   playerSettingsData: {fileID: 11400000, guid: a6eba25996664712bac54a95ef35a652, type: 2}
-  SlamAttemptEvent: {fileID: 11400000, guid: 7fc7738845896e62a9d3c7b297b98ff9, type: 2}
   SlamDestructibleHitEvent: {fileID: 11400000, guid: 16d4898338ffa0a6abbd4b4f3a179ff3, type: 2}
   SlamSolidHitEvent: {fileID: 11400000, guid: ee846e24cf148bf2d893937c1c67b156, type: 2}
 --- !u!114 &8571536540697160804
@@ -11758,9 +11757,9 @@ CanvasRenderer:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 1896962079}
   - {fileID: 705507995}
   - {fileID: 841781652}
   - {fileID: 1135952862549686186}
   - {fileID: 1844357373}
-  - {fileID: 1896962079}
   - {fileID: 324765472}
