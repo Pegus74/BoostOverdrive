@@ -20,6 +20,7 @@ public class FirstPersonController : MonoBehaviour
     private Scene currentScene;
     
     [SerializeField] private MetricsMaster mm;
+    public EnergyBar energyBar;
     
     [HideInInspector]
     public Component LastWallJumpedFrom { get; private set; } = null;
@@ -305,6 +306,7 @@ public class FirstPersonController : MonoBehaviour
                 dashDirection.Normalize();
 
                 isDashing = true;
+                energyBar.RemoveEnergy();
                 dashTimer = mm.dashDuration;
                 Vector3 currentVelocity = rb.velocity;
                 Vector3 dashVelocity = dashDirection * mm.dashPower;
@@ -615,6 +617,7 @@ public class FirstPersonController : MonoBehaviour
 
     private void StartSlam()
     {
+        energyBar.RemoveEnergy();
         isSlamming = true;
         slamImpactOccurred = false;
         isReboundingFromSlam = false; 
@@ -891,6 +894,7 @@ public class FirstPersonController : MonoBehaviour
     
     private IEnumerator CrawlSlideCoroutine()
     {
+        energyBar.RemoveEnergy();
         isSliding = true;
 
         Vector3 originalScale = cap.localScale;
