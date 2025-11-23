@@ -20,7 +20,7 @@ public class PlayerStateModel : ScriptableObject
     private bool _isSlamming;
     
     private int _currentStyleIndex = 0;
-    
+    [SerializeField] private bool isChargingJump;   
     private Component _lastWallJumpedFrom; 
     
     // Геттеры для чтения состояния извне
@@ -34,6 +34,7 @@ public class PlayerStateModel : ScriptableObject
     public bool IsDashing => _isDashing;
     public bool IsSliding => _isSliding;
     public bool IsSlamming => _isSlamming;
+    public bool IsChargingJump => isChargingJump;
 
     public int CurrentStyleIndex => _currentStyleIndex;
     
@@ -63,7 +64,12 @@ public class PlayerStateModel : ScriptableObject
         _currentJumpPower = newPower;
         Debug.Log($"[Model] Jump Speed updated to: {newPower}");
     }
-    
+
+    public void SetIsChargingJump(bool charging)
+    {
+        isChargingJump = charging;
+    }
+
     public void SetDashPower(float newPower)
     {
         if (_currentDashPower != newPower)

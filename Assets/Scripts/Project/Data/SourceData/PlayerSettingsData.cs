@@ -41,4 +41,10 @@ public class PlayerSettingsData : ScriptableObject
     public float raycastCheckDistance = 1.0f;
     public float horizontalForceHands = 10f;
     public float verticalForceLegs = 15f;
+
+    [Header("Настройки заряженного прыжка")]
+    public bool enableChargedJump = true;
+    public float chargeSpeed = 2f;
+    public float minJumpPowerPercent = 0.35f;
+
 }
