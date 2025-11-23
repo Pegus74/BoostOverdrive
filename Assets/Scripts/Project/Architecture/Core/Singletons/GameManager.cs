@@ -4,14 +4,10 @@ using UnityEngine.SceneManagement;
 public class NewGameManager : MonoBehaviour
 {
     public GameStateEvent OnGameStateChanged = new GameStateEvent(); 
-
-    [SerializeField] private GameEvent SoftResetRequestEvent;
-    [SerializeField] private GameEvent SoftResetCompletedEvent;
     
     public static NewGameManager Instance;
     [SerializeField] private GameState currentState = GameState.Playing;
     
-    [SerializeField] private LevelRestarter levelRestarter;
     private PlayerInputController playerInputController;
     
     private void Awake()
@@ -38,18 +34,13 @@ public class NewGameManager : MonoBehaviour
 
     private void OnEnable()
     {
-        playerInputController.OnPauseAttemptEvent.AddListener(TogglePause);
-        
-        if (SoftResetCompletedEvent != null)
-            SoftResetCompletedEvent.RegisterListener(FinishRestart);
+        playerInputController.InputEvents.OnPauseAttemptEvent.AddListener(TogglePause);
     }
 
     private void OnDisable()
     {
-        playerInputController.OnPauseAttemptEvent.RemoveListener(TogglePause);
+        playerInputController.InputEvents.OnPauseAttemptEvent.RemoveListener(TogglePause);
         
-        if (SoftResetCompletedEvent != null)
-            SoftResetCompletedEvent.UnregisterListener(FinishRestart);
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -84,21 +75,11 @@ public class NewGameManager : MonoBehaviour
 
     public void RestartLevel()
     {
-        if (SoftResetRequestEvent == null)
-        {
-            Debug.LogWarning("SoftResetRequestEvent не задан. Перезапуск сцены.");
-            int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-            SceneManager.LoadScene(currentSceneIndex);
-            return;
-        }
-        
         if (currentState == GameState.Playing)
         {
             currentState = GameState.Paused;
             UpdateGameState(); 
         }
-        
-        SoftResetRequestEvent.Raise(); 
         
         Debug.Log("[GameManager]: Soft Reset Requested.");
     }

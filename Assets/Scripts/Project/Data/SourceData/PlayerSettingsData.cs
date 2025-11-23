@@ -7,6 +7,7 @@ public class PlayerSettingsData : ScriptableObject
     [Header("Настройки Камеры")]
     public float mouseSensitivity = 2f;
     public float maxLookAngle = 50f;
+    public float bobSpeed = 5f;
     public bool invertCamera = false;
     public bool lockCursor = true;
     public bool cameraCanMove = true;
@@ -16,7 +17,7 @@ public class PlayerSettingsData : ScriptableObject
     
     [Header("Настройки Движения")]
     public float maxVelocityChange = 10f;
-    public bool enableAirJump = false;
+    public float acceleration = 20f;
     public bool playerCanMove = true;
     public bool enableJump = true;
     

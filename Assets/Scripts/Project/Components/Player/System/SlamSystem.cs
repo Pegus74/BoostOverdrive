@@ -34,7 +34,7 @@ public class SlamSystem : MonoBehaviour
 
     void OnEnable()
     {
-        playerInputController.SlamAttemptEvent.AddListener(InitiateSlam);
+        playerInputController.InputEvents.SlamAttemptEvent.AddListener(InitiateSlam);
         
         SlamDestructibleHitEvent?.RegisterListener(StopSlamOnDestructibleHit);
         SlamSolidHitEvent?.RegisterListener(StopSlamOnSolidHit);
@@ -42,7 +42,7 @@ public class SlamSystem : MonoBehaviour
 
     void OnDisable()
     {
-        playerInputController.DashAttemptEvent.AddListener(InitiateSlam);
+        playerInputController.InputEvents.DashAttemptEvent.AddListener(InitiateSlam);
         
         SlamDestructibleHitEvent?.UnregisterListener(StopSlamOnDestructibleHit);
         SlamSolidHitEvent?.UnregisterListener(StopSlamOnSolidHit);

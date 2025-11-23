@@ -28,14 +28,14 @@ public class StyleManager : MonoBehaviour
     private void OnEnable()
     {
         // Подписываемся на событие ввода
-        playerInputController.ToggleStyleAttemptEvent.AddListener(SwitchStyle);
+        playerInputController.InputEvents.ToggleStyleAttemptEvent.AddListener(SwitchStyle);
         // Устанавливаем начальное состояние при старте
         ApplyStyleToModel(currentStyleIndex);
     }
 
     private void OnDisable()
     {
-        playerInputController.ToggleStyleAttemptEvent.RemoveListener(SwitchStyle);
+        playerInputController.InputEvents.ToggleStyleAttemptEvent.RemoveListener(SwitchStyle);
     }
     
     /// <summary>

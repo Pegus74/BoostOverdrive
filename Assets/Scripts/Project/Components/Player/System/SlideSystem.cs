@@ -4,7 +4,7 @@ using System.Collections;
 /// <summary>
 /// Управляет способностью CrawlSlide
 /// </summary>
-public class CrawlSlideSystem : MonoBehaviour, IRestartable
+public class CrawlSlideSystem : MonoBehaviour
 {
     [Header("Model & Settings")]
     public PlayerStateModel playerStateModel; 
@@ -15,8 +15,6 @@ public class CrawlSlideSystem : MonoBehaviour, IRestartable
     
     private PlayerInputController playerInputController;
     
-    [Header("Soft Reset Event")]
-    [SerializeField] private GameEvent OnLevelResetEvent;
     
     private Rigidbody _rb;
     private CapsuleCollider _capsuleCollider;
@@ -63,12 +61,12 @@ public class CrawlSlideSystem : MonoBehaviour, IRestartable
 
     void OnEnable()
     {
-        playerInputController.SlideAttemptEvent.AddListener(InitiateCrawlSlide);
+        playerInputController.InputEvents.SlideAttemptEvent.AddListener(InitiateCrawlSlide);
     }
 
     void OnDisable()
     {
-        playerInputController.SlideAttemptEvent.AddListener(InitiateCrawlSlide);
+        playerInputController.InputEvents.SlideAttemptEvent.AddListener(InitiateCrawlSlide);
         
         if (_currentSlideCoroutine != null)
         {
@@ -278,19 +276,4 @@ public class CrawlSlideSystem : MonoBehaviour, IRestartable
             playerCamera.transform.localPosition = new Vector3(localPos.x, _originalCameraLocalY, localPos.z);
         }
     }
-    
-    public void SoftReset()
-    {
-        if (_currentSlideCoroutine != null)
-        {
-            StopCoroutine(_currentSlideCoroutine);
-            _currentSlideCoroutine = null;
-        }
-        
-        playerStateModel.SetIsDashing(false); 
-        _isSlideAvailable = true;
-        
-        Debug.Log("DashSystem: State has been reset for Soft Reset.");
-    }
-    
 }

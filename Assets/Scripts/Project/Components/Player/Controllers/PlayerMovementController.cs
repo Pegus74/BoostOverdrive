@@ -4,7 +4,7 @@ using UnityEngine.Events;
 /// <summary>
 /// отвечает только за физическое движение игрока
 /// </summary>
-public class PlayerMovementController : MonoBehaviour, IRestartable
+public class PlayerMovementController : MonoBehaviour
 {
     [Header("Model & Settings")]
     public PlayerStateModel playerStateModel;
@@ -15,14 +15,16 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
     private PlayerInputController playerInputController;
     // public WallJumpEvent OnWallJumpDetectedEvent;
     
-    [Header("Soft Reset Event")]
-    [SerializeField] private GameEvent OnLevelResetEvent;
-    
-    [HideInInspector] private Rigidbody rb;
+    private Rigidbody rb;
     private Vector2 currentMoveInput = Vector2.zero;
     private Vector3 externalImpulse = Vector3.zero;
+    private Vector3 smoothedTarget = Vector3.zero;
+    private Vector3 smoothedLocalVelocity = Vector3.zero;
     private const int LEGS_STYLE_INDEX = 1;
     private const int HANDS_STYLE_INDEX = 0;
+
+    private bool isWalking = false;
+    public bool IsWalking => isWalking;
     
     void Awake()
     {
@@ -42,17 +44,15 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
 
     void OnEnable()
     {
-        playerInputController.MoveInputEvent.AddListener(OnMoveInput);
-        playerInputController.JumpAttemptEvent.AddListener(InitiateJumpLogic);
-        OnLevelResetEvent.RegisterListener(SoftReset);
+        playerInputController.InputEvents.MoveInputEvent.AddListener(OnMoveInput);
+        playerInputController.InputEvents.JumpAttemptEvent.AddListener(InitiateJumpLogic);
         // OnWallJumpDetectedEvent?.RegisterListener(HandleWallJump);
     }
 
     void OnDisable()
     {
-        playerInputController.MoveInputEvent.RemoveListener(OnMoveInput);
-        playerInputController.JumpAttemptEvent.RemoveListener(InitiateJumpLogic);
-        OnLevelResetEvent.UnregisterListener(SoftReset);
+        playerInputController.InputEvents.MoveInputEvent.RemoveListener(OnMoveInput);
+        playerInputController.InputEvents.JumpAttemptEvent.RemoveListener(InitiateJumpLogic);
         // OnWallJumpDetectedEvent?.UnregisterListener(HandleWallJump);
     }
     
@@ -103,9 +103,20 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
         if (targetDirection.sqrMagnitude > 1f) targetDirection.Normalize();
 
         float playerSpeed = playerStateModel.CurrentWalkSpeed * playerStateModel.MovementSpeedModifier;
-
-        // Преобразование Vector2 в Vector3 относительно направления игрока
-        Vector3 targetVelocity = transform.TransformDirection(targetDirection) * playerSpeed + externalImpulse;
+        
+        Vector3 inputLocal = new Vector3(input.x, 0, input.y);
+        if (inputLocal.sqrMagnitude > 1f)
+            inputLocal.Normalize();
+        
+        Vector3 rawLocalTarget = inputLocal * playerSpeed;
+        
+        smoothedLocalVelocity = Vector3.MoveTowards(
+            smoothedLocalVelocity,
+            rawLocalTarget,
+            playerSettingsData.acceleration * Time.fixedDeltaTime
+        );
+        
+        Vector3 targetVelocity = transform.TransformDirection(smoothedLocalVelocity) + externalImpulse;
 
         Vector3 velocity = rb.velocity;
         Vector3 velocityChange = (targetVelocity - velocity); 
@@ -117,6 +128,10 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
         velocityChange.y = 0;
 
         rb.AddForce(velocityChange, ForceMode.VelocityChange);
+        
+        bool hasInput = smoothedLocalVelocity.sqrMagnitude > 0.01f;
+        bool hasHorizontalSpeed = new Vector3(rb.velocity.x, 0f, rb.velocity.z).sqrMagnitude > 0.01f;
+        isWalking = playerStateModel.IsGrounded && hasInput && hasHorizontalSpeed;
         
         externalImpulse = Vector3.Lerp(externalImpulse, Vector3.zero, 5f * Time.fixedDeltaTime);
     }
@@ -205,15 +220,6 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
         if (specialVerticalCaseTriggered && currentStyleIndex == HANDS_STYLE_INDEX)
         {
             rb.AddForce(Vector3.up * playerStateModel.CurrentJumpPower * 0.75f, ForceMode.Impulse);
-        }
-    }
-    
-    public void SoftReset()
-    {
-        if (rb != null)
-        {
-            rb.isKinematic = true; 
-            rb.isKinematic = false;
         }
     }
 }

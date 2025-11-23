@@ -4075,7 +4075,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerStateModel: {fileID: 11400000, guid: a6c1c06db7c8e6b5fb54a26c184a9fa7, type: 2}
   playerSettingsData: {fileID: 11400000, guid: a6eba25996664712bac54a95ef35a652, type: 2}
-  OnLevelResetEvent: {fileID: 11400000, guid: 2b0bcb8c7e46c11ff94b6ebe33a356c2, type: 2}
 --- !u!114 &1015622864
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4092,7 +4091,6 @@ MonoBehaviour:
   playerSettingsData: {fileID: 11400000, guid: a6eba25996664712bac54a95ef35a652, type: 2}
   visualModelTransform: {fileID: 1135952862549686186}
   playerCamera: {fileID: 4164208336333350519}
-  OnLevelResetEvent: {fileID: 11400000, guid: 2b0bcb8c7e46c11ff94b6ebe33a356c2, type: 2}
 --- !u!1 &1039753630
 GameObject:
   m_ObjectHideFlags: 0
@@ -9468,6 +9466,8 @@ MonoBehaviour:
   playerStateModel: {fileID: 11400000, guid: a6c1c06db7c8e6b5fb54a26c184a9fa7, type: 2}
   playerSettingsData: {fileID: 11400000, guid: a6eba25996664712bac54a95ef35a652, type: 2}
   playerCamera: {fileID: 4164208336333350519}
+  joint: {fileID: 6955201677007353701}
+  bobAmount: {x: 0.15, y: 0.05, z: 0}
 --- !u!114 &1573506294349146447
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10139,7 +10139,6 @@ MonoBehaviour:
   playerStateModel: {fileID: 11400000, guid: a6c1c06db7c8e6b5fb54a26c184a9fa7, type: 2}
   playerSettingsData: {fileID: 11400000, guid: a6eba25996664712bac54a95ef35a652, type: 2}
   obstaclesSettings: {fileID: 11400000, guid: ebe29eef7bdecf5999d2bd28f0e1528c, type: 2}
-  OnLevelResetEvent: {fileID: 11400000, guid: 2b0bcb8c7e46c11ff94b6ebe33a356c2, type: 2}
 --- !u!20 &4164208336333350519
 Camera:
   m_ObjectHideFlags: 0
@@ -11459,24 +11458,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74b7d511ca03dc77c906aa3f441953a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  JumpAttemptEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  DashAttemptEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  SlamAttemptEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  SlideAttemptEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  ToggleStyleAttemptEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  OnPauseAttemptEvent:
-    m_PersistentCalls:
-      m_Calls: []
+  InputEvents:
+    JumpAttemptEvent:
+      m_PersistentCalls:
+        m_Calls: []
+    DashAttemptEvent:
+      m_PersistentCalls:
+        m_Calls: []
+    SlamAttemptEvent:
+      m_PersistentCalls:
+        m_Calls: []
+    SlideAttemptEvent:
+      m_PersistentCalls:
+        m_Calls: []
+    ToggleStyleAttemptEvent:
+      m_PersistentCalls:
+        m_Calls: []
+    OnPauseAttemptEvent:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!114 &8571536540697160802
 MonoBehaviour:
   m_ObjectHideFlags: 0

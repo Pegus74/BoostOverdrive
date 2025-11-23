@@ -167,7 +167,7 @@ public class FirstPersonController : MonoBehaviour
     public bool enableHeadBob = true;
     public Transform joint;
     public float bobSpeed = 10f;
-    public Vector3 bobAmount = new Vector3(.15f, .05f, 0f);
+    public Vector3 bobAmount = new Vector3(0f, .1f, 0f);
 
     private Vector3 jointOriginalPos;
     private float timer = 0;

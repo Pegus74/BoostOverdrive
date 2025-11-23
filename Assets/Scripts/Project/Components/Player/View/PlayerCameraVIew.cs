@@ -5,12 +5,13 @@ using UnityEngine.Events;
 public class PlayerCameraView : MonoBehaviour
 {
     [Header("Model & Settings")]
-    public PlayerStateModel playerStateModel; 
+    public PlayerMovementController playerMovementController; 
     public PlayerSettingsData playerSettingsData;
     
     [Header("Camera Components")]
     public Camera playerCamera;
-    
+
+    public Transform joint;
     private PlayerInputController playerInputController;
     
     // Углы вращения
@@ -19,7 +20,11 @@ public class PlayerCameraView : MonoBehaviour
     // Ввод для обработки в Update()
     private Vector2 currentLookInput = Vector2.zero;
     private Image crosshairObject;
-    private Coroutine currentCameraRotationCoroutine; 
+    private Coroutine currentCameraRotationCoroutine;
+
+    private float timer = 0f;
+    public Vector3 bobAmount = new Vector3(.15f, .05f, 0f);
+    private Vector3 jointOriginalPos;
     
 
     private void Awake()
@@ -38,16 +43,18 @@ public class PlayerCameraView : MonoBehaviour
         
         yaw = transform.localEulerAngles.y;
         pitch = playerCamera.transform.localEulerAngles.x;
+        
+        jointOriginalPos = joint.localPosition;
     }
 
     private void OnEnable()
     {
-        playerInputController.LookInputEvent.AddListener(OnLookInput);
+        playerInputController.InputEvents.LookInputEvent.AddListener(OnLookInput);
     }
 
     private void OnDisable()
     {
-        playerInputController.LookInputEvent.RemoveListener(OnLookInput);
+        playerInputController.InputEvents.LookInputEvent.RemoveListener(OnLookInput);
     }
 
     /// <summary>
@@ -60,11 +67,12 @@ public class PlayerCameraView : MonoBehaviour
 
     private void LateUpdate()
     {
-        // Применяем вращение только если камера может двигаться
         if (playerSettingsData.cameraCanMove && currentLookInput != Vector2.zero)
         {
             ApplyLookRotation(currentLookInput);
         }
+        
+        HeadBob();
     }
 
     /// <summary>
@@ -81,6 +89,24 @@ public class PlayerCameraView : MonoBehaviour
         
         transform.localEulerAngles = new Vector3(0, yaw, 0);
         playerCamera.transform.localEulerAngles = new Vector3(pitch, 0, 0);
+    }
+    
+    private void HeadBob()
+    {
+        Debug.Log(playerMovementController.IsWalking);
+        if (playerMovementController.IsWalking)
+        {
+            timer += Time.deltaTime * playerSettingsData.bobSpeed;
+            joint.localPosition = jointOriginalPos + new Vector3(
+                Mathf.Sin(timer) * bobAmount.x,
+                Mathf.Sin(timer) * bobAmount.y,
+                Mathf.Sin(timer) * bobAmount.z);
+        }
+        else
+        {
+            timer = 0;
+            joint.localPosition = Vector3.Lerp(joint.localPosition, jointOriginalPos, Time.deltaTime * playerSettingsData.bobSpeed);
+        }
     }
     
     /// <summary>

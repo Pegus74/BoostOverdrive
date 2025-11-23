@@ -1,13 +1,8 @@
 using System;
 using UnityEngine;
 
-/// <summary>
-/// Хранит изменяемые параметры игрока. Все контроллеры пишут и читают из него
-/// </summary>
-[CreateAssetMenu(fileName = "PlayerStateModel", menuName = "GameData/Player State Model")]
-public class PlayerStateModel : ScriptableObject
+public class PlayerStateModel : MonoBehaviour
 {
-    // Приватные поля для хранения данных (НЕ МЕНЯЮТСЯ напрямую извне)
     private float _currentWalkSpeed;
     private float _currentJumpPower;
     private float _currentDashPower;
@@ -18,12 +13,14 @@ public class PlayerStateModel : ScriptableObject
     private bool _isDashing;
     private bool _isSliding;
     private bool _isSlamming;
+    private bool _isWalking;
     
     private int _currentStyleIndex = 0;
     
-    private Component _lastWallJumpedFrom; 
+    private Component _lastWallJumpedFrom;
+
+    private Vector3 groundNormal;
     
-    // Геттеры для чтения состояния извне
     public float CurrentWalkSpeed => _currentWalkSpeed;
     public float CurrentJumpPower => _currentJumpPower;
     public float CurrentDashPower => _currentDashPower;
@@ -35,9 +32,19 @@ public class PlayerStateModel : ScriptableObject
     public bool IsSliding => _isSliding;
     public bool IsSlamming => _isSlamming;
 
+    public bool IsWalking()
+    {
+        if (_currentWalkSpeed > 0.01f)
+            _isWalking = true;
+        else 
+            _isWalking = false;
+        return _isWalking;
+    }
+
     public int CurrentStyleIndex => _currentStyleIndex;
     
     public Component LastWallJumpedFrom => _lastWallJumpedFrom;
+    public Vector3 GroundNormal => groundNormal;
     
     [Header("Уведомления об Изменении Состояния")]
     public IntEvent OnStyleChangedEvent; 
@@ -144,4 +151,10 @@ public class PlayerStateModel : ScriptableObject
             Debug.Log($"[Model] LastWallJumpedFrom updated to: {newWall}");
         }
     }
+    
+    public void SetGroundNormal(Vector3 normal)
+    {
+        groundNormal = normal;
+    }
+    
 }
