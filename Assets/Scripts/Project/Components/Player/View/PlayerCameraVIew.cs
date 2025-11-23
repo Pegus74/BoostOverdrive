@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 
 public class PlayerCameraView : MonoBehaviour
 {
@@ -7,16 +8,14 @@ public class PlayerCameraView : MonoBehaviour
     public PlayerStateModel playerStateModel; 
     public PlayerSettingsData playerSettingsData;
     
-    [Header("Input Listeners (Events)")]
-    public Vector2Event LookInputEvent; 
-    
     [Header("Camera Components")]
     public Camera playerCamera;
+    
+    private PlayerInputController playerInputController;
     
     // Углы вращения
     private float yaw = 0f;
     private float pitch = 0f;
-    
     // Ввод для обработки в Update()
     private Vector2 currentLookInput = Vector2.zero;
     private Image crosshairObject;
@@ -25,6 +24,7 @@ public class PlayerCameraView : MonoBehaviour
 
     private void Awake()
     {
+        playerInputController = GetComponent<PlayerInputController>();
         if (playerSettingsData.crosshair)
         {
             SetupCrosshair();
@@ -42,12 +42,12 @@ public class PlayerCameraView : MonoBehaviour
 
     private void OnEnable()
     {
-        LookInputEvent?.RegisterListener(OnLookInput);
+        playerInputController.LookInputEvent.AddListener(OnLookInput);
     }
 
     private void OnDisable()
     {
-        LookInputEvent?.UnregisterListener(OnLookInput);
+        playerInputController.LookInputEvent.RemoveListener(OnLookInput);
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 /// <summary>
 /// отвечает только за физическое движение игрока
@@ -11,16 +12,14 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
     public ObstaclesSettingsData obstaclesSettings;
     
     [Header("Input Listeners")] 
-    public Vector2Event MoveInputEvent;
-    public GameEvent JumpAttemptEvent;
-    public WallJumpEvent OnWallJumpDetectedEvent;
+    private PlayerInputController playerInputController;
+    // public WallJumpEvent OnWallJumpDetectedEvent;
     
     [Header("Soft Reset Event")]
     [SerializeField] private GameEvent OnLevelResetEvent;
     
-    
     [HideInInspector] private Rigidbody rb;
-    private Vector2 currentMoveInput = Vector2.zero; // Текущий ввод для FixedUpdate
+    private Vector2 currentMoveInput = Vector2.zero;
     private Vector3 externalImpulse = Vector3.zero;
     private const int LEGS_STYLE_INDEX = 1;
     private const int HANDS_STYLE_INDEX = 0;
@@ -34,6 +33,8 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
             return;
         }
         
+        playerInputController = GetComponent<PlayerInputController>();
+        
         rb.freezeRotation = true;
         
         playerStateModel.SetLastWallJumpedFrom(null);
@@ -41,18 +42,18 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
 
     void OnEnable()
     {
-        MoveInputEvent?.RegisterListener(OnMoveInput);
-        JumpAttemptEvent?.RegisterListener(InitiateJumpLogic);
+        playerInputController.MoveInputEvent.AddListener(OnMoveInput);
+        playerInputController.JumpAttemptEvent.AddListener(InitiateJumpLogic);
         OnLevelResetEvent.RegisterListener(SoftReset);
-        OnWallJumpDetectedEvent?.RegisterListener(HandleWallJump);
+        // OnWallJumpDetectedEvent?.RegisterListener(HandleWallJump);
     }
 
     void OnDisable()
     {
-        MoveInputEvent?.UnregisterListener(OnMoveInput);
-        JumpAttemptEvent?.UnregisterListener(InitiateJumpLogic);
+        playerInputController.MoveInputEvent.RemoveListener(OnMoveInput);
+        playerInputController.JumpAttemptEvent.RemoveListener(InitiateJumpLogic);
         OnLevelResetEvent.UnregisterListener(SoftReset);
-        OnWallJumpDetectedEvent?.UnregisterListener(HandleWallJump);
+        // OnWallJumpDetectedEvent?.UnregisterListener(HandleWallJump);
     }
     
     /// <summary>
@@ -62,11 +63,8 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
     {
         currentMoveInput = input;
     }
-
-    /// <summary>
-    /// Вызывается при попытке прыжка (через JumpAttemptEvent)
-    /// </summary>
-    public void InitiateJumpLogic()
+    
+    private void InitiateJumpLogic()
     {
         if (playerStateModel.IsGrounded && !playerStateModel.IsSliding && !playerStateModel.IsSlamming)
         {

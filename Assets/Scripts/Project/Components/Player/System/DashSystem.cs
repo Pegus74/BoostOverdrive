@@ -7,11 +7,10 @@ public class DashSystem : MonoBehaviour, IRestartable
     public PlayerStateModel playerStateModel;
     public PlayerSettingsData playerSettingsData;
     
-    [Header("Input Listener")]
-    public GameEvent DashAttemptEvent;
-    
     [Header("Soft Reset Event")]
     [SerializeField] private GameEvent OnLevelResetEvent;
+    
+    private PlayerInputController playerInputController;
     
     private Rigidbody _rb;
     private bool _isDashAvailable = true;
@@ -21,6 +20,7 @@ public class DashSystem : MonoBehaviour, IRestartable
 
     void Awake()
     {
+        playerInputController = GetComponent<PlayerInputController>();
         _rb = GetComponent<Rigidbody>();
         if (_rb == null)
         {
@@ -31,14 +31,14 @@ public class DashSystem : MonoBehaviour, IRestartable
 
     void OnEnable()
     {
-        DashAttemptEvent?.RegisterListener(InitiateDash);
+        playerInputController.DashAttemptEvent.AddListener(InitiateDash);
         
         OnLevelResetEvent.RegisterListener(SoftReset);
     }
 
     void OnDisable()
     {
-        DashAttemptEvent?.UnregisterListener(InitiateDash);
+        playerInputController.DashAttemptEvent.RemoveListener(InitiateDash);
         
         if (_currentDashCoroutine != null)
         {

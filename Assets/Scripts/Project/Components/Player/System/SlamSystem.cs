@@ -11,8 +11,7 @@ public class SlamSystem : MonoBehaviour
     public PlayerStateModel playerStateModel;
     public PlayerSettingsData playerSettingsData;
     
-    [Header("Input Listener")]
-    public GameEvent SlamAttemptEvent;
+    private PlayerInputController playerInputController;
     
     [Header("Collision Events")] 
     public Vector3Event SlamDestructibleHitEvent; 
@@ -24,6 +23,7 @@ public class SlamSystem : MonoBehaviour
 
     void Awake()
     {
+        playerInputController = GetComponent<PlayerInputController>();
         _rb = GetComponent<Rigidbody>();
         if (_rb == null)
         {
@@ -34,7 +34,7 @@ public class SlamSystem : MonoBehaviour
 
     void OnEnable()
     {
-        SlamAttemptEvent?.RegisterListener(InitiateSlam);
+        playerInputController.SlamAttemptEvent.AddListener(InitiateSlam);
         
         SlamDestructibleHitEvent?.RegisterListener(StopSlamOnDestructibleHit);
         SlamSolidHitEvent?.RegisterListener(StopSlamOnSolidHit);
@@ -42,7 +42,7 @@ public class SlamSystem : MonoBehaviour
 
     void OnDisable()
     {
-        SlamAttemptEvent?.UnregisterListener(InitiateSlam);
+        playerInputController.DashAttemptEvent.AddListener(InitiateSlam);
         
         SlamDestructibleHitEvent?.UnregisterListener(StopSlamOnDestructibleHit);
         SlamSolidHitEvent?.UnregisterListener(StopSlamOnSolidHit);

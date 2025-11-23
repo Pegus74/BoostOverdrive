@@ -5,20 +5,15 @@ using UnityEngine.UI;
 /// </summary>
 public class UIGameStateListener : MonoBehaviour
 {
-    [SerializeField] private GameStateEvent GameStateChangedEvent;
-
     [Header("Настройки UI")]
     [Tooltip("Состояние(я) игры, при котором этот объект должен быть АКТИВЕН.")]
     [SerializeField] private GameState targetGameState;
     
     [SerializeField] CanvasGroup targetCanvasGroup;
     
-
-    
-    private void OnEnable()
+    private void Start()
     {
-        if (GameStateChangedEvent != null)
-            GameStateChangedEvent.RegisterListener(HandleGameStateChange);
+        NewGameManager.Instance.OnGameStateChanged.AddListener(HandleGameStateChange);
 
         if (NewGameManager.Instance != null)
         {
@@ -29,8 +24,7 @@ public class UIGameStateListener : MonoBehaviour
 
     private void OnDisable()
     {
-        if (GameStateChangedEvent != null)
-            GameStateChangedEvent.UnregisterListener(HandleGameStateChange);
+        NewGameManager.Instance.OnGameStateChanged.RemoveListener(HandleGameStateChange);
         
     }
 
