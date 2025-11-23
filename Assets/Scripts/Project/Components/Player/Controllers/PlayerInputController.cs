@@ -13,7 +13,8 @@ public class PlayerInputController : MonoBehaviour
     public GameEvent SlideAttemptEvent;
     public GameEvent ToggleStyleAttemptEvent;
     public GameEvent OnPauseAttemptEvent;
-    
+    public GameEvent JumpCanceledEvent;
+
     [Header("GameState")]
     [SerializeField] private GameStateEvent GameStateChangedEvent;
 
@@ -30,6 +31,7 @@ public class PlayerInputController : MonoBehaviour
         playerControls.Gameplay.Look.canceled += OnLook;
 
         playerControls.Gameplay.Jump.performed += OnJump;
+        playerControls.Gameplay.Jump.canceled += OnJumpCanceled;
         playerControls.Gameplay.Dash.performed += OnDash;
         playerControls.Gameplay.Slide.performed += OnSlide;
         playerControls.Gameplay.Slam.performed += OnSlam;
@@ -67,7 +69,8 @@ public class PlayerInputController : MonoBehaviour
         playerControls.Gameplay.Slide.performed -= OnSlide;
         playerControls.Gameplay.Slam.performed -= OnSlam;
         playerControls.Gameplay.ToggleStyle.performed -= OnToggleStyle;
-        
+        playerControls.Gameplay.Jump.canceled -= OnJumpCanceled;
+
         playerControls.Gameplay.Pause.performed -= OnPause;
         
         playerControls.Dispose();
@@ -114,7 +117,12 @@ public class PlayerInputController : MonoBehaviour
     {
         OnPauseAttemptEvent?.Raise();
     }
-    
+
+    private void OnJumpCanceled(InputAction.CallbackContext context)
+    {
+        JumpCanceledEvent?.Raise();
+    }
+
     private void HandleGameStateChange(GameState newState)
     {
         // Отключаем весь ввод кроме кнопки паузы, если игра не в состоянии Playing

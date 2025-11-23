@@ -17,8 +17,9 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
     
     [Header("Soft Reset Event")]
     [SerializeField] private GameEvent OnLevelResetEvent;
-    
-    
+
+    public FloatEvent ChargedJumpExecuteEvent;
+
     [HideInInspector] private Rigidbody rb;
     private Vector2 currentMoveInput = Vector2.zero; // Текущий ввод для FixedUpdate
     private Vector3 externalImpulse = Vector3.zero;
@@ -45,6 +46,7 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
         JumpAttemptEvent?.RegisterListener(InitiateJumpLogic);
         OnLevelResetEvent.RegisterListener(SoftReset);
         OnWallJumpDetectedEvent?.RegisterListener(HandleWallJump);
+        ChargedJumpExecuteEvent?.RegisterListener(ExecuteChargedJump);
     }
 
     void OnDisable()
@@ -53,6 +55,7 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
         JumpAttemptEvent?.UnregisterListener(InitiateJumpLogic);
         OnLevelResetEvent.UnregisterListener(SoftReset);
         OnWallJumpDetectedEvent?.UnregisterListener(HandleWallJump);
+        ChargedJumpExecuteEvent?.UnregisterListener(ExecuteChargedJump);
     }
     
     /// <summary>
@@ -68,6 +71,8 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
     /// </summary>
     public void InitiateJumpLogic()
     {
+        if (playerStateModel.IsChargingJump) return;
+
         if (playerStateModel.IsGrounded && !playerStateModel.IsSliding && !playerStateModel.IsSlamming)
         {
             Jump();
@@ -130,7 +135,17 @@ public class PlayerMovementController : MonoBehaviour, IRestartable
         rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         rb.AddForce(Vector3.up * playerStateModel.CurrentJumpPower, ForceMode.Impulse);
     }
-    
+
+    public void ExecuteChargedJump(float jumpPower)
+    {
+        if (!playerSettingsData.enableJump) return;
+
+        rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+        rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
+
+        playerStateModel.SetIsGrounded(false);
+    }
+
     /// <summary>
     /// Вызывается при обнаружении прыжка от стены (принимает WallJumpData).
     /// </summary>
