@@ -10,6 +10,8 @@ public class EnergyBar : MonoBehaviour
     {
         energyBar.fillAmount = playerEnergy;
         
+        playerEnergy -= Time.deltaTime / 100;
+        
         if (playerEnergy <= 0.01f)
             GameManager.Instance.PlayerDied();
     }
