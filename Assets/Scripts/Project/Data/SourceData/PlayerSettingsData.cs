@@ -30,13 +30,14 @@ public class PlayerSettingsData : ScriptableObject
     public float squatHeightScale = 0.5f;
     public float squatTransitionDuration = 0.3f;
     public float slideCooldown = 0.5f;
-    
+
     [Header("Настройки Slam")]
+    public bool enableSlam = true;
     public float slamDuration = 0.15f;
     public float slamCooldown = 1.0f;
     public float slamSlowdownDuration = 0.5f;
     public float destructibleWallReboundMultiplier = 100.0f;
-    
+
     [Header("Настройки Взаимодействия со Стенами")]
     public float raycastCheckDistance = 1.0f;
     public float horizontalForceHands = 10f;
