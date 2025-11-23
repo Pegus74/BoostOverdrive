@@ -1008,6 +1008,37 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &323475579
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 323475580}
+  m_Layer: 0
+  m_Name: RespawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &323475580
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 323475579}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 267.8, y: 61.178, z: 57.010902}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &396802517
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1115,7 +1146,7 @@ PrefabInstance:
     - target: {fileID: 7806049255009064623, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
       propertyPath: targetPoint
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 323475580}
     - target: {fileID: 8792636544598214514, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
       propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
       value: 1801810542
@@ -11531,3 +11562,4 @@ SceneRoots:
   - {fileID: 652023101}
   - {fileID: 557697105}
   - {fileID: 700106237}
+  - {fileID: 323475580}

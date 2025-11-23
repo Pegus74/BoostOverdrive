@@ -50,7 +50,7 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 213905598762093505}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 3
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
@@ -667,7 +667,7 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4459864850019384750}
   m_Enabled: 0
-  m_CastShadows: 1
+  m_CastShadows: 3
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
@@ -817,12 +817,6 @@ MonoBehaviour:
   slamCooldown: 1
   reboundMultiplier: 0.5
   slamIndicatorPrefab: {fileID: 773316331030536582, guid: fc851329742e8754b8bce76605c07921, type: 3}
-  horizontalForceLegs: 14
-  verticalForceLegs: 10
-  reboundForceHands: 20
-  extraAccelerationHands: 5
-  cameraRotationDuration: 0.3
-  cameraRotateKey: 113
   enableCrawlSlide: 1
   crawlSlideKey: 99
   slideDuration: 2
@@ -831,6 +825,7 @@ MonoBehaviour:
   squatHeightScale: 0.5
   squatTransitionDuration: 0.5
   slideFrictionMultiplier: 0.95
+  cap: {fileID: 0}
   enableHeadBob: 1
   joint: {fileID: 4459864851508666808}
   bobSpeed: 10

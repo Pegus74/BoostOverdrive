@@ -4012,6 +4012,37 @@ MonoBehaviour:
     m_Bits: 64
   raycastCheckDistance: 1
   mm: {fileID: 11400000, guid: 3d5d607f94ab2b68da80c8bc30880b61, type: 2}
+--- !u!1 &996000070
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 996000071}
+  m_Layer: 0
+  m_Name: RespawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &996000071
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 996000070}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 267.8, y: 61.178, z: 57.010902}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1024311423
 GameObject:
   m_ObjectHideFlags: 0
@@ -7748,7 +7779,7 @@ PrefabInstance:
     - target: {fileID: 7806049255009064623, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
       propertyPath: targetPoint
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 996000071}
     - target: {fileID: 8792636544598214514, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
       propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
       value: 1801810542
@@ -10228,3 +10259,4 @@ SceneRoots:
   - {fileID: 1379516074}
   - {fileID: 1295926639}
   - {fileID: 2082334783}
+  - {fileID: 996000071}
