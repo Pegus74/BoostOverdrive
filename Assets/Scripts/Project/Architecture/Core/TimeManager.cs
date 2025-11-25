@@ -5,18 +5,21 @@ using UnityEngine;
 /// </summary>
 public class TimeManager : MonoBehaviour
 {
-    [SerializeField] private GameStateEvent GameStateChangedEvent; 
+    public NewGameManager gameManager;
+    
+    private void Awake()
+    {
+        gameManager = NewGameManager.Instance;
+    }
 
     private void OnEnable()
     {
-        if (GameStateChangedEvent != null)
-            GameStateChangedEvent.RegisterListener(HandleGameStateChange);
+        gameManager.OnGameStateChanged.AddListener(HandleGameStateChange);
     }
 
     private void OnDisable()
     {
-        if (GameStateChangedEvent != null)
-            GameStateChangedEvent.UnregisterListener(HandleGameStateChange);
+        gameManager.OnGameStateChanged.RemoveListener(HandleGameStateChange);
     }
 
     private void HandleGameStateChange(GameState newState)

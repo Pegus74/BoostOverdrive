@@ -1,24 +1,17 @@
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 
 public class PlayerInputController : MonoBehaviour
 {
-    [Header("Input Events")]
-    public Vector2Event moveInputEvent;
-    public Vector2Event LookInputEvent;
-    public GameEvent JumpAttemptEvent;
-    public GameEvent DashAttemptEvent;
-    public GameEvent SlamAttemptEvent;
-    public GameEvent SlideAttemptEvent;
-    public GameEvent ToggleStyleAttemptEvent;
-    public GameEvent OnPauseAttemptEvent;
-    public GameEvent JumpCanceledEvent;
-
+    [HideInInspector]
+    public InputEvents InputEvents = new InputEvents();
+    
     [Header("GameState")]
     [SerializeField] private GameStateEvent GameStateChangedEvent;
 
-    private PlayerControls playerControls;
+    private PlayerControls playerControls; // Pattern - Provider
 
     private void Awake()
     {
@@ -31,7 +24,6 @@ public class PlayerInputController : MonoBehaviour
         playerControls.Gameplay.Look.canceled += OnLook;
 
         playerControls.Gameplay.Jump.performed += OnJump;
-        playerControls.Gameplay.Jump.canceled += OnJumpCanceled;
         playerControls.Gameplay.Dash.performed += OnDash;
         playerControls.Gameplay.Slide.performed += OnSlide;
         playerControls.Gameplay.Slam.performed += OnSlam;
@@ -45,7 +37,7 @@ public class PlayerInputController : MonoBehaviour
         playerControls.Enable();
         
         if (GameStateChangedEvent != null)
-            GameStateChangedEvent.RegisterListener(HandleGameStateChange);
+            GameStateChangedEvent.AddListener(HandleGameStateChange);
     }
 
     private void OnDisable()
@@ -53,7 +45,7 @@ public class PlayerInputController : MonoBehaviour
         playerControls.Disable();
         
         if (GameStateChangedEvent != null)
-            GameStateChangedEvent.UnregisterListener(HandleGameStateChange);
+            GameStateChangedEvent.RemoveListener(HandleGameStateChange);
     }
 
     private void OnDestroy()
@@ -69,8 +61,7 @@ public class PlayerInputController : MonoBehaviour
         playerControls.Gameplay.Slide.performed -= OnSlide;
         playerControls.Gameplay.Slam.performed -= OnSlam;
         playerControls.Gameplay.ToggleStyle.performed -= OnToggleStyle;
-        playerControls.Gameplay.Jump.canceled -= OnJumpCanceled;
-
+        
         playerControls.Gameplay.Pause.performed -= OnPause;
         
         playerControls.Dispose();
@@ -79,50 +70,45 @@ public class PlayerInputController : MonoBehaviour
     private void OnMove(InputAction.CallbackContext context)
     {
         Vector2 value = context.ReadValue<Vector2>();
-        moveInputEvent?.Raise(value);
+        InputEvents.MoveInputEvent.Invoke(value);
     }
 
     private void OnLook(InputAction.CallbackContext context)
     {
         Vector2 value = context.ReadValue<Vector2>();
-        LookInputEvent?.Raise(value);
+        InputEvents.LookInputEvent.Invoke(value);
     }
 
     private void OnJump(InputAction.CallbackContext context)
     {
-        JumpAttemptEvent?.Raise();
+        InputEvents.JumpAttemptEvent.Invoke();
     }
 
     private void OnDash(InputAction.CallbackContext context)
     {
-        DashAttemptEvent?.Raise();
+        InputEvents.DashAttemptEvent.Invoke();
     }
 
     private void OnSlam(InputAction.CallbackContext context)
     {
-        SlamAttemptEvent?.Raise();
+        InputEvents.SlamAttemptEvent.Invoke();
     }
     
     private void OnSlide(InputAction.CallbackContext context)
     {
-        SlideAttemptEvent?.Raise();
+        InputEvents.SlideAttemptEvent.Invoke();
     }
 
     private void OnToggleStyle(InputAction.CallbackContext context)
     {
-        ToggleStyleAttemptEvent?.Raise();
+        InputEvents.ToggleStyleAttemptEvent.Invoke();
     }
 
     private void OnPause(InputAction.CallbackContext context)
     {
-        OnPauseAttemptEvent?.Raise();
+        InputEvents.OnPauseAttemptEvent.Invoke();
     }
-
-    private void OnJumpCanceled(InputAction.CallbackContext context)
-    {
-        JumpCanceledEvent?.Raise();
-    }
-
+    
     private void HandleGameStateChange(GameState newState)
     {
         // Отключаем весь ввод кроме кнопки паузы, если игра не в состоянии Playing
