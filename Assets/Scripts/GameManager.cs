@@ -25,7 +25,15 @@ public class GameManager : MonoBehaviour
         GameOver,
         GameWin
     }
-    private State currentState = State.Playing;
+    public State currentState = State.Playing;
+    
+    public enum GameMode
+    {
+        Classic,
+        Hard
+    }
+    
+    private GameMode currentGameMode = GameMode.Classic;
 
     private void Awake()
     {
@@ -88,7 +96,7 @@ public class GameManager : MonoBehaviour
     }
 
 
-    private void UpdateGameState()
+    public void UpdateGameState()
     {
 
         bool shouldTimeStop = (currentState != State.Playing);
@@ -262,9 +270,7 @@ public class GameManager : MonoBehaviour
     }
 
     #endregion
-
-
-
+    
     #region Win
     public void PlayerWin(string levelName = null)
     {
@@ -311,8 +317,11 @@ public class GameManager : MonoBehaviour
     {
         currentState = State.GameOver;
         if (gameOverCanvas != null) gameOverCanvas.gameObject.SetActive(true);
-        TimerManager timer = FindObjectOfType<TimerManager>();
-        if (timer != null) timer.StopTimerWithoutSaving();
+        if (currentGameMode == GameMode.Classic)
+        {
+            TimerManager timer = FindObjectOfType<TimerManager>();
+            if (timer != null) timer.StopTimerWithoutSaving();
+        }
         UpdateGameState();
     }
 
@@ -326,7 +335,9 @@ public class GameManager : MonoBehaviour
         if (gameOverCanvas != null) gameOverCanvas.gameObject.SetActive(false);
         if (gameWinCanvas != null) gameWinCanvas.gameObject.SetActive(false);
         currentState = State.Playing;
+        Debug.Log(currentState);
         UpdateGameState();
+        Debug.Log(currentState);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
@@ -361,7 +372,19 @@ public class GameManager : MonoBehaviour
     }
 
     #endregion
-
+    
+    #region GameMode
+    
+    public void ChangeGameMode()
+    {
+        bool isClassic = (currentGameMode == GameMode.Classic);
+        currentGameMode = isClassic ? GameMode.Hard : GameMode.Classic;
+        RestartLevel();
+    }
+    
+    #endregion
+    
+    public GameMode GetCurrentGameMode() => currentGameMode;
     public State GetCurrentState() => currentState;
     public MusicManager MusicManager => musicManager;
 }

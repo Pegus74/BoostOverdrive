@@ -20,6 +20,7 @@ public class FirstPersonController : MonoBehaviour
     private Scene currentScene;
 
     [SerializeField] private MetricsMaster mm;
+    public EnergyBar energyBar;
     
     [HideInInspector]
     public Component LastWallJumpedFrom { get; private set; } = null;
@@ -157,9 +158,14 @@ public class FirstPersonController : MonoBehaviour
     public float squatHeightScale = 0.5f;
     public float squatTransitionDuration = 0.5f;
     public float slideFrictionMultiplier = 0.95f;
+    
     private bool isSliding = false;
     private Vector3 originalScale;
     private Coroutine slideCoroutine;
+    
+    public Transform cap;
+    private Vector3 capsuleDefaultPos;
+    private Vector3 capsuleDefaultScale;
     #endregion
     
     #region Head Bob
@@ -189,6 +195,9 @@ public class FirstPersonController : MonoBehaviour
             slamIndicatorInstance = Instantiate(slamIndicatorPrefab);
             slamIndicatorInstance.SetActive(false);  
         }
+        
+        capsuleDefaultPos = cap.localPosition;
+        capsuleDefaultScale = cap.localScale;
     }
 
     private void Start()
@@ -240,10 +249,6 @@ public class FirstPersonController : MonoBehaviour
         else if (currentScene.name == "level2")
         {
             enableSlam = false;
-            enableCrawlSlide = false;
-        }
-        else
-        {
             enableCrawlSlide = false;
         }
         #endregion
@@ -314,6 +319,7 @@ public class FirstPersonController : MonoBehaviour
                 dashDirection.Normalize();
 
                 isDashing = true;
+                energyBar.RemoveEnergy();
                 dashTimer = mm.dashDuration;
                 Vector3 currentVelocity = rb.velocity;
                 Vector3 dashVelocity = dashDirection * mm.dashPower;
@@ -625,6 +631,7 @@ public class FirstPersonController : MonoBehaviour
     private void StartSlam()
     {
         isSlamming = true;
+        energyBar.RemoveEnergy();
         slamImpactOccurred = false;
         isReboundingFromSlam = false; 
         Vector3 currentVelocity = rb.velocity;
@@ -899,39 +906,50 @@ public class FirstPersonController : MonoBehaviour
     
     private IEnumerator CrawlSlideCoroutine()
     {
+        energyBar.RemoveEnergy();
         isSliding = true;
-        float timer = 0f;
+
+        Vector3 originalScale = cap.localScale;
         Vector3 targetScale = originalScale;
         targetScale.y *= squatHeightScale;
 
-        int currentStyleIndex = styleManager?.GetCurrentStyleIndex() ?? 0;
-        
-        Vector3 originalPos = transform.localPosition;
+        Vector3 originalPos = cap.localPosition;
         Vector3 targetPos = originalPos;
 
+        float delta = originalScale.y - targetScale.y;
+
+        int currentStyleIndex = styleManager.GetCurrentStyleIndex();
+        
         if (currentStyleIndex == 0)
         {
-            targetPos.y = originalPos.y - (originalScale.y - targetScale.y) * 0.5f;
+            targetPos.y = originalPos.y - delta * 0.5f;
         }
         else
         {
-            targetPos.y = originalPos.y + (originalScale.y - targetScale.y) * 0.5f;
+            targetPos.y = originalPos.y + delta * 0.5f;
         }
-
+        
         if (currentStyleIndex == 1 && isGrounded)
             rb.useGravity = false;
+        
+
+        targetPos.y = Mathf.Max(targetPos.y, capsuleDefaultPos.y);
 
         float t = 0f;
+
         while (t < squatTransitionDuration)
         {
             t += Time.deltaTime;
             float progress = t / squatTransitionDuration;
-            transform.localScale = Vector3.Lerp(originalScale, targetScale, progress);
-            transform.localPosition = Vector3.Lerp(originalPos, targetPos, progress);
+
+            cap.localScale = Vector3.Lerp(originalScale, targetScale, progress);
+            cap.localPosition = Vector3.Lerp(originalPos, targetPos, progress);
+
             yield return null;
         }
-        transform.localScale = targetScale;
-        transform.localPosition = targetPos;
+
+        cap.localScale = targetScale;
+        cap.localPosition = targetPos;
 
         if (currentStyleIndex == 1)
         {
@@ -978,39 +996,45 @@ public class FirstPersonController : MonoBehaviour
     
     private IEnumerator StopCrawlSlideCoroutine()
     {
-        isSliding = false; 
-        
-        Vector3 targetScale = originalScale;
-        targetScale.y *= squatHeightScale;
-        
-        int currentStyleIndex = styleManager?.GetCurrentStyleIndex() ?? 0;
+        isSliding = false;
+        Vector3 currentScale = cap.localScale;
+        Vector3 currentPos = cap.localPosition;
 
-        float t = 0f;
-        Vector3 originalPos = transform.localPosition;
-        Vector3 targetPos = transform.localPosition;
+        Vector3 targetScale = originalScale;
+        Vector3 targetPos = capsuleDefaultPos;
+
+        float delta = originalScale.y - currentScale.y;
+
+        int currentStyleIndex = styleManager?.GetCurrentStyleIndex() ?? 0;
+        
 
         if (currentStyleIndex == 0)
         {
-            targetPos.y = originalPos.y + (originalScale.y - targetScale.y) * 0.5f;
+            targetPos.y = capsuleDefaultPos.y + delta * 0.5f;
         }
         else
         {
-            targetPos.y = originalPos.y - (originalScale.y - targetScale.y) * 0.5f;
+            targetPos.y = capsuleDefaultPos.y - delta * 0.5f;
         }
         
+
+        targetPos.y = Mathf.Max(targetPos.y, capsuleDefaultPos.y);
+
+        float t = 0f;
+
         while (t < squatTransitionDuration)
         {
             t += Time.deltaTime;
             float progress = t / squatTransitionDuration;
-            transform.localScale = Vector3.Lerp(targetScale, originalScale, progress);
-            
-            transform.localPosition = Vector3.Lerp(originalPos, originalPos, progress); 
-            
+
+            cap.localScale = Vector3.Lerp(currentScale, targetScale, progress);
+            cap.localPosition = Vector3.Lerp(currentPos, targetPos, progress);
+
             yield return null;
         }
-        
-        transform.localScale = originalScale;
-        transform.localPosition = originalPos;
+
+        cap.localScale = capsuleDefaultScale;
+        cap.localPosition = capsuleDefaultPos;
 
         ResetSpeedModifier();
     }
