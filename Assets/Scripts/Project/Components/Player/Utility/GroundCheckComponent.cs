@@ -13,7 +13,7 @@ public class GroundCheckComponent : MonoBehaviour
     [SerializeField] LayerMask groundLayer;
     [Range(0f, 90f)]
     [SerializeField] float maxSlopeAngle = 45f; // Максимальный угол наклона поверхности, чтобы считаться землей
-    
+    private Vector3 currentGroundNormal;
     
     private Rigidbody rb;
     private bool isGrounded = false;
@@ -39,7 +39,9 @@ public class GroundCheckComponent : MonoBehaviour
 
     private void OnCollisionExit(Collision collision)
     {
-        isGrounded = false; 
+        isGrounded = false;
+        currentGroundNormal = Vector3.up;
+        playerStateModel.SetGroundNormal(Vector3.up);
     }
     
     private void FixedUpdate()
@@ -54,33 +56,36 @@ public class GroundCheckComponent : MonoBehaviour
     {
         if (playerStateModel == null) return;
 
-        // Проверка LayerMask
         if (((1 << collision.gameObject.layer) & groundLayer) == 0)
-        {
-            return; // Не является слоем земли
-        }
+            return;
 
         bool contactFound = false;
+        Vector3 bestNormal = Vector3.up;
+
         foreach (ContactPoint contact in collision.contacts)
         {
-            // Проверка угла наклона поверхности
             float angle = Vector3.Angle(contact.normal, Vector3.up);
 
             if (angle < maxSlopeAngle)
             {
                 contactFound = true;
+                bestNormal = contact.normal;
                 playerStateModel.SetLastWallJumpedFrom(null);
                 break;
             }
         }
-        
-        if (isEntering)
+
+        if (contactFound)
         {
-            isGrounded = contactFound;
+            isGrounded = true;
+            currentGroundNormal = bestNormal;
+            playerStateModel.SetGroundNormal(bestNormal);
         }
-        else if (!contactFound)
+        else if (isEntering)
         {
             isGrounded = false;
+            currentGroundNormal = Vector3.up;
+            playerStateModel.SetGroundNormal(Vector3.up);
         }
     }
 }

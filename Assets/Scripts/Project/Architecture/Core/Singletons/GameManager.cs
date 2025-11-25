@@ -3,20 +3,16 @@ using UnityEngine.SceneManagement;
 
 public class NewGameManager : MonoBehaviour
 {
-    [SerializeField] private GameStateEvent OnGameStateChanged; 
-    [SerializeField] private GameEvent OnPauseAttemptEvent;
-
-    [SerializeField] private GameEvent SoftResetRequestEvent;
-    [SerializeField] private GameEvent SoftResetCompletedEvent;
+    public GameStateEvent OnGameStateChanged = new GameStateEvent(); 
     
     public static NewGameManager Instance;
     [SerializeField] private GameState currentState = GameState.Playing;
     
-    [SerializeField] private LevelRestarter levelRestarter;
-    
+    private PlayerInputController playerInputController;
     
     private void Awake()
     {
+        playerInputController = FindObjectOfType<PlayerInputController>();
         if (Instance == null)
         {
             Instance = this;
@@ -38,20 +34,13 @@ public class NewGameManager : MonoBehaviour
 
     private void OnEnable()
     {
-        if (OnPauseAttemptEvent != null)
-            OnPauseAttemptEvent.RegisterListener(TogglePause);
-        
-        if (SoftResetCompletedEvent != null)
-            SoftResetCompletedEvent.RegisterListener(FinishRestart);
+        playerInputController.InputEvents.OnPauseAttemptEvent.AddListener(TogglePause);
     }
 
     private void OnDisable()
     {
-        if (OnPauseAttemptEvent != null)
-            OnPauseAttemptEvent.UnregisterListener(TogglePause);
+        playerInputController.InputEvents.OnPauseAttemptEvent.RemoveListener(TogglePause);
         
-        if (SoftResetCompletedEvent != null)
-            SoftResetCompletedEvent.UnregisterListener(FinishRestart);
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -65,7 +54,7 @@ public class NewGameManager : MonoBehaviour
     {
         if (OnGameStateChanged != null)
         {
-            OnGameStateChanged.Raise(currentState);
+            OnGameStateChanged.Invoke(currentState);
             Debug.Log($"GameManager gameState Changed to: {currentState}");
         }
     }
@@ -86,21 +75,11 @@ public class NewGameManager : MonoBehaviour
 
     public void RestartLevel()
     {
-        if (SoftResetRequestEvent == null)
-        {
-            Debug.LogWarning("SoftResetRequestEvent не задан. Перезапуск сцены.");
-            int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-            SceneManager.LoadScene(currentSceneIndex);
-            return;
-        }
-        
         if (currentState == GameState.Playing)
         {
             currentState = GameState.Paused;
             UpdateGameState(); 
         }
-        
-        SoftResetRequestEvent.Raise(); 
         
         Debug.Log("[GameManager]: Soft Reset Requested.");
     }
