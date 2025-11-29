@@ -13,8 +13,16 @@ public class PlayerMovementController : MonoBehaviour
     
     [Header("Input Listeners")] 
     private PlayerInputController playerInputController;
+
+
+    [Header("Wall Jump")]
+    public WallJumpEvent OnWallJumpDetectedEvent;
+
+    [Header("Wall Jump Settings")]
+    public SpringWallSettings wallJumpSettings;
+
     // public WallJumpEvent OnWallJumpDetectedEvent;
-    
+
     private Rigidbody rb;
     private Vector2 currentMoveInput = Vector2.zero;
     private Vector3 externalImpulse = Vector3.zero;
@@ -46,13 +54,19 @@ public class PlayerMovementController : MonoBehaviour
     void OnEnable()
     {
         InputEvents.MoveInputEvent.AddListener(OnMoveInput); 
-        InputEvents.JumpAttemptEvent.AddListener(InitiateJumpLogic);
+        InputEvents.JumpAttemptEvent.AddListener(InitiateJumpLogic); 
+        // OnWallJumpDetectedEvent?.RegisterListener(HandleWallJump);
+        InputEvents.JumpAttemptEvent.AddListener(CheckForWallJumps);
+        OnWallJumpDetectedEvent?.AddListener(HandleWallJump);
     }
 
     void OnDisable()
     { 
         InputEvents.MoveInputEvent.RemoveListener(OnMoveInput); 
         InputEvents.JumpAttemptEvent.RemoveListener(InitiateJumpLogic);
+        
+        InputEvents.JumpAttemptEvent.RemoveListener(CheckForWallJumps);
+        OnWallJumpDetectedEvent?.RemoveListener(HandleWallJump);
     }
     
     /// <summary>
@@ -143,81 +157,102 @@ public class PlayerMovementController : MonoBehaviour
         rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         rb.AddForce(Vector3.up * playerStateModel.CurrentJumpPower, ForceMode.Impulse);
     }
-    
+    private void CheckForWallJumps()
+    {
+        if (playerStateModel.IsGrounded)
+        {
+            return; // Не проверяем прыжки от стен когда на земле
+        }
+
+        SpringWall[] springWalls = FindObjectsOfType<SpringWall>();
+
+        foreach (SpringWall wall in springWalls)
+        {
+            if (wall.TryDetectWallJump(out WallJumpData jumpData))
+            {
+                Debug.Log($"Wall jump executed! Style: {jumpData.styleIndex}");
+                OnWallJumpDetectedEvent?.Invoke(jumpData);
+                return; // Обрабатываем только первую подходящую стену
+            }
+        }
+    }
+
     /// <summary>
     /// Вызывается при обнаружении прыжка от стены (принимает WallJumpData).
     /// </summary>
-    private void HandleWallJump(WallJumpData data)
+    /// 
+    public void HandleWallJump(WallJumpData data)
     {
-        Vector3 normal = data.surfaceNormal;
-        Component wall = data.wallComponent;
-        
-        if (playerStateModel.LastWallJumpedFrom == wall) 
+        Debug.Log($"HandleWallJump called! Style: {data.styleIndex}");
+
+        if (playerStateModel.LastWallJumpedFrom == data.wallComponent)
+        {
+            Debug.Log("Already jumped from this wall recently");
             return;
+        }
+        playerStateModel.SetLastWallJumpedFrom(data.wallComponent);
 
-        playerStateModel.SetLastWallJumpedFrom(wall);
+        Vector3 normal = data.surfaceNormal;
+        SpringWall wall = data.wallComponent as SpringWall;
 
-        int currentStyleIndex = playerStateModel.CurrentStyleIndex;
         Vector3 approachVector = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-        
+
         bool specialVerticalCaseTriggered = false;
-        
         rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
 
         #region HANDS (Стиль Рук)
-        if (currentStyleIndex == HANDS_STYLE_INDEX)
+        if (data.styleIndex == HANDS_STYLE_INDEX)
         {
-            Vector3 V_approach_norm = approachVector;
-            V_approach_norm.y = 0;
-            V_approach_norm.Normalize();
-            
+            Vector3 V_approach_norm = approachVector.normalized;
+
             float angle = Vector3.Angle(V_approach_norm, -normal);
-            
+
             bool isSpecialCase = (angle <= 15f || angle >= 165f || (angle >= 75f && angle <= 105f));
 
             Vector3 reboundVector = Vector3.zero;
-            float reboundForce = obstaclesSettings.reboundForceHands;
+            float reboundForce = wall.settings.reboundForceHands;
 
             if (isSpecialCase)
             {
-                reboundVector = normal;
-                reboundVector += Vector3.up; 
-                reboundVector.Normalize(); 
-                
+                reboundVector = normal + Vector3.up;
+                reboundVector.Normalize();
                 specialVerticalCaseTriggered = true;
             }
             else
             {
                 reboundVector = Vector3.Reflect(V_approach_norm, normal);
-
                 reboundVector.y = 0;
                 reboundVector.Normalize();
             }
-            
+
             Vector3 impulse = reboundVector * reboundForce;
-            impulse += reboundVector * obstaclesSettings.extraAccelerationHands;
-            
-            SetExternalImpulse(impulse); 
-            
+            impulse += reboundVector * wall.settings.extraAccelerationHands;
+
+            SetExternalImpulse(impulse);
+
+            if (wall != null)
+            {
+                StartCoroutine(wall.ApplySpeedModifierCoroutine(playerStateModel));
+            }
         }
         #endregion
 
         #region LEGS (Стиль Ног)
-        else if (currentStyleIndex == LEGS_STYLE_INDEX)
+        else if (data.styleIndex == LEGS_STYLE_INDEX)
         {
             Vector3 jumpDirection = transform.forward;
             jumpDirection.y = 0;
             jumpDirection.Normalize();
-            
-            Vector3 finalImpulse = jumpDirection * obstaclesSettings.horizontalForceLegs + Vector3.up * obstaclesSettings.verticalForceLegs;
-            
+
+            Vector3 finalImpulse = jumpDirection * wall.settings.horizontalForceLegs +
+                                 Vector3.up * wall.settings.verticalForceLegs;
+
             rb.AddForce(finalImpulse, ForceMode.Impulse);
-            
-            SetExternalImpulse(Vector3.zero); 
+            SetExternalImpulse(Vector3.zero);
         }
         #endregion
-        
-        if (specialVerticalCaseTriggered && currentStyleIndex == HANDS_STYLE_INDEX)
+
+        if (specialVerticalCaseTriggered && data.styleIndex == HANDS_STYLE_INDEX)
         {
             rb.AddForce(Vector3.up * playerStateModel.CurrentJumpPower * 0.75f, ForceMode.Impulse);
         }

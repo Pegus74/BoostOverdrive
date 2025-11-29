@@ -19,7 +19,8 @@ public class PlayerSettingsData : ScriptableObject
     public float acceleration = 20f;
     public bool playerCanMove = true;
     public bool enableJump = true;
-    
+    public bool enableAirJump = false;
+
     [Header("Настройки Dash")]
     public float dashDuration = 0.15f;
     public float dashCooldown = 1.0f;
@@ -41,4 +42,10 @@ public class PlayerSettingsData : ScriptableObject
     public float raycastCheckDistance = 1.0f;
     public float horizontalForceHands = 10f;
     public float verticalForceLegs = 15f;
+
+    [Header("Настройки заряженного прыжка")]
+    public bool enableChargedJump = true;
+    public float chargeSpeed = 2f;
+    public float minJumpPowerPercent = 0.35f;
+
 }

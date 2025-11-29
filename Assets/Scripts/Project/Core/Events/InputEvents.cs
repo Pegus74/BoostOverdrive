@@ -8,8 +8,10 @@ public static class InputEvents
     public static Vector2Event LookInputEvent = new Vector2Event();
     
     public static UnityEvent JumpAttemptEvent = new UnityEvent();
+    public static UnityEvent JumpCanceledEvent = new UnityEvent();
     
-    public static UnityEvent DashAttemptEvent = new UnityEvent();
+    
+    public static UnityEvent DashAttemptEvent = new UnityEvent(); 
     public static UnityEvent SlamAttemptEvent = new UnityEvent();
     public static UnityEvent SlideAttemptEvent = new UnityEvent();
     

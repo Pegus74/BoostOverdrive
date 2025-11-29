@@ -16,6 +16,9 @@ public class GameManager : MonoBehaviour
     private string currentLevelName;
     public List<string> levelNames = new List<string>();
 
+    [SerializeField] private CollectableSystem collectableSystem;
+    [SerializeField] private CollectableUI collectableUI;
+
     public static GameManager Instance;
 
     public enum State
@@ -130,7 +133,7 @@ public class GameManager : MonoBehaviour
         {
             FindMusicManager();
         }
-
+        SetupCollectablesUI();
         if (scene.name != "MainMenu" && !levelNames.Contains(scene.name))
         {
             levelNames.Add(scene.name);
@@ -176,6 +179,42 @@ public class GameManager : MonoBehaviour
 
     }
 
+    #region Collectables
+
+    public void SetupCollectablesUI()
+    {
+        if (collectableUI != null)
+        {
+            collectableUI.UpdateAllUI();
+        }
+    }
+
+    public void ResetAllCollectables()
+    {
+        if (collectableSystem != null)
+        {
+            collectableSystem.ResetAllCoins();
+            if (SceneManager.GetActiveScene().name != "MainMenu")
+            {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            }
+        }
+    }
+
+    public void ResetCoinsProgress()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.ResetAllCollectables();
+        }
+    }
+
+    public CollectableSystem GetCollectableSystem()
+    {
+        return collectableSystem;
+    }
+
+    #endregion
 
     #region Timer
 

@@ -14,7 +14,8 @@ public class PlayerStateModel : MonoBehaviour
     private bool _isSliding;
     private bool _isSlamming;
     private bool _isWalking;
-    
+    private bool isChargingJump;
+
     private int _currentStyleIndex = 0;
     
     private Component _lastWallJumpedFrom;
@@ -31,6 +32,7 @@ public class PlayerStateModel : MonoBehaviour
     public bool IsDashing => _isDashing;
     public bool IsSliding => _isSliding;
     public bool IsSlamming => _isSlamming;
+    public bool IsChargingJump => isChargingJump;
 
     public bool IsWalking()
     {
@@ -70,7 +72,13 @@ public class PlayerStateModel : MonoBehaviour
         _currentJumpPower = newPower;
         Debug.Log($"[Model] Jump Speed updated to: {newPower}");
     }
-    
+
+    public void SetIsChargingJump(bool charging)
+    {
+        isChargingJump = charging;
+    }
+
+
     public void SetDashPower(float newPower)
     {
         if (_currentDashPower != newPower)

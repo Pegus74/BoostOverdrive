@@ -62,13 +62,13 @@ public class FirstPersonController : MonoBehaviour
     public bool enableJump = true;
     public KeyCode jumpKey = KeyCode.Space;
     public float jumpPower = 5f;
-    
+
     public float jumpBufferTime = 0.15f;
     private float jumpBufferTimer = 0f;
-    
+
     public float coyoteTime = 0.15f;
     private float coyoteTimer = 0f;
-    
+
     public bool isGrounded = false;
     public bool isJumping = false;
     private int jumpDelayFrames = 60;
@@ -76,7 +76,8 @@ public class FirstPersonController : MonoBehaviour
     [Header("Charged Jump")]
     public bool enableChargedJump = false;
     public float chargeSpeed = 2f;
-    public float minJumpPowerPercent = 0.35f; 
+    public float minJumpPowerPercent = 0.35f;
+    public float chargeDelay = 1f; 
     public Image chargedJumpUI;
     public Image chargedJumpBackground;
 
@@ -87,6 +88,8 @@ public class FirstPersonController : MonoBehaviour
     private bool isChargingJump = false;
     private float currentCharge = 0f;
     private float chargeStartTime = 0f;
+    private bool isHoldingJumpKey = false;
+    private float jumpHoldTimer = 0f;
     private StyleController styleController;
 
     #endregion
@@ -275,17 +278,19 @@ public class FirstPersonController : MonoBehaviour
         #region Jump
         if (enableJump)
         {
-            if (enableChargedJump)
-            {
-                HandleChargedJump();
-            }
-            else
+          
+            if (!enableChargedJump)
             {
                 if (Input.GetKeyDown(jumpKey))
                 {
                     jumpBufferTimer = jumpBufferTime;
                 }
             }
+            else
+            {
+                HandleChargedJump();
+            }
+
             if (jumpBufferTimer > 0)
             {
                 jumpBufferTimer -= Time.deltaTime;
@@ -302,6 +307,7 @@ public class FirstPersonController : MonoBehaviour
             }
         }
         #endregion
+
 
         #region Dash
         if (enableDash)
@@ -493,6 +499,9 @@ public class FirstPersonController : MonoBehaviour
         
         if (isDashing)
         {
+            Vector3 velocity = rb.velocity;
+            velocity.y = Mathf.Clamp(velocity.y, -5f, 5f); 
+            rb.velocity = velocity;
             CheckDashCollisions();
         }
         externalImpulse = Vector3.Lerp(externalImpulse, Vector3.zero, 5f * Time.fixedDeltaTime);
@@ -531,7 +540,24 @@ public class FirstPersonController : MonoBehaviour
 
         if (Input.GetKeyDown(jumpKey) && isGrounded && !isChargingJump)
         {
-            StartChargingJump();
+            isHoldingJumpKey = true;
+            jumpHoldTimer = 0f;
+        }
+
+        if (isHoldingJumpKey && Input.GetKey(jumpKey))
+        {
+            jumpHoldTimer += Time.deltaTime;
+            if (jumpHoldTimer >= chargeDelay && !isChargingJump)
+            {
+                StartChargingJump();
+            }
+        }
+
+        if (Input.GetKeyUp(jumpKey) && isHoldingJumpKey && !isChargingJump)
+        {
+            JumpWithCleanup(); 
+            isHoldingJumpKey = false;
+            jumpHoldTimer = 0f;
         }
         if (isChargingJump)
         {
@@ -555,11 +581,17 @@ public class FirstPersonController : MonoBehaviour
                 CancelChargingJump();
             }
         }
+        if (Input.GetKeyUp(jumpKey))
+        {
+            isHoldingJumpKey = false;
+            jumpHoldTimer = 0f;
+        }
     }
 
     private void StartChargingJump()
     {
         isChargingJump = true;
+        isHoldingJumpKey = false; 
         currentCharge = 0f;
         chargeStartTime = Time.time;
         if (chargedJumpUI != null)
@@ -613,7 +645,9 @@ public class FirstPersonController : MonoBehaviour
     private void CancelChargingJump()
     {
         isChargingJump = false;
+        isHoldingJumpKey = false;
         currentCharge = 0f;
+        jumpHoldTimer = 0f;
         if (chargedJumpUI != null)
         {
             chargedJumpUI.gameObject.SetActive(false);
@@ -668,6 +702,7 @@ public class FirstPersonController : MonoBehaviour
         {
             currentJumpPower = styleManager.CurrentStyle.jumpPower;
         }
+        rb.AddForce(Vector3.up * currentJumpPower, ForceMode.Impulse);
         isGrounded = false;
         isJumping = true;
     }
@@ -849,16 +884,16 @@ public class FirstPersonController : MonoBehaviour
             return;
         Vector3 checkStart = transform.position + Vector3.up * 0.5f;
         Vector3 checkDirection = dashDirection.normalized;
+        CheckDirectionWithOffset(checkStart, checkDirection, Vector3.down * 0.2f);
         CheckDirectionWithOffset(checkStart, checkDirection, Vector3.zero);
-        CheckDirectionWithOffset(checkStart, checkDirection, Vector3.up * 0.3f);
-        CheckDirectionWithOffset(checkStart, checkDirection, Vector3.down * 0.3f);
+        CheckDirectionWithOffset(checkStart, checkDirection, Vector3.up * 0.2f);
 
     }
 
     private void CheckDirectionWithOffset(Vector3 start, Vector3 direction, Vector3 offset)
     {
-        RaycastHit[] hits = Physics.SphereCastAll(start + offset, dashCollisionCheckRadius,
-            direction, dashCollisionCheckDistance, wallCheckLayerMask);
+        RaycastHit[] hits = Physics.SphereCastAll(start + offset, dashCollisionCheckRadius * 0.8f, 
+            direction, dashCollisionCheckDistance * 0.7f, wallCheckLayerMask); 
 
         foreach (RaycastHit hit in hits)
         {
@@ -871,8 +906,27 @@ public class FirstPersonController : MonoBehaviour
                 ProcessDashWallBreak(wall, hit.point);
                 return;
             }
+            else
+            {
+                ProcessDashCollision(hit);
+                return;
+            }
         }
     }
+
+    private void ProcessDashCollision(RaycastHit hit)
+    {
+        Vector3 reflection = Vector3.Reflect(dashDirection, hit.normal);
+        reflection.y = 0; 
+        reflection.Normalize();
+        Vector3 currentVelocity = rb.velocity;
+        currentVelocity.x = reflection.x * mm.dashPower * 0.3f;
+        currentVelocity.z = reflection.z * mm.dashPower * 0.3f;
+        currentVelocity.y = Mathf.Min(currentVelocity.y, 2f); 
+        rb.velocity = currentVelocity;
+        isDashing = false;
+    }
+
     private void ProcessDashWallBreak(DestructibleWall wall, Vector3 hitPoint)
     {
         wall.DestroyWall();
