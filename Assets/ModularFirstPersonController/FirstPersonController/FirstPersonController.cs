@@ -499,6 +499,9 @@ public class FirstPersonController : MonoBehaviour
         
         if (isDashing)
         {
+            Vector3 velocity = rb.velocity;
+            velocity.y = Mathf.Clamp(velocity.y, -5f, 5f); 
+            rb.velocity = velocity;
             CheckDashCollisions();
         }
         externalImpulse = Vector3.Lerp(externalImpulse, Vector3.zero, 5f * Time.fixedDeltaTime);
@@ -881,16 +884,16 @@ public class FirstPersonController : MonoBehaviour
             return;
         Vector3 checkStart = transform.position + Vector3.up * 0.5f;
         Vector3 checkDirection = dashDirection.normalized;
+        CheckDirectionWithOffset(checkStart, checkDirection, Vector3.down * 0.2f);
         CheckDirectionWithOffset(checkStart, checkDirection, Vector3.zero);
-        CheckDirectionWithOffset(checkStart, checkDirection, Vector3.up * 0.3f);
-        CheckDirectionWithOffset(checkStart, checkDirection, Vector3.down * 0.3f);
+        CheckDirectionWithOffset(checkStart, checkDirection, Vector3.up * 0.2f);
 
     }
 
     private void CheckDirectionWithOffset(Vector3 start, Vector3 direction, Vector3 offset)
     {
-        RaycastHit[] hits = Physics.SphereCastAll(start + offset, dashCollisionCheckRadius,
-            direction, dashCollisionCheckDistance, wallCheckLayerMask);
+        RaycastHit[] hits = Physics.SphereCastAll(start + offset, dashCollisionCheckRadius * 0.8f, 
+            direction, dashCollisionCheckDistance * 0.7f, wallCheckLayerMask); 
 
         foreach (RaycastHit hit in hits)
         {
@@ -903,8 +906,27 @@ public class FirstPersonController : MonoBehaviour
                 ProcessDashWallBreak(wall, hit.point);
                 return;
             }
+            else
+            {
+                ProcessDashCollision(hit);
+                return;
+            }
         }
     }
+
+    private void ProcessDashCollision(RaycastHit hit)
+    {
+        Vector3 reflection = Vector3.Reflect(dashDirection, hit.normal);
+        reflection.y = 0; 
+        reflection.Normalize();
+        Vector3 currentVelocity = rb.velocity;
+        currentVelocity.x = reflection.x * mm.dashPower * 0.3f;
+        currentVelocity.z = reflection.z * mm.dashPower * 0.3f;
+        currentVelocity.y = Mathf.Min(currentVelocity.y, 2f); 
+        rb.velocity = currentVelocity;
+        isDashing = false;
+    }
+
     private void ProcessDashWallBreak(DestructibleWall wall, Vector3 hitPoint)
     {
         wall.DestroyWall();
