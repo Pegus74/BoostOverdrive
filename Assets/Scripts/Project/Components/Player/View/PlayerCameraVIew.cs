@@ -17,6 +17,7 @@ public class PlayerCameraView : MonoBehaviour
     // Углы вращения
     private float yaw = 0f;
     private float pitch = 0f;
+    
     // Ввод для обработки в Update()
     private Vector2 currentLookInput = Vector2.zero;
     private Image crosshairObject;
@@ -29,7 +30,7 @@ public class PlayerCameraView : MonoBehaviour
 
     private void Awake()
     {
-        playerInputController = GetComponent<PlayerInputController>();
+        playerInputController = FindObjectOfType<PlayerInputController>();
         if (playerSettingsData.crosshair)
         {
             SetupCrosshair();
@@ -48,13 +49,13 @@ public class PlayerCameraView : MonoBehaviour
     }
 
     private void OnEnable()
-    {
-        playerInputController.InputEvents.LookInputEvent.AddListener(OnLookInput);
+    { 
+        InputEvents.LookInputEvent.AddListener(OnLookInput);
     }
 
     private void OnDisable()
-    {
-        playerInputController.InputEvents.LookInputEvent.RemoveListener(OnLookInput);
+    { 
+        InputEvents.LookInputEvent.RemoveListener(OnLookInput);
     }
 
     /// <summary>
@@ -67,7 +68,7 @@ public class PlayerCameraView : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (playerSettingsData.cameraCanMove && currentLookInput != Vector2.zero)
+        if (NewGameManager.Instance.GetCurrentState() == GameState.Playing && currentLookInput != Vector2.zero)
         {
             ApplyLookRotation(currentLookInput);
         }

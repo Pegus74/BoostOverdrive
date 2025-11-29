@@ -13,9 +13,6 @@ public class SlamSystem : MonoBehaviour
     
     private PlayerInputController playerInputController;
     
-    [Header("Collision Events")] 
-    public Vector3Event SlamDestructibleHitEvent; 
-    public GameEvent SlamSolidHitEvent;           
 
     private Rigidbody _rb;
     private bool _isSlamAvailable = true;
@@ -23,7 +20,7 @@ public class SlamSystem : MonoBehaviour
 
     void Awake()
     {
-        playerInputController = GetComponent<PlayerInputController>();
+        playerInputController = FindObjectOfType<PlayerInputController>();
         _rb = GetComponent<Rigidbody>();
         if (_rb == null)
         {
@@ -33,19 +30,19 @@ public class SlamSystem : MonoBehaviour
     }
 
     void OnEnable()
-    {
-        playerInputController.InputEvents.SlamAttemptEvent.AddListener(InitiateSlam);
+    { 
+        InputEvents.SlamAttemptEvent.AddListener(InitiateSlam);
         
-        SlamDestructibleHitEvent?.RegisterListener(StopSlamOnDestructibleHit);
-        SlamSolidHitEvent?.RegisterListener(StopSlamOnSolidHit);
+        AbilityEvents.SlamDestructibleHitEvent.AddListener(StopSlamOnDestructibleHit);
+        AbilityEvents.SlamSolidHitEvent.AddListener(StopSlamOnSolidHit);
     }
 
     void OnDisable()
-    {
-        playerInputController.InputEvents.DashAttemptEvent.AddListener(InitiateSlam);
+    { 
+        InputEvents.DashAttemptEvent.AddListener(InitiateSlam);
         
-        SlamDestructibleHitEvent?.UnregisterListener(StopSlamOnDestructibleHit);
-        SlamSolidHitEvent?.UnregisterListener(StopSlamOnSolidHit);
+        AbilityEvents.SlamDestructibleHitEvent.RemoveListener(StopSlamOnDestructibleHit);
+        AbilityEvents.SlamSolidHitEvent.RemoveListener(StopSlamOnSolidHit);
         
         if (_currentSlamCoroutine != null)
         {
@@ -73,7 +70,8 @@ public class SlamSystem : MonoBehaviour
     private IEnumerator SlamCoroutine()
     {
         _isSlamAvailable = false;
-        playerStateModel.SetIsSlamming(true); 
+        playerStateModel.SetIsSlamming(true);
+        AbilityEvents.OnAbilityStarted.Invoke();
 
         Vector3 slamDirection = Vector3.down; 
         float finalSlamPower = playerStateModel.CurrentSlamPower;
@@ -174,6 +172,6 @@ public class SlamSystem : MonoBehaviour
         }
 
         _isSlamAvailable = true;
-        Debug.Log("Slam is now available.");
+        Debug.Log("[Slide] Slam is now available.");
     }
 }

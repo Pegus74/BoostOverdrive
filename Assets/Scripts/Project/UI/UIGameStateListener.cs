@@ -13,7 +13,7 @@ public class UIGameStateListener : MonoBehaviour
     
     private void Start()
     {
-        NewGameManager.Instance.OnGameStateChanged.AddListener(HandleGameStateChange);
+        GameEvents.OnGameStateChanged.AddListener(HandleGameStateChange);
 
         if (NewGameManager.Instance != null)
         {
@@ -24,8 +24,7 @@ public class UIGameStateListener : MonoBehaviour
 
     private void OnDisable()
     {
-        NewGameManager.Instance.OnGameStateChanged.RemoveListener(HandleGameStateChange);
-        
+        GameEvents.OnGameStateChanged.RemoveListener(HandleGameStateChange);
     }
 
     private void HandleGameStateChange(GameState newState)

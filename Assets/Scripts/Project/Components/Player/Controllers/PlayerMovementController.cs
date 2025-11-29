@@ -26,8 +26,9 @@ public class PlayerMovementController : MonoBehaviour
     private Rigidbody rb;
     private Vector2 currentMoveInput = Vector2.zero;
     private Vector3 externalImpulse = Vector3.zero;
-    private Vector3 smoothedTarget = Vector3.zero;
+    
     private Vector3 smoothedLocalVelocity = Vector3.zero;
+    
     private const int LEGS_STYLE_INDEX = 1;
     private const int HANDS_STYLE_INDEX = 0;
 
@@ -43,7 +44,7 @@ public class PlayerMovementController : MonoBehaviour
             return;
         }
         
-        playerInputController = GetComponent<PlayerInputController>();
+        playerInputController = FindObjectOfType<PlayerInputController>();
         
         rb.freezeRotation = true;
         
@@ -52,19 +53,19 @@ public class PlayerMovementController : MonoBehaviour
 
     void OnEnable()
     {
-        playerInputController.InputEvents.MoveInputEvent.AddListener(OnMoveInput);
-        playerInputController.InputEvents.JumpAttemptEvent.AddListener(InitiateJumpLogic);
+        InputEvents.MoveInputEvent.AddListener(OnMoveInput); 
+        InputEvents.JumpAttemptEvent.AddListener(InitiateJumpLogic); 
         // OnWallJumpDetectedEvent?.RegisterListener(HandleWallJump);
-        playerInputController.InputEvents.JumpAttemptEvent.AddListener(CheckForWallJumps);
+        InputEvents.JumpAttemptEvent.AddListener(CheckForWallJumps);
         OnWallJumpDetectedEvent?.AddListener(HandleWallJump);
     }
 
     void OnDisable()
-    {
-        playerInputController.InputEvents.MoveInputEvent.RemoveListener(OnMoveInput);
-        playerInputController.InputEvents.JumpAttemptEvent.RemoveListener(InitiateJumpLogic);
-        // OnWallJumpDetectedEvent?.UnregisterListener(HandleWallJump);
-        playerInputController.InputEvents.JumpAttemptEvent.RemoveListener(CheckForWallJumps);
+    { 
+        InputEvents.MoveInputEvent.RemoveListener(OnMoveInput); 
+        InputEvents.JumpAttemptEvent.RemoveListener(InitiateJumpLogic);
+        
+        InputEvents.JumpAttemptEvent.RemoveListener(CheckForWallJumps);
         OnWallJumpDetectedEvent?.RemoveListener(HandleWallJump);
     }
     
@@ -78,10 +79,11 @@ public class PlayerMovementController : MonoBehaviour
     
     private void InitiateJumpLogic()
     {
-        if (playerStateModel.IsGrounded && !playerStateModel.IsSliding && !playerStateModel.IsSlamming)
+        if (playerStateModel.IsGrounded && !playerStateModel.IsSliding 
+                                        && !playerStateModel.IsSlamming 
+                                        && !playerStateModel.IsDashing)
         {
             Jump();
-            Debug.Log("Jump Attempted!");
         }
     }
     

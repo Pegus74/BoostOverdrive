@@ -1,6 +1,5 @@
 using UnityEngine;
 
-// Данные, которые не меняются во время игры для игрока
 [CreateAssetMenu(fileName = "NewPlayerSettings", menuName = "GameData/Player Settings Data")]
 public class PlayerSettingsData : ScriptableObject
 {

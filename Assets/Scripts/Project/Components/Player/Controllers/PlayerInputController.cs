@@ -5,13 +5,10 @@ using UnityEngine.Serialization;
 
 public class PlayerInputController : MonoBehaviour
 {
-    [HideInInspector]
-    public InputEvents InputEvents = new InputEvents();
-    
     [Header("GameState")]
     [SerializeField] private GameStateEvent GameStateChangedEvent;
 
-    private PlayerControls playerControls; 
+    private PlayerControls playerControls; // Pattern - Provider
 
     private void Awake()
     {
@@ -30,6 +27,8 @@ public class PlayerInputController : MonoBehaviour
         playerControls.Gameplay.ToggleStyle.performed += OnToggleStyle;
         
         playerControls.Gameplay.Pause.performed += OnPause;
+        
+        playerControls.Gameplay.Restart.performed += OnRestart;
     }
 
     private void OnEnable()
@@ -63,6 +62,8 @@ public class PlayerInputController : MonoBehaviour
         playerControls.Gameplay.ToggleStyle.performed -= OnToggleStyle;
         
         playerControls.Gameplay.Pause.performed -= OnPause;
+        
+        playerControls.Gameplay.Restart.performed -= OnRestart;
         
         playerControls.Dispose();
     }
@@ -113,6 +114,12 @@ public class PlayerInputController : MonoBehaviour
         InputEvents.JumpCanceledEvent.Invoke();
     }
 
+
+    private void OnRestart(InputAction.CallbackContext context)
+    {
+        InputEvents.OnRestartAttemptEvent.Invoke();
+    }
+    
     private void HandleGameStateChange(GameState newState)
     {
         // Отключаем весь ввод кроме кнопки паузы, если игра не в состоянии Playing

@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mouseSensitivity: 2
   maxLookAngle: 80
+  bobSpeed: 5
   invertCamera: 0
   lockCursor: 1
   cameraCanMove: 1
@@ -21,7 +22,7 @@ MonoBehaviour:
   crosshairImage: {fileID: 21300000, guid: be4ce60e2c9768c44b9b10b9c5258045, type: 3}
   crosshairColor: {r: 1, g: 1, b: 1, a: 1}
   maxVelocityChange: 10
-  enableAirJump: 0
+  acceleration: 40
   playerCanMove: 1
   enableJump: 1
   dashDuration: 0.15
@@ -31,7 +32,6 @@ MonoBehaviour:
   squatHeightScale: 0.5
   squatTransitionDuration: 0.3
   slideCooldown: 0.5
-  enableSlam: 1
   slamDuration: 0.15
   slamCooldown: 1
   slamSlowdownDuration: 0.5
@@ -39,6 +39,3 @@ MonoBehaviour:
   raycastCheckDistance: 1
   horizontalForceHands: 10
   verticalForceLegs: 15
-  enableChargedJump: 1
-  chargeSpeed: 2
-  minJumpPowerPercent: 0.35

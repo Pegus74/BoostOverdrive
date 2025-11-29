@@ -1,9 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// Отвечает исключительно за физическую проверку нахождения на земле
-/// и обновление IsGrounded в PlayerStateModel.
-/// </summary>
 public class GroundCheckComponent : MonoBehaviour
 {
     [Header("Model")]
