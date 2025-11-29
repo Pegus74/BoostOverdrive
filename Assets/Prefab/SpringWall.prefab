@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7364607905028171725}
   - component: {fileID: 9126725261044316744}
   - component: {fileID: 4570951677003416314}
+  - component: {fileID: 7922195010428931952}
   m_Layer: 0
   m_Name: SpringWall
   m_TagString: Untagged
@@ -107,3 +108,21 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &7922195010428931952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7197009612212104142}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e222c559d2bbf940ac3ad061869b2af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  activationDistance: 1
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  raycastCheckDistance: 1
+  mm: {fileID: 11400000, guid: 3d5d607f94ab2b68da80c8bc30880b61, type: 2}
