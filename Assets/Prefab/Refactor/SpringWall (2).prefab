@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &7197009612212104142
+--- !u!1 &218034630495820532
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,48 +8,48 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 9054840367771348372}
-  - component: {fileID: 7364607905028171725}
-  - component: {fileID: 9126725261044316744}
-  - component: {fileID: 4570951677003416314}
-  - component: {fileID: 7922195010428931952}
+  - component: {fileID: 1143316583464859732}
+  - component: {fileID: 3523980676287853907}
+  - component: {fileID: 8449959598070067544}
+  - component: {fileID: 2034117453011524914}
+  - component: {fileID: 1005464500989740277}
   m_Layer: 0
-  m_Name: SpringWall
+  m_Name: SpringWall (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &9054840367771348372
+--- !u!4 &1143316583464859732
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7197009612212104142}
+  m_GameObject: {fileID: 218034630495820532}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 11.56, y: 3.75, z: 40.48}
-  m_LocalScale: {x: 10, y: 5, z: 1}
+  m_LocalRotation: {x: -0, y: -0.99999285, z: -0, w: -0.0037882077}
+  m_LocalPosition: {x: 1.99, y: 6.02, z: 18.93}
+  m_LocalScale: {x: 5, y: 10, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
---- !u!33 &7364607905028171725
+  m_LocalEulerAnglesHint: {x: 0, y: -180.434, z: 0}
+--- !u!33 &3523980676287853907
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7197009612212104142}
+  m_GameObject: {fileID: 218034630495820532}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &9126725261044316744
+--- !u!23 &8449959598070067544
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7197009612212104142}
+  m_GameObject: {fileID: 218034630495820532}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -87,13 +87,13 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &4570951677003416314
+--- !u!65 &2034117453011524914
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7197009612212104142}
+  m_GameObject: {fileID: 218034630495820532}
   m_Material: {fileID: 13400000, guid: 408941e0339573c4e9610bf29394cfd4, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
@@ -108,21 +108,31 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &7922195010428931952
+--- !u!114 &1005464500989740277
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7197009612212104142}
+  m_GameObject: {fileID: 218034630495820532}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e222c559d2bbf940ac3ad061869b2af, type: 3}
+  m_Script: {fileID: 11500000, guid: efb5ccc79b3f70045b17f46dc59dcb53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  activationDistance: 1
-  playerLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  raycastCheckDistance: 1
-  mm: {fileID: 11400000, guid: 3d5d607f94ab2b68da80c8bc30880b61, type: 2}
+  settings: {fileID: 11400000, guid: 702fc211cbf14e542911f328ec6d46a1, type: 2}
+  OnWallJumpDetectedEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 619782220178815816, guid: 9faeba5d0e3557347991df00ff3885d6, type: 3}
+        m_TargetAssemblyTypeName: PlayerMovementController, Assembly-CSharp
+        m_MethodName: HandleWallJump
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2

@@ -11,7 +11,7 @@ public class PlayerInputController : MonoBehaviour
     [Header("GameState")]
     [SerializeField] private GameStateEvent GameStateChangedEvent;
 
-    private PlayerControls playerControls; // Pattern - Provider
+    private PlayerControls playerControls; 
 
     private void Awake()
     {
@@ -22,7 +22,7 @@ public class PlayerInputController : MonoBehaviour
 
         playerControls.Gameplay.Look.performed += OnLook;
         playerControls.Gameplay.Look.canceled += OnLook;
-
+        playerControls.Gameplay.Jump.canceled += OnJumpCanceled;
         playerControls.Gameplay.Jump.performed += OnJump;
         playerControls.Gameplay.Dash.performed += OnDash;
         playerControls.Gameplay.Slide.performed += OnSlide;
@@ -55,7 +55,7 @@ public class PlayerInputController : MonoBehaviour
         
         playerControls.Gameplay.Look.performed -= OnLook;
         playerControls.Gameplay.Look.canceled -= OnLook;
-        
+        playerControls.Gameplay.Jump.canceled -= OnJumpCanceled;
         playerControls.Gameplay.Jump.performed -= OnJump;
         playerControls.Gameplay.Dash.performed -= OnDash;
         playerControls.Gameplay.Slide.performed -= OnSlide;
@@ -108,7 +108,11 @@ public class PlayerInputController : MonoBehaviour
     {
         InputEvents.OnPauseAttemptEvent.Invoke();
     }
-    
+    private void OnJumpCanceled(InputAction.CallbackContext context)
+    {
+        InputEvents.JumpCanceledEvent.Invoke();
+    }
+
     private void HandleGameStateChange(GameState newState)
     {
         // Отключаем весь ввод кроме кнопки паузы, если игра не в состоянии Playing
