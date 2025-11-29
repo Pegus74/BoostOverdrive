@@ -8,6 +8,7 @@ public class SpringWallSettings : ScriptableObject
     public float raycastCheckDistance = 1.0f;
     public LayerMask playerLayer;
 
+    
     [Header("Hands Style Settings")]
     public float reboundForceHands = 10f;
     public float extraAccelerationHands = 5f;

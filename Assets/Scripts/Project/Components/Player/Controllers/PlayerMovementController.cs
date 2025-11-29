@@ -155,16 +155,39 @@ public class PlayerMovementController : MonoBehaviour
         rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         rb.AddForce(Vector3.up * playerStateModel.CurrentJumpPower, ForceMode.Impulse);
     }
+    private void CheckForWallJumps()
+    {
+        if (playerStateModel.IsGrounded)
+        {
+            return; // Не проверяем прыжки от стен когда на земле
+        }
+
+        SpringWall[] springWalls = FindObjectsOfType<SpringWall>();
+
+        foreach (SpringWall wall in springWalls)
+        {
+            if (wall.TryDetectWallJump(out WallJumpData jumpData))
+            {
+                Debug.Log($"Wall jump executed! Style: {jumpData.styleIndex}");
+                OnWallJumpDetectedEvent?.Invoke(jumpData);
+                return; // Обрабатываем только первую подходящую стену
+            }
+        }
+    }
 
     /// <summary>
     /// Вызывается при обнаружении прыжка от стены (принимает WallJumpData).
     /// </summary>
     /// 
-    private void HandleWallJump(WallJumpData data)
+    public void HandleWallJump(WallJumpData data)
     {
-        if (playerStateModel.LastWallJumpedFrom == data.wallComponent)
-            return;
+        Debug.Log($"HandleWallJump called! Style: {data.styleIndex}");
 
+        if (playerStateModel.LastWallJumpedFrom == data.wallComponent)
+        {
+            Debug.Log("Already jumped from this wall recently");
+            return;
+        }
         playerStateModel.SetLastWallJumpedFrom(data.wallComponent);
 
         Vector3 normal = data.surfaceNormal;

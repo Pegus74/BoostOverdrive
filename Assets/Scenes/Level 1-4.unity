@@ -2584,6 +2584,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7197009612212104142, guid: 8bae701bd5d856140b28e9842e12871e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1999007376}
+    - targetCorrespondingSourceObject: {fileID: 7197009612212104142, guid: 8bae701bd5d856140b28e9842e12871e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1999007377}
   m_SourcePrefab: {fileID: 100100000, guid: 8bae701bd5d856140b28e9842e12871e, type: 3}
 --- !u!1 &442265339
 GameObject:
@@ -6636,6 +6639,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7197009612212104142, guid: 8bae701bd5d856140b28e9842e12871e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1072026410}
+    - targetCorrespondingSourceObject: {fileID: 7197009612212104142, guid: 8bae701bd5d856140b28e9842e12871e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1072026415}
   m_SourcePrefab: {fileID: 100100000, guid: 8bae701bd5d856140b28e9842e12871e, type: 3}
 --- !u!1 &968317721
 GameObject:
@@ -7505,6 +7511,34 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 9054840367771348372, guid: 8bae701bd5d856140b28e9842e12871e, type: 3}
   m_PrefabInstance: {fileID: 945552648}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1072026415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1072026409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efb5ccc79b3f70045b17f46dc59dcb53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  settings: {fileID: 11400000, guid: 702fc211cbf14e542911f328ec6d46a1, type: 2}
+  OnWallJumpDetectedEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: PlayerMovementController, Assembly-CSharp
+        m_MethodName: HandleWallJump
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1095400020
 GameObject:
   m_ObjectHideFlags: 0
@@ -11288,6 +11322,22 @@ MonoBehaviour:
     m_Bits: 64
   raycastCheckDistance: 1
   mm: {fileID: 11400000, guid: 3d5d607f94ab2b68da80c8bc30880b61, type: 2}
+--- !u!114 &1999007377
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1999007374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efb5ccc79b3f70045b17f46dc59dcb53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  settings: {fileID: 0}
+  OnWallJumpDetectedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &2020440252
 GameObject:
   m_ObjectHideFlags: 0
