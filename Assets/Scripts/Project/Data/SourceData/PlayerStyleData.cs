@@ -1,6 +1,5 @@
 using UnityEngine;
 
-// Данные, которые меняются в зависимости от стиля
 [CreateAssetMenu(fileName = "NewPlayerStyle", menuName = "GameData/Player Style Data")]
 public class PlayerStyleData : ScriptableObject
 {

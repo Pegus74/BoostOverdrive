@@ -13,9 +13,6 @@ public class SlamSystem : MonoBehaviour
     
     private PlayerInputController playerInputController;
     
-    [Header("Collision Events")] 
-    public Vector3Event SlamDestructibleHitEvent; 
-    public GameEvent SlamSolidHitEvent;           
 
     private Rigidbody _rb;
     private bool _isSlamAvailable = true;
@@ -36,16 +33,16 @@ public class SlamSystem : MonoBehaviour
     { 
         InputEvents.SlamAttemptEvent.AddListener(InitiateSlam);
         
-        SlamDestructibleHitEvent?.RegisterListener(StopSlamOnDestructibleHit);
-        SlamSolidHitEvent?.RegisterListener(StopSlamOnSolidHit);
+        AbilityEvents.SlamDestructibleHitEvent.AddListener(StopSlamOnDestructibleHit);
+        AbilityEvents.SlamSolidHitEvent.AddListener(StopSlamOnSolidHit);
     }
 
     void OnDisable()
     { 
         InputEvents.DashAttemptEvent.AddListener(InitiateSlam);
         
-        SlamDestructibleHitEvent?.UnregisterListener(StopSlamOnDestructibleHit);
-        SlamSolidHitEvent?.UnregisterListener(StopSlamOnSolidHit);
+        AbilityEvents.SlamDestructibleHitEvent.RemoveListener(StopSlamOnDestructibleHit);
+        AbilityEvents.SlamSolidHitEvent.RemoveListener(StopSlamOnSolidHit);
         
         if (_currentSlamCoroutine != null)
         {

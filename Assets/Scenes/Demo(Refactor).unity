@@ -966,7 +966,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   obstaclesSettingsData: {fileID: 11400000, guid: ebe29eef7bdecf5999d2bd28f0e1528c, type: 2}
-  OnPlayerSpeedModifierChange: {fileID: 11400000, guid: c596cd5a1377b0eb9b9ccd462fa4f728, type: 2}
 --- !u!1 &167484302
 GameObject:
   m_ObjectHideFlags: 0
@@ -5085,7 +5084,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   obstaclesSettingsData: {fileID: 11400000, guid: ebe29eef7bdecf5999d2bd28f0e1528c, type: 2}
-  OnPlayerSpeedModifierChange: {fileID: 11400000, guid: c596cd5a1377b0eb9b9ccd462fa4f728, type: 2}
 --- !u!136 &1165723934
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -6386,6 +6384,150 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &1474534260
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1474534262}
+  - component: {fileID: 1474534261}
+  - component: {fileID: 1474534263}
+  m_Layer: 0
+  m_Name: MusicManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1474534261
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1474534260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55a4377741764f58b4241225c536987f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  menuMusic: {fileID: 8300000, guid: 7cf58861b94000f499619a56fb1a1bf8, type: 3}
+  gameMusic: {fileID: 8300000, guid: 257339a913c73774fa3ebcd68cde2dec, type: 3}
+--- !u!4 &1474534262
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1474534260}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 570.79205, y: 386.56845, z: -184.66827}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &1474534263
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1474534260}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &1483835289
 GameObject:
   m_ObjectHideFlags: 0
@@ -8002,7 +8144,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   obstaclesSettingsData: {fileID: 11400000, guid: ebe29eef7bdecf5999d2bd28f0e1528c, type: 2}
-  OnPlayerSpeedModifierChange: {fileID: 11400000, guid: c596cd5a1377b0eb9b9ccd462fa4f728, type: 2}
 --- !u!43 &1805283168
 Mesh:
   m_ObjectHideFlags: 0
@@ -9160,7 +9301,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93387a8e38cd49c09b83d4c9d825fedc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameManager: {fileID: 2053394807}
 --- !u!4 &2053394811 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2467805672265206934, guid: e8d25671ccfa2ada9be6ffbd02d11dd9, type: 3}
@@ -9607,9 +9747,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a14a9c8e02e4644a92f2210ce31304b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerStateModel: {fileID: 11400000, guid: a6c1c06db7c8e6b5fb54a26c184a9fa7, type: 2}
-  LegstyleUI: {fileID: 8065868956224813070}
-  HandsStyleUI: {fileID: 0}
 --- !u!114 &2038806522645163392
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9996,10 +10133,10 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18
-  m_fontSizeBase: 18
+  m_fontSize: 44.75
+  m_fontSizeBase: 65
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
@@ -11354,7 +11491,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -50, y: 50}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &8571536540697160802
@@ -11384,8 +11521,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerStateModel: {fileID: 11400000, guid: a6c1c06db7c8e6b5fb54a26c184a9fa7, type: 2}
   playerSettingsData: {fileID: 11400000, guid: a6eba25996664712bac54a95ef35a652, type: 2}
-  SlamDestructibleHitEvent: {fileID: 11400000, guid: 16d4898338ffa0a6abbd4b4f3a179ff3, type: 2}
-  SlamSolidHitEvent: {fileID: 11400000, guid: ee846e24cf148bf2d893937c1c67b156, type: 2}
 --- !u!114 &8571536540697160804
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11399,8 +11534,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerStateModel: {fileID: 11400000, guid: a6c1c06db7c8e6b5fb54a26c184a9fa7, type: 2}
-  SlamDestructibleHitEvent: {fileID: 11400000, guid: 16d4898338ffa0a6abbd4b4f3a179ff3, type: 2}
-  SlamSolidHitEvent: {fileID: 11400000, guid: ee846e24cf148bf2d893937c1c67b156, type: 2}
 --- !u!114 &8571536540697160805
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11414,7 +11547,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerStateModel: {fileID: 11400000, guid: a6c1c06db7c8e6b5fb54a26c184a9fa7, type: 2}
-  OnPlayerSpeedModifierChange: {fileID: 11400000, guid: c596cd5a1377b0eb9b9ccd462fa4f728, type: 2}
 --- !u!114 &8571536540697160806
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11439,28 +11571,13 @@ GameObject:
   m_Component:
   - component: {fileID: 6359642542559711526}
   - component: {fileID: 3810359460704992626}
-  - component: {fileID: 8792891470539923998}
   m_Layer: 6
   m_Name: DashBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &8792891470539923998
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8792891470539923997}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 526772972fc94c89926e02a03683c762, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerStateModel: {fileID: 0}
-  OnPlayerSpeedModifierChange: {fileID: 0}
+  m_IsActive: 0
 --- !u!1 &8989161530730097844
 GameObject:
   m_ObjectHideFlags: 0
@@ -11520,9 +11637,10 @@ RectTransform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 1181408604}
   - {fileID: 1896962079}
   - {fileID: 705507995}
   - {fileID: 841781652}
   - {fileID: 1135952862549686186}
   - {fileID: 1844357373}
-  - {fileID: 1181408604}
+  - {fileID: 1474534262}

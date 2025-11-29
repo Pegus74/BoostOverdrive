@@ -7,9 +7,6 @@ public class RDestructibleWall : MonoBehaviour
     [Header("Settings")]
     public ObstaclesSettingsData obstaclesSettings;
     
-    [Header("Soft Reset Event")]
-    public GameEvent OnLevelResetEvent;
-    
     [SerializeField] private List<InitialPartData> initialWallPartsData = new List<InitialPartData>();
     [SerializeField] private List<GameObject> wallParts = new List<GameObject>(); 
     [SerializeField] private Collider wallCollider;  

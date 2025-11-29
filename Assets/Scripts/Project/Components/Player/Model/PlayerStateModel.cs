@@ -46,9 +46,9 @@ public class PlayerStateModel : MonoBehaviour
     public Component LastWallJumpedFrom => _lastWallJumpedFrom;
     public Vector3 GroundNormal => groundNormal;
     
-    [Header("Уведомления об Изменении Состояния")]
-    public IntEvent OnStyleChangedEvent; 
-    public BoolEvent OnGroundedStateChangedEvent;
+    // [Header("Уведомления об Изменении Состояния")]
+    // // public IntEvent OnStyleChangedEvent; 
+    // // public BoolEvent OnGroundedStateChangedEvent;
 
 
     private void OnEnable()
@@ -99,7 +99,6 @@ public class PlayerStateModel : MonoBehaviour
         if (_isGrounded != isGrounded)
         {
             _isGrounded = isGrounded;
-            OnGroundedStateChangedEvent.Raise(isGrounded);
             Debug.Log($"[Model] IsGrounded updated to: {isGrounded}");
         }
     }
@@ -109,7 +108,6 @@ public class PlayerStateModel : MonoBehaviour
         if (_isDashing != isDashing)
         {
             _isDashing = isDashing;
-            OnGroundedStateChangedEvent.Raise(isDashing);
             Debug.Log($"[Model] isDashing updated to: {isDashing}");
         }
     }
@@ -119,7 +117,6 @@ public class PlayerStateModel : MonoBehaviour
         if (_isSliding != isSliding)
         {
             _isSliding = isSliding;
-            OnGroundedStateChangedEvent.Raise(isSliding);
             Debug.Log($"[Model] isSliding updated to: {isSliding}");
         }
     }
@@ -138,7 +135,6 @@ public class PlayerStateModel : MonoBehaviour
         if (_currentStyleIndex != newIndex)
         {
             _currentStyleIndex = newIndex;
-            OnStyleChangedEvent.Raise(newIndex);
             Debug.Log($"[Model] Style Index updated to: {newIndex}");
         }
     }

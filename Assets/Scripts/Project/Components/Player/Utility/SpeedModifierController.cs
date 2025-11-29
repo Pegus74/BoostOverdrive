@@ -7,18 +7,15 @@ public class SpeedModifierController : MonoBehaviour
 {
     [Header("Model")]
     public PlayerStateModel playerStateModel;
-    
-    [Header("Event Listener")]
-    public FloatEvent OnPlayerSpeedModifierChange;
 
     private void OnEnable()
     {
-        OnPlayerSpeedModifierChange?.RegisterListener(UpdateSpeedModifier);
+        PlayerEvents.OnPlayerSpeedModifierChange.AddListener(UpdateSpeedModifier);
     }
 
     private void OnDisable()
     {
-        OnPlayerSpeedModifierChange?.UnregisterListener(UpdateSpeedModifier);
+        PlayerEvents.OnPlayerSpeedModifierChange.RemoveListener(UpdateSpeedModifier);
     }
 
     /// <summary>
