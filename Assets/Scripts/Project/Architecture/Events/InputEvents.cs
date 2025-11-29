@@ -2,15 +2,15 @@ using UnityEngine;
 using UnityEngine.Events;
 
 [System.Serializable]
-public class InputEvents
+public static class InputEvents
 {
-    public Vector2Event MoveInputEvent = new Vector2Event();
-    public Vector2Event LookInputEvent = new Vector2Event();
-    public UnityEvent JumpAttemptEvent = new UnityEvent();
-    public UnityEvent DashAttemptEvent = new UnityEvent();
-    public UnityEvent SlamAttemptEvent = new UnityEvent();
-    public UnityEvent SlideAttemptEvent = new UnityEvent();
-    public UnityEvent ToggleStyleAttemptEvent = new UnityEvent();
-    public UnityEvent OnPauseAttemptEvent = new UnityEvent();
-    public UnityEvent OnRestartAttemptEvent = new UnityEvent();
+    public static Vector2Event MoveInputEvent = new Vector2Event();
+    public static Vector2Event LookInputEvent = new Vector2Event();
+    public static UnityEvent JumpAttemptEvent = new UnityEvent();
+    public static UnityEvent DashAttemptEvent = new UnityEvent();
+    public static UnityEvent SlamAttemptEvent = new UnityEvent();
+    public static UnityEvent SlideAttemptEvent = new UnityEvent();
+    public static UnityEvent ToggleStyleAttemptEvent = new UnityEvent();
+    public static UnityEvent OnPauseAttemptEvent = new UnityEvent();
+    public static UnityEvent OnRestartAttemptEvent = new UnityEvent();
 }

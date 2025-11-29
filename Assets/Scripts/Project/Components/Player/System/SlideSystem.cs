@@ -31,7 +31,7 @@ public class CrawlSlideSystem : MonoBehaviour
 
     void Awake()
     {
-        playerInputController = GetComponent<PlayerInputController>();
+        playerInputController = FindObjectOfType<PlayerInputController>();
         _rb = GetComponent<Rigidbody>();
         _capsuleCollider = GetComponent<CapsuleCollider>();
 
@@ -60,13 +60,13 @@ public class CrawlSlideSystem : MonoBehaviour
     }
 
     void OnEnable()
-    {
-        playerInputController.InputEvents.SlideAttemptEvent.AddListener(InitiateCrawlSlide);
+    { 
+        InputEvents.SlideAttemptEvent.AddListener(InitiateCrawlSlide);
     }
 
     void OnDisable()
-    {
-        playerInputController.InputEvents.SlideAttemptEvent.AddListener(InitiateCrawlSlide);
+    { 
+        InputEvents.SlideAttemptEvent.AddListener(InitiateCrawlSlide);
         
         if (_currentSlideCoroutine != null)
         {
@@ -92,6 +92,7 @@ public class CrawlSlideSystem : MonoBehaviour
     {
         _isSlideAvailable = false;
         playerStateModel.SetIsSliding(true); 
+        AbilityEvents.OnAbilityStarted.Invoke();
 
         // === РАСЧЕТ ЦЕЛЕВЫХ ПАРАМЕТРОВ НА ОСНОВЕ СТИЛЯ ===
         int styleIndex = playerStateModel.CurrentStyleIndex;
@@ -198,6 +199,7 @@ public class CrawlSlideSystem : MonoBehaviour
 
         _rb.isKinematic = false;
         _rootPositionAdjustmentY = 0f; 
+        
         
         // 4. ФАЗА ПЕРЕЗАРЯДКИ (COOLDOWN)
         yield return new WaitForSeconds(playerSettingsData.slideCooldown);

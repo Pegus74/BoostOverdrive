@@ -18,7 +18,7 @@ public class StyleManager : MonoBehaviour
 
     private void Awake()
     {
-        playerInputController = GetComponent<PlayerInputController>();
+        playerInputController = FindObjectOfType<PlayerInputController>();
         if (playerStateModel == null || styleDataAssets == null || styleDataAssets.Length == 0)
         {
             enabled = false;
@@ -27,15 +27,13 @@ public class StyleManager : MonoBehaviour
 
     private void OnEnable()
     {
-        // Подписываемся на событие ввода
-        playerInputController.InputEvents.ToggleStyleAttemptEvent.AddListener(SwitchStyle);
-        // Устанавливаем начальное состояние при старте
+        InputEvents.ToggleStyleAttemptEvent.AddListener(SwitchStyle);
         ApplyStyleToModel(currentStyleIndex);
     }
 
     private void OnDisable()
-    {
-        playerInputController.InputEvents.ToggleStyleAttemptEvent.RemoveListener(SwitchStyle);
+    { 
+        InputEvents.ToggleStyleAttemptEvent.RemoveListener(SwitchStyle);
     }
     
     /// <summary>

@@ -3,10 +3,11 @@ using UnityEngine.SceneManagement;
 
 public class NewGameManager : MonoBehaviour
 {
-    public GameStateEvent OnGameStateChanged = new GameStateEvent(); 
     
     public static NewGameManager Instance;
+    
     [SerializeField] private GameState currentState = GameState.Playing;
+    [SerializeField] private GameMode currentMode = GameMode.Classic;
     
     private PlayerInputController playerInputController;
     
@@ -16,15 +17,16 @@ public class NewGameManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
             SceneManager.sceneLoaded += OnSceneLoaded;
             
-            UpdateGameState();
         }
         else
         {
             SceneManager.sceneLoaded -= OnSceneLoaded;
             Destroy(gameObject);
         }
+        
     }
 
     private void OnDestroy()
@@ -33,20 +35,23 @@ public class NewGameManager : MonoBehaviour
     }
 
     private void OnEnable()
-    {
-        playerInputController.InputEvents.OnPauseAttemptEvent.AddListener(TogglePause);
-        playerInputController.InputEvents.OnRestartAttemptEvent.AddListener(RestartLevel);
+    { 
+        InputEvents.OnPauseAttemptEvent.AddListener(TogglePause); 
+        InputEvents.OnRestartAttemptEvent.AddListener(RestartLevel);
     }
 
     private void OnDisable()
-    {
-        playerInputController.InputEvents.OnPauseAttemptEvent.RemoveListener(TogglePause);
-        playerInputController.InputEvents.OnRestartAttemptEvent.RemoveListener(RestartLevel);
-        
+    { 
+        InputEvents.OnPauseAttemptEvent.RemoveListener(TogglePause); 
+        InputEvents.OnRestartAttemptEvent.RemoveListener(RestartLevel);
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        playerInputController = FindObjectOfType<PlayerInputController>();
+        currentState = GameState.Playing;
+        UpdateGameState();
+        
     }
 
     /// <summary>
@@ -54,10 +59,10 @@ public class NewGameManager : MonoBehaviour
     /// </summary>
     private void UpdateGameState()
     {
-        if (OnGameStateChanged != null)
+        if (GameEvents.OnGameStateChanged != null)
         {
-            OnGameStateChanged.Invoke(currentState);
-            Debug.Log($"[GameManager] gameState Changed to: {currentState}");
+            Debug.Log($"[GameManager] GameState Changed to: {currentState}");
+            GameEvents.OnGameStateChanged.Invoke(currentState);
         }
     }
 
@@ -78,9 +83,7 @@ public class NewGameManager : MonoBehaviour
     public void RestartLevel()
     {
         currentState = GameState.Playing;
-        UpdateGameState(); 
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        
     }
 
     public void TogglePause()
@@ -107,8 +110,18 @@ public class NewGameManager : MonoBehaviour
         
         SceneManager.LoadScene("MainMenu");
     }
+    
+    public void ChangeGameMode()
+    {
+        bool isClassic = (currentMode == GameMode.Classic);
+        currentMode = isClassic ? GameMode.Hard : GameMode.Classic;
+        Debug.Log("[GameManager] GameMode Changed to: " + currentMode);
+        RestartLevel();
+    }
 
     public GameState GetCurrentState() => currentState;
+    
+    public GameMode GetCurrentGameMode() => currentMode;
     
     #endregion
 }

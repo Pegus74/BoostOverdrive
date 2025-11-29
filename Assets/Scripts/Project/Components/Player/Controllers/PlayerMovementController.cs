@@ -36,7 +36,7 @@ public class PlayerMovementController : MonoBehaviour
             return;
         }
         
-        playerInputController = GetComponent<PlayerInputController>();
+        playerInputController = FindObjectOfType<PlayerInputController>();
         
         rb.freezeRotation = true;
         
@@ -45,14 +45,14 @@ public class PlayerMovementController : MonoBehaviour
 
     void OnEnable()
     {
-        playerInputController.InputEvents.MoveInputEvent.AddListener(OnMoveInput);
-        playerInputController.InputEvents.JumpAttemptEvent.AddListener(InitiateJumpLogic);
+        InputEvents.MoveInputEvent.AddListener(OnMoveInput); 
+        InputEvents.JumpAttemptEvent.AddListener(InitiateJumpLogic);
     }
 
     void OnDisable()
-    {
-        playerInputController.InputEvents.MoveInputEvent.RemoveListener(OnMoveInput);
-        playerInputController.InputEvents.JumpAttemptEvent.RemoveListener(InitiateJumpLogic);
+    { 
+        InputEvents.MoveInputEvent.RemoveListener(OnMoveInput); 
+        InputEvents.JumpAttemptEvent.RemoveListener(InitiateJumpLogic);
     }
     
     /// <summary>

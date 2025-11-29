@@ -14,12 +14,12 @@ public class TimeManager : MonoBehaviour
 
     private void OnEnable()
     {
-        gameManager.OnGameStateChanged.AddListener(HandleGameStateChange);
+        GameEvents.OnGameStateChanged.AddListener(HandleGameStateChange);
     }
 
     private void OnDisable()
     {
-        gameManager.OnGameStateChanged.RemoveListener(HandleGameStateChange);
+        GameEvents.OnGameStateChanged.RemoveListener(HandleGameStateChange);
     }
 
     private void HandleGameStateChange(GameState newState)
@@ -31,6 +31,6 @@ public class TimeManager : MonoBehaviour
         Cursor.lockState = isPlaying ? CursorLockMode.Locked : CursorLockMode.None;
         Cursor.visible = !isPlaying;
 
-        Debug.Log($"TimeManager Time.timeScale set to: {Time.timeScale}. Cursor is visible: {Cursor.visible}");
+        Debug.Log($"[TimeManager] Time set to: {Time.timeScale}. Cursor is visible: {Cursor.visible}");
     }
 }

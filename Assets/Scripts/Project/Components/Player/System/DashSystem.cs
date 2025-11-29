@@ -16,7 +16,7 @@ public class DashSystem : MonoBehaviour
 
     void Awake()
     {
-        playerInputController = GetComponent<PlayerInputController>();
+        playerInputController = FindObjectOfType<PlayerInputController>();
         _rb = GetComponent<Rigidbody>();
         if (_rb == null)
         {
@@ -26,13 +26,13 @@ public class DashSystem : MonoBehaviour
     }
 
     void OnEnable()
-    {
-        playerInputController.InputEvents.DashAttemptEvent.AddListener(InitiateDash);
+    { 
+        InputEvents.DashAttemptEvent.AddListener(InitiateDash);
     }
 
     void OnDisable()
-    {
-        playerInputController.InputEvents.DashAttemptEvent.RemoveListener(InitiateDash);
+    { 
+        InputEvents.DashAttemptEvent.RemoveListener(InitiateDash);
         
         if (_currentDashCoroutine != null)
         {
@@ -64,6 +64,8 @@ public class DashSystem : MonoBehaviour
     private IEnumerator DashCoroutine()
     {
         _isDashAvailable = false;
+        playerStateModel.SetIsDashing(true);
+        AbilityEvents.OnAbilityStarted.Invoke();
         
         // 1. НАЧАЛО ДЭША
         playerStateModel.SetIsDashing(true); 

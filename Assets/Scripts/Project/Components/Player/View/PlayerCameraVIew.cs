@@ -30,7 +30,7 @@ public class PlayerCameraView : MonoBehaviour
 
     private void Awake()
     {
-        playerInputController = GetComponent<PlayerInputController>();
+        playerInputController = FindObjectOfType<PlayerInputController>();
         if (playerSettingsData.crosshair)
         {
             SetupCrosshair();
@@ -49,13 +49,13 @@ public class PlayerCameraView : MonoBehaviour
     }
 
     private void OnEnable()
-    {
-        playerInputController.InputEvents.LookInputEvent.AddListener(OnLookInput);
+    { 
+        InputEvents.LookInputEvent.AddListener(OnLookInput);
     }
 
     private void OnDisable()
-    {
-        playerInputController.InputEvents.LookInputEvent.RemoveListener(OnLookInput);
+    { 
+        InputEvents.LookInputEvent.RemoveListener(OnLookInput);
     }
 
     /// <summary>

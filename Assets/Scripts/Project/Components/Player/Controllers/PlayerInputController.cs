@@ -5,9 +5,6 @@ using UnityEngine.Serialization;
 
 public class PlayerInputController : MonoBehaviour
 {
-    [HideInInspector]
-    public InputEvents InputEvents = new InputEvents();
-    
     [Header("GameState")]
     [SerializeField] private GameStateEvent GameStateChangedEvent;
 
