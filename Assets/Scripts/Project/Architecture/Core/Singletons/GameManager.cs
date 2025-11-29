@@ -35,11 +35,13 @@ public class NewGameManager : MonoBehaviour
     private void OnEnable()
     {
         playerInputController.InputEvents.OnPauseAttemptEvent.AddListener(TogglePause);
+        playerInputController.InputEvents.OnRestartAttemptEvent.AddListener(RestartLevel);
     }
 
     private void OnDisable()
     {
         playerInputController.InputEvents.OnPauseAttemptEvent.RemoveListener(TogglePause);
+        playerInputController.InputEvents.OnRestartAttemptEvent.RemoveListener(RestartLevel);
         
     }
 
@@ -55,7 +57,7 @@ public class NewGameManager : MonoBehaviour
         if (OnGameStateChanged != null)
         {
             OnGameStateChanged.Invoke(currentState);
-            Debug.Log($"GameManager gameState Changed to: {currentState}");
+            Debug.Log($"[GameManager] gameState Changed to: {currentState}");
         }
     }
 
@@ -75,22 +77,11 @@ public class NewGameManager : MonoBehaviour
 
     public void RestartLevel()
     {
-        if (currentState == GameState.Playing)
-        {
-            currentState = GameState.Paused;
-            UpdateGameState(); 
-        }
-        
-        Debug.Log("[GameManager]: Soft Reset Requested.");
-    }
-    
-    public void FinishRestart()
-    {
         currentState = GameState.Playing;
-        UpdateGameState();
-        Debug.Log("[GameManager]: Soft Reset Completed.");
+        UpdateGameState(); 
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        
     }
-    
 
     public void TogglePause()
     {

@@ -30,6 +30,8 @@ public class PlayerInputController : MonoBehaviour
         playerControls.Gameplay.ToggleStyle.performed += OnToggleStyle;
         
         playerControls.Gameplay.Pause.performed += OnPause;
+        
+        playerControls.Gameplay.Restart.performed += OnRestart;
     }
 
     private void OnEnable()
@@ -63,6 +65,8 @@ public class PlayerInputController : MonoBehaviour
         playerControls.Gameplay.ToggleStyle.performed -= OnToggleStyle;
         
         playerControls.Gameplay.Pause.performed -= OnPause;
+        
+        playerControls.Gameplay.Restart.performed -= OnRestart;
         
         playerControls.Dispose();
     }
@@ -107,6 +111,11 @@ public class PlayerInputController : MonoBehaviour
     private void OnPause(InputAction.CallbackContext context)
     {
         InputEvents.OnPauseAttemptEvent.Invoke();
+    }
+
+    private void OnRestart(InputAction.CallbackContext context)
+    {
+        InputEvents.OnRestartAttemptEvent.Invoke();
     }
     
     private void HandleGameStateChange(GameState newState)

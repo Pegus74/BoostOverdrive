@@ -12,4 +12,5 @@ public class InputEvents
     public UnityEvent SlideAttemptEvent = new UnityEvent();
     public UnityEvent ToggleStyleAttemptEvent = new UnityEvent();
     public UnityEvent OnPauseAttemptEvent = new UnityEvent();
+    public UnityEvent OnRestartAttemptEvent = new UnityEvent();
 }

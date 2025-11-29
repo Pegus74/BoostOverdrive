@@ -203,7 +203,7 @@ public class CrawlSlideSystem : MonoBehaviour
         yield return new WaitForSeconds(playerSettingsData.slideCooldown);
 
         _isSlideAvailable = true;
-        Debug.Log("Crawl/Slide is now available.");
+        Debug.Log("[Slide] CrawlSlide is now available.");
         _currentSlideCoroutine = null;
     }
     

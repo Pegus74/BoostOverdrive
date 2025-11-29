@@ -23,11 +23,7 @@ public class StyleHUDView : MonoBehaviour
     {
         playerStateModel?.OnStyleChangedEvent.UnregisterListener(UpdateStyleUI);
     }
-
-    /// <summary>
-    /// Вызывается при получении OnStyleChangedEvent с новым индексом.
-    /// </summary>
-    /// <param name="newStyleIndex">Индекс стиля (0: Legs, 1: Hands).</param>
+    
     private void UpdateStyleUI(int newStyleIndex)
     {
         if (LegstyleUI != null && HandsStyleUI != null)

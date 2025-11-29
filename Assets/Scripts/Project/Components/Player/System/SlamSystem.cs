@@ -174,6 +174,6 @@ public class SlamSystem : MonoBehaviour
         }
 
         _isSlamAvailable = true;
-        Debug.Log("Slam is now available.");
+        Debug.Log("[Slide] Slam is now available.");
     }
 }

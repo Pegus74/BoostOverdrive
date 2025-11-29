@@ -106,6 +106,6 @@ public class DashSystem : MonoBehaviour
         }
 
         _isDashAvailable = true;
-        Debug.Log("Dash is now available.");
+        Debug.Log("[Dash] Dash is now available.");
     }
 }

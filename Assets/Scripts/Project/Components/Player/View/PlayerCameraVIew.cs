@@ -17,6 +17,7 @@ public class PlayerCameraView : MonoBehaviour
     // Углы вращения
     private float yaw = 0f;
     private float pitch = 0f;
+    
     // Ввод для обработки в Update()
     private Vector2 currentLookInput = Vector2.zero;
     private Image crosshairObject;
@@ -67,7 +68,7 @@ public class PlayerCameraView : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (playerSettingsData.cameraCanMove && currentLookInput != Vector2.zero)
+        if (NewGameManager.Instance.GetCurrentState() == GameState.Playing && currentLookInput != Vector2.zero)
         {
             ApplyLookRotation(currentLookInput);
         }
