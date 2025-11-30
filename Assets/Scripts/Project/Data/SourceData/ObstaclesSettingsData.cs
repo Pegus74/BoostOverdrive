@@ -1,6 +1,5 @@
 using UnityEngine;
 
-// Данные, которые не меняются во время игры для препятсвий
 [CreateAssetMenu(fileName = "NewObstaclesettings", menuName = "GameData/Obstacles Settings Data")]
 public class ObstaclesSettingsData : ScriptableObject
 {

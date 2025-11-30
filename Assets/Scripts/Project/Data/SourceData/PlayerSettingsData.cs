@@ -1,12 +1,12 @@
 using UnityEngine;
 
-// Данные, которые не меняются во время игры для игрока
 [CreateAssetMenu(fileName = "NewPlayerSettings", menuName = "GameData/Player Settings Data")]
 public class PlayerSettingsData : ScriptableObject
 {
     [Header("Настройки Камеры")]
     public float mouseSensitivity = 2f;
     public float maxLookAngle = 50f;
+    public float bobSpeed = 5f;
     public bool invertCamera = false;
     public bool lockCursor = true;
     public bool cameraCanMove = true;
@@ -16,10 +16,11 @@ public class PlayerSettingsData : ScriptableObject
     
     [Header("Настройки Движения")]
     public float maxVelocityChange = 10f;
-    public bool enableAirJump = false;
+    public float acceleration = 20f;
     public bool playerCanMove = true;
     public bool enableJump = true;
-    
+    public bool enableAirJump = false;
+
     [Header("Настройки Dash")]
     public float dashDuration = 0.15f;
     public float dashCooldown = 1.0f;
@@ -41,4 +42,10 @@ public class PlayerSettingsData : ScriptableObject
     public float raycastCheckDistance = 1.0f;
     public float horizontalForceHands = 10f;
     public float verticalForceLegs = 15f;
+
+    [Header("Настройки заряженного прыжка")]
+    public bool enableChargedJump = true;
+    public float chargeSpeed = 2f;
+    public float minJumpPowerPercent = 0.35f;
+
 }

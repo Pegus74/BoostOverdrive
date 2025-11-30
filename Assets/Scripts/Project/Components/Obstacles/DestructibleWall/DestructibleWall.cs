@@ -2,13 +2,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class RDestructibleWall : MonoBehaviour, IRestartable
+public class RDestructibleWall : MonoBehaviour
 {
     [Header("Settings")]
     public ObstaclesSettingsData obstaclesSettings;
-    
-    [Header("Soft Reset Event")]
-    public GameEvent OnLevelResetEvent;
     
     [SerializeField] private List<InitialPartData> initialWallPartsData = new List<InitialPartData>();
     [SerializeField] private List<GameObject> wallParts = new List<GameObject>(); 
@@ -40,18 +37,6 @@ public class RDestructibleWall : MonoBehaviour, IRestartable
         }
         
         ResetWall();
-    }
-    
-    private void OnEnable()
-    {
-        if (OnLevelResetEvent != null)
-            OnLevelResetEvent.RegisterListener(SoftReset);
-    }
-    
-    private void OnDisable()
-    {
-        if (OnLevelResetEvent != null)
-            OnLevelResetEvent.UnregisterListener(SoftReset);
     }
     
     private void ResetWall()
@@ -111,11 +96,5 @@ public class RDestructibleWall : MonoBehaviour, IRestartable
                 rb.AddExplosionForce(obstaclesSettings.explosionForce * 1.2f, impactPoint, obstaclesSettings.explosionRadius, 2f, ForceMode.Impulse);
             }
         }
-    }
-
-    public void SoftReset()
-    {
-        if (!isDestroyed) return;
-        ResetWall();
     }
 }

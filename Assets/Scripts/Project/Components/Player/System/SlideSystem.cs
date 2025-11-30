@@ -4,7 +4,7 @@ using System.Collections;
 /// <summary>
 /// Управляет способностью CrawlSlide
 /// </summary>
-public class CrawlSlideSystem : MonoBehaviour, IRestartable
+public class CrawlSlideSystem : MonoBehaviour
 {
     [Header("Model & Settings")]
     public PlayerStateModel playerStateModel; 
@@ -13,11 +13,8 @@ public class CrawlSlideSystem : MonoBehaviour, IRestartable
     public Transform visualModelTransform; 
     public Camera playerCamera; 
     
-    [Header("Input Listener")]
-    public GameEvent SlideAttemptEvent;
+    private PlayerInputController playerInputController;
     
-    [Header("Soft Reset Event")]
-    [SerializeField] private GameEvent OnLevelResetEvent;
     
     private Rigidbody _rb;
     private CapsuleCollider _capsuleCollider;
@@ -34,6 +31,7 @@ public class CrawlSlideSystem : MonoBehaviour, IRestartable
 
     void Awake()
     {
+        playerInputController = FindObjectOfType<PlayerInputController>();
         _rb = GetComponent<Rigidbody>();
         _capsuleCollider = GetComponent<CapsuleCollider>();
 
@@ -62,13 +60,13 @@ public class CrawlSlideSystem : MonoBehaviour, IRestartable
     }
 
     void OnEnable()
-    {
-        SlideAttemptEvent?.RegisterListener(InitiateCrawlSlide);
+    { 
+        InputEvents.SlideAttemptEvent.AddListener(InitiateCrawlSlide);
     }
 
     void OnDisable()
-    {
-        SlideAttemptEvent?.UnregisterListener(InitiateCrawlSlide);
+    { 
+        InputEvents.SlideAttemptEvent.AddListener(InitiateCrawlSlide);
         
         if (_currentSlideCoroutine != null)
         {
@@ -94,6 +92,7 @@ public class CrawlSlideSystem : MonoBehaviour, IRestartable
     {
         _isSlideAvailable = false;
         playerStateModel.SetIsSliding(true); 
+        AbilityEvents.OnAbilityStarted.Invoke();
 
         // === РАСЧЕТ ЦЕЛЕВЫХ ПАРАМЕТРОВ НА ОСНОВЕ СТИЛЯ ===
         int styleIndex = playerStateModel.CurrentStyleIndex;
@@ -201,11 +200,12 @@ public class CrawlSlideSystem : MonoBehaviour, IRestartable
         _rb.isKinematic = false;
         _rootPositionAdjustmentY = 0f; 
         
+        
         // 4. ФАЗА ПЕРЕЗАРЯДКИ (COOLDOWN)
         yield return new WaitForSeconds(playerSettingsData.slideCooldown);
 
         _isSlideAvailable = true;
-        Debug.Log("Crawl/Slide is now available.");
+        Debug.Log("[Slide] CrawlSlide is now available.");
         _currentSlideCoroutine = null;
     }
     
@@ -278,19 +278,4 @@ public class CrawlSlideSystem : MonoBehaviour, IRestartable
             playerCamera.transform.localPosition = new Vector3(localPos.x, _originalCameraLocalY, localPos.z);
         }
     }
-    
-    public void SoftReset()
-    {
-        if (_currentSlideCoroutine != null)
-        {
-            StopCoroutine(_currentSlideCoroutine);
-            _currentSlideCoroutine = null;
-        }
-        
-        playerStateModel.SetIsDashing(false); 
-        _isSlideAvailable = true;
-        
-        Debug.Log("DashSystem: State has been reset for Soft Reset.");
-    }
-    
 }

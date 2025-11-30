@@ -12,15 +12,13 @@ public class StyleManager : MonoBehaviour
     
     [Tooltip("Массив неизменяемых данных о стилях")]
     public PlayerStyleData[] styleDataAssets; 
-    
-    [Header("Input Listener")]
-    public GameEvent ToggleStyleAttemptEvent; 
-
-    
     private int currentStyleIndex = 0;
+    
+    private PlayerInputController playerInputController;
 
     private void Awake()
     {
+        playerInputController = FindObjectOfType<PlayerInputController>();
         if (playerStateModel == null || styleDataAssets == null || styleDataAssets.Length == 0)
         {
             enabled = false;
@@ -29,15 +27,13 @@ public class StyleManager : MonoBehaviour
 
     private void OnEnable()
     {
-        // Подписываемся на событие ввода
-        ToggleStyleAttemptEvent?.RegisterListener(SwitchStyle);
-        // Устанавливаем начальное состояние при старте
+        InputEvents.ToggleStyleAttemptEvent.AddListener(SwitchStyle);
         ApplyStyleToModel(currentStyleIndex);
     }
 
     private void OnDisable()
-    {
-        ToggleStyleAttemptEvent?.UnregisterListener(SwitchStyle);
+    { 
+        InputEvents.ToggleStyleAttemptEvent.RemoveListener(SwitchStyle);
     }
     
     /// <summary>

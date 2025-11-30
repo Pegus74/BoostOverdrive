@@ -5,9 +5,6 @@ public class BoostTileHandler : MonoBehaviour
 {
     [Header("Settings")]
     public ObstaclesSettingsData obstaclesSettingsData;
-    
-    [Header("Event to Raise")]
-    public FloatEvent OnPlayerSpeedModifierChange;
 
     private const float NormalSpeed = 1.0f;
     private bool isPlayerInside = false;
@@ -51,7 +48,7 @@ public class BoostTileHandler : MonoBehaviour
         if (obstaclesSettingsData != null)
         {
             float boost = obstaclesSettingsData.boostTileMultiplier;
-            OnPlayerSpeedModifierChange.Raise(boost);
+            PlayerEvents.OnPlayerSpeedModifierChange.Invoke(boost);
             Debug.Log($"[Boost Tile] Speed Modifier Change Event: {boost}");
         }
     }
@@ -78,7 +75,7 @@ public class BoostTileHandler : MonoBehaviour
     
     private void RemoveBoost()
     {
-        OnPlayerSpeedModifierChange.Raise(NormalSpeed); 
+        PlayerEvents.OnPlayerSpeedModifierChange.Invoke(NormalSpeed);
         Debug.Log($"[Boost Tile] Speed Modifier Change Event: {NormalSpeed} (Cooldown ended)");
     }
 }

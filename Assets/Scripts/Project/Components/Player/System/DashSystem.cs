@@ -1,18 +1,13 @@
 using UnityEngine;
 using System.Collections;
 
-public class DashSystem : MonoBehaviour, IRestartable
+public class DashSystem : MonoBehaviour
 {
     [Header("Model & Settings")]
     public PlayerStateModel playerStateModel;
     public PlayerSettingsData playerSettingsData;
     
-    [Header("Input Listener")]
-    public GameEvent DashAttemptEvent;
-    
-    [Header("Soft Reset Event")]
-    [SerializeField] private GameEvent OnLevelResetEvent;
-    
+    private PlayerInputController playerInputController;
     private Rigidbody _rb;
     private bool _isDashAvailable = true;
     private Coroutine _currentDashCoroutine;
@@ -21,6 +16,7 @@ public class DashSystem : MonoBehaviour, IRestartable
 
     void Awake()
     {
+        playerInputController = FindObjectOfType<PlayerInputController>();
         _rb = GetComponent<Rigidbody>();
         if (_rb == null)
         {
@@ -30,15 +26,13 @@ public class DashSystem : MonoBehaviour, IRestartable
     }
 
     void OnEnable()
-    {
-        DashAttemptEvent?.RegisterListener(InitiateDash);
-        
-        OnLevelResetEvent.RegisterListener(SoftReset);
+    { 
+        InputEvents.DashAttemptEvent.AddListener(InitiateDash);
     }
 
     void OnDisable()
-    {
-        DashAttemptEvent?.UnregisterListener(InitiateDash);
+    { 
+        InputEvents.DashAttemptEvent.RemoveListener(InitiateDash);
         
         if (_currentDashCoroutine != null)
         {
@@ -47,7 +41,6 @@ public class DashSystem : MonoBehaviour, IRestartable
             playerStateModel.SetIsDashing(false); 
             _isDashAvailable = true;
         }
-        OnLevelResetEvent.UnregisterListener(SoftReset);
     }
 
     /// <summary>
@@ -71,6 +64,8 @@ public class DashSystem : MonoBehaviour, IRestartable
     private IEnumerator DashCoroutine()
     {
         _isDashAvailable = false;
+        playerStateModel.SetIsDashing(true);
+        AbilityEvents.OnAbilityStarted.Invoke();
         
         // 1. НАЧАЛО ДЭША
         playerStateModel.SetIsDashing(true); 
@@ -113,20 +108,6 @@ public class DashSystem : MonoBehaviour, IRestartable
         }
 
         _isDashAvailable = true;
-        Debug.Log("Dash is now available.");
-    }
-
-    public void SoftReset()
-    {
-        if (_currentDashCoroutine != null)
-        {
-            StopCoroutine(_currentDashCoroutine);
-            _currentDashCoroutine = null;
-        }
-        
-        playerStateModel.SetIsDashing(false); 
-        _isDashAvailable = true;
-        
-        Debug.Log("DashSystem: State has been reset for Soft Reset.");
+        Debug.Log("[Dash] Dash is now available.");
     }
 }

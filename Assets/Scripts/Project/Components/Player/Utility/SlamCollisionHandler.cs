@@ -5,10 +5,6 @@ public class SlamCollisionHandler : MonoBehaviour
     [Header("Model")]
     public PlayerStateModel playerStateModel;
     
-    [Header("Output Events")]
-    public Vector3Event SlamDestructibleHitEvent;
-    public GameEvent SlamSolidHitEvent;
-
     private void Awake()
     {
         if (playerStateModel == null)
@@ -31,13 +27,13 @@ public class SlamCollisionHandler : MonoBehaviour
             Vector3 impactPoint = other.ClosestPoint(transform.position);
             
             wall.DestroyWall(impactPoint);
-            Debug.Log("DestructibleWall destroyed by Slam");
+            Debug.Log("[DestructibleWall] Destroyed by Slam"); 
             
-            SlamDestructibleHitEvent?.Raise(impactPoint); 
+            AbilityEvents.SlamDestructibleHitEvent.Invoke(impactPoint); 
         }
         else if (other.CompareTag("Ground") || other.CompareTag("Untagged")) 
         {
-            SlamSolidHitEvent?.Raise(); 
+            AbilityEvents.SlamSolidHitEvent.Invoke(); 
         }
     }
 }
