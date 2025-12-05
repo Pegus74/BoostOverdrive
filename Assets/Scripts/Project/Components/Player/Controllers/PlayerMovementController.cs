@@ -1,216 +1,166 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-/// <summary>
-/// отвечает только за физическое движение игрока
-/// </summary>
 public class PlayerMovementController : MonoBehaviour
 {
-    [Header("Model & Settings")]
     public PlayerStateModel playerStateModel;
-    public PlayerSettingsData playerSettingsData;
-    public ObstaclesSettingsData obstaclesSettings;
-    
-    [Header("Input Listeners")] 
-    private PlayerInputController playerInputController;
-
-
-    [Header("Wall Jump")]
     public WallJumpEvent OnWallJumpDetectedEvent;
-
-    [Header("Wall Jump Settings")]
     public SpringWallSettings wallJumpSettings;
-
-    // public WallJumpEvent OnWallJumpDetectedEvent;
 
     private Rigidbody rb;
     private Vector2 currentMoveInput = Vector2.zero;
     private Vector3 externalImpulse = Vector3.zero;
-    
     private Vector3 smoothedLocalVelocity = Vector3.zero;
-    
+
     private const int LEGS_STYLE_INDEX = 1;
     private const int HANDS_STYLE_INDEX = 0;
 
     private bool isWalking = false;
     public bool IsWalking => isWalking;
-    
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        if (rb == null)
-        {
-            enabled = false;
-            return;
-        }
-        
-        playerInputController = FindObjectOfType<PlayerInputController>();
-        
-        rb.freezeRotation = true;
-        
+        if (rb == null) enabled = false;
+        else rb.freezeRotation = true;
         playerStateModel.SetLastWallJumpedFrom(null);
     }
 
     void OnEnable()
     {
-        InputEvents.MoveInputEvent.AddListener(OnMoveInput); 
-        InputEvents.JumpAttemptEvent.AddListener(InitiateJumpLogic); 
-        // OnWallJumpDetectedEvent?.RegisterListener(HandleWallJump);
+        InputEvents.MoveInputEvent.AddListener(OnMoveInput);
+        InputEvents.JumpAttemptEvent.AddListener(InitiateJumpLogic);
         InputEvents.JumpAttemptEvent.AddListener(CheckForWallJumps);
         OnWallJumpDetectedEvent?.AddListener(HandleWallJump);
     }
 
     void OnDisable()
-    { 
-        InputEvents.MoveInputEvent.RemoveListener(OnMoveInput); 
+    {
+        InputEvents.MoveInputEvent.RemoveListener(OnMoveInput);
         InputEvents.JumpAttemptEvent.RemoveListener(InitiateJumpLogic);
-        
         InputEvents.JumpAttemptEvent.RemoveListener(CheckForWallJumps);
         OnWallJumpDetectedEvent?.RemoveListener(HandleWallJump);
     }
-    
-    /// <summary>
-    /// Сохраняет ввод движения для FixedUpdate
-    /// </summary>
-    public void OnMoveInput(Vector2 input)
-    {
-        currentMoveInput = input;
-    }
-    
-    private void InitiateJumpLogic()
-    {
-        if (playerStateModel.IsGrounded && !playerStateModel.IsSliding 
-                                        && !playerStateModel.IsSlamming 
-                                        && !playerStateModel.IsDashing)
-        {
-            Jump();
-        }
-    }
-    
-    private void SetExternalImpulse(Vector3 impulse)
-    {
-        externalImpulse = impulse;
-    }
 
-    // --- ФИЗИЧЕСКАЯ ЛОГИКА ---
+    public void OnMoveInput(Vector2 input) => currentMoveInput = input;
+
+    private void InitiateJumpLogic() => playerStateModel.BufferJump();
+
+    private void SetExternalImpulse(Vector3 impulse) => externalImpulse = impulse;
+
+    private void Update()
+    {
+        TryJump();  
+    }
 
     private void FixedUpdate()
     {
         if (rb == null) return;
 
-        if (playerSettingsData.playerCanMove && 
-            !playerStateModel.IsDashing &&
-            !playerStateModel.IsSliding &&
-            !playerStateModel.IsSlamming)
-        {
+        playerStateModel.UpdateCoyoteTime(Time.fixedDeltaTime);
+        playerStateModel.UpdateJumpBuffer(Time.fixedDeltaTime);
+
+        if (playerStateModel.playerCanMove && !playerStateModel.IsDashing && !playerStateModel.IsSliding && !playerStateModel.IsSlamming)
             ApplyMovementForce(currentMoveInput);
+
+        if (playerStateModel.IsGrounded && rb.linearVelocity.y <= 0f && !playerStateModel.IsDashing)
+        {
+            ProjectVelocityToGround();
+            ApplyGroundStickForce();
         }
     }
 
-    /// <summary>
-    /// Применяет силу движения, основываясь на Vector2 ввода.
-    /// </summary>
+    private void TryJump()
+    {
+        bool canJump = playerStateModel.IsGrounded || playerStateModel.CoyoteCounter > 0f;
+        bool wantsJump = playerStateModel.JumpBufferCounter > 0f;
+
+        if (canJump && wantsJump && playerStateModel.settings.enableJump)
+        {
+            Jump(); 
+        }
+    }
+
+    private void Jump()
+    {
+        rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);  
+        rb.AddForce(Vector3.up * playerStateModel.CurrentJumpPower, ForceMode.Impulse);
+        playerStateModel.ResetJumpBuffer();
+        playerStateModel.ResetCoyoteTime();
+    }
+
     private void ApplyMovementForce(Vector2 input)
     {
-        Vector3 targetDirection = new Vector3(input.x, 0, input.y);
-
-        if (targetDirection.sqrMagnitude > 1f) targetDirection.Normalize();
-
-        float playerSpeed = playerStateModel.CurrentWalkSpeed * playerStateModel.MovementSpeedModifier;
-        
         Vector3 inputLocal = new Vector3(input.x, 0, input.y);
-        if (inputLocal.sqrMagnitude > 1f)
-            inputLocal.Normalize();
-        
-        Vector3 rawLocalTarget = inputLocal * playerSpeed;
-        
-        smoothedLocalVelocity = Vector3.MoveTowards(
-            smoothedLocalVelocity,
-            rawLocalTarget,
-            playerSettingsData.acceleration * Time.fixedDeltaTime
-        );
-        
-        Vector3 targetVelocity = transform.TransformDirection(smoothedLocalVelocity) + externalImpulse;
+        if (inputLocal.sqrMagnitude > 1f) inputLocal.Normalize();
 
-        Vector3 velocity = rb.velocity;
-        Vector3 velocityChange = (targetVelocity - velocity); 
-        
-        velocityChange.x = Mathf.Clamp(velocityChange.x, -playerSettingsData.maxVelocityChange,
-            playerSettingsData.maxVelocityChange);
-        velocityChange.z = Mathf.Clamp(velocityChange.z, -playerSettingsData.maxVelocityChange,
-            playerSettingsData.maxVelocityChange);
+        Vector3 rawLocalTarget = inputLocal * playerStateModel.CurrentWalkSpeed;
+        smoothedLocalVelocity = Vector3.MoveTowards(smoothedLocalVelocity, rawLocalTarget, playerStateModel.settings.acceleration * Time.fixedDeltaTime);
+
+        Vector3 targetVelocity = transform.TransformDirection(smoothedLocalVelocity) + externalImpulse;
+        Vector3 velocityChange = targetVelocity - rb.linearVelocity;
+
+        velocityChange.x = Mathf.Clamp(velocityChange.x, -playerStateModel.settings.maxVelocityChange, playerStateModel.settings.maxVelocityChange);
+        velocityChange.z = Mathf.Clamp(velocityChange.z, -playerStateModel.settings.maxVelocityChange, playerStateModel.settings.maxVelocityChange);
         velocityChange.y = 0;
 
         rb.AddForce(velocityChange, ForceMode.VelocityChange);
-        
+
         bool hasInput = smoothedLocalVelocity.sqrMagnitude > 0.01f;
-        bool hasHorizontalSpeed = new Vector3(rb.velocity.x, 0f, rb.velocity.z).sqrMagnitude > 0.01f;
+        bool hasHorizontalSpeed = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z).sqrMagnitude > 0.01f;
         isWalking = playerStateModel.IsGrounded && hasInput && hasHorizontalSpeed;
-        
+
         externalImpulse = Vector3.Lerp(externalImpulse, Vector3.zero, 5f * Time.fixedDeltaTime);
     }
-    
-    private void Jump()
+
+    private void ProjectVelocityToGround()
     {
-        if (!playerSettingsData.enableJump) return;
-        
-        rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-        rb.AddForce(Vector3.up * playerStateModel.CurrentJumpPower, ForceMode.Impulse);
+        Vector3 normal = playerStateModel.GroundNormal;
+        if (normal == Vector3.zero) normal = Vector3.up;
+        rb.linearVelocity = Vector3.ProjectOnPlane(rb.linearVelocity, normal);
     }
+
+    private void ApplyGroundStickForce()
+    {
+        float slopeAngle = Vector3.Angle(playerStateModel.GroundNormal, Vector3.up);
+        if (slopeAngle < 1f || slopeAngle > playerStateModel.settings.groundStickMaxSlope) return;
+
+        Vector3 stickDirection = -playerStateModel.GroundNormal;
+        float stickForce = playerStateModel.settings.groundStickForce * Mathf.Sin(slopeAngle * Mathf.Deg2Rad);
+        rb.AddForce(stickDirection * stickForce, ForceMode.Acceleration);
+    }
+
     private void CheckForWallJumps()
     {
-        if (playerStateModel.IsGrounded)
+        if (playerStateModel.IsGrounded) return;
+        foreach (SpringWall wall in FindObjectsOfType<SpringWall>())
         {
-            return; // Не проверяем прыжки от стен когда на земле
-        }
-
-        SpringWall[] springWalls = FindObjectsOfType<SpringWall>();
-
-        foreach (SpringWall wall in springWalls)
-        {
-            if (wall.TryDetectWallJump(out WallJumpData jumpData))
+            if (wall.TryDetectWallJump(out WallJumpData data))
             {
-                Debug.Log($"Wall jump executed! Style: {jumpData.styleIndex}");
-                OnWallJumpDetectedEvent?.Invoke(jumpData);
-                return; // Обрабатываем только первую подходящую стену
+                OnWallJumpDetectedEvent?.Invoke(data);
+                return;
             }
         }
     }
 
-    /// <summary>
-    /// Вызывается при обнаружении прыжка от стены (принимает WallJumpData).
-    /// </summary>
-    /// 
     public void HandleWallJump(WallJumpData data)
     {
-        Debug.Log($"HandleWallJump called! Style: {data.styleIndex}");
-
-        if (playerStateModel.LastWallJumpedFrom == data.wallComponent)
-        {
-            Debug.Log("Already jumped from this wall recently");
-            return;
-        }
+        if (playerStateModel.LastWallJumpedFrom == data.wallComponent) return;
         playerStateModel.SetLastWallJumpedFrom(data.wallComponent);
 
         Vector3 normal = data.surfaceNormal;
         SpringWall wall = data.wallComponent as SpringWall;
-
-        Vector3 approachVector = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-
+        Vector3 approachVector = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
         bool specialVerticalCaseTriggered = false;
-        rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+        rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
 
-        #region HANDS (Стиль Рук)
         if (data.styleIndex == HANDS_STYLE_INDEX)
         {
             Vector3 V_approach_norm = approachVector.normalized;
-
             float angle = Vector3.Angle(V_approach_norm, -normal);
-
             bool isSpecialCase = (angle <= 15f || angle >= 165f || (angle >= 75f && angle <= 105f));
 
-            Vector3 reboundVector = Vector3.zero;
-            float reboundForce = wall.settings.reboundForceHands;
+            Vector3 reboundVector;
 
             if (isSpecialCase)
             {
@@ -225,36 +175,24 @@ public class PlayerMovementController : MonoBehaviour
                 reboundVector.Normalize();
             }
 
-            Vector3 impulse = reboundVector * reboundForce;
-            impulse += reboundVector * wall.settings.extraAccelerationHands;
-
+            Vector3 impulse = reboundVector * wall.settings.reboundForceHands + reboundVector * wall.settings.extraAccelerationHands;
             SetExternalImpulse(impulse);
 
             if (wall != null)
-            {
                 StartCoroutine(wall.ApplySpeedModifierCoroutine(playerStateModel));
-            }
         }
-        #endregion
-
-        #region LEGS (Стиль Ног)
         else if (data.styleIndex == LEGS_STYLE_INDEX)
         {
             Vector3 jumpDirection = transform.forward;
             jumpDirection.y = 0;
             jumpDirection.Normalize();
 
-            Vector3 finalImpulse = jumpDirection * wall.settings.horizontalForceLegs +
-                                 Vector3.up * wall.settings.verticalForceLegs;
-
+            Vector3 finalImpulse = jumpDirection * wall.settings.horizontalForceLegs + Vector3.up * wall.settings.verticalForceLegs;
             rb.AddForce(finalImpulse, ForceMode.Impulse);
             SetExternalImpulse(Vector3.zero);
         }
-        #endregion
 
         if (specialVerticalCaseTriggered && data.styleIndex == HANDS_STYLE_INDEX)
-        {
             rb.AddForce(Vector3.up * playerStateModel.CurrentJumpPower * 0.75f, ForceMode.Impulse);
-        }
     }
 }

@@ -1,8 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// Слушает FloatEvent и обновляет MovementSpeedModifier в PlayerStateModel.
-/// </summary>
 public class SpeedModifierController : MonoBehaviour
 {
     [Header("Model")]
@@ -18,9 +15,7 @@ public class SpeedModifierController : MonoBehaviour
         PlayerEvents.OnPlayerSpeedModifierChange.RemoveListener(UpdateSpeedModifier);
     }
 
-    /// <summary>
-    /// Вызывается при срабатывании FloatEvent.
-    /// </summary>
+ 
     private void UpdateSpeedModifier(float newModifier)
     {
         if (playerStateModel != null)

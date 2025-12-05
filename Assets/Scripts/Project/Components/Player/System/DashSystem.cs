@@ -3,111 +3,104 @@ using System.Collections;
 
 public class DashSystem : MonoBehaviour
 {
-    [Header("Model & Settings")]
     public PlayerStateModel playerStateModel;
-    public PlayerSettingsData playerSettingsData;
-    
-    private PlayerInputController playerInputController;
-    private Rigidbody _rb;
-    private bool _isDashAvailable = true;
-    private Coroutine _currentDashCoroutine;
-    
-    private readonly bool allowHorizontalDashOnly = true; 
+
+    private Rigidbody rb;
+    private bool isDashAvailable = true;
+    private Coroutine currentDashCoroutine;
 
     void Awake()
     {
-        playerInputController = FindObjectOfType<PlayerInputController>();
-        _rb = GetComponent<Rigidbody>();
-        if (_rb == null)
-        {
-            enabled = false;
-        }
+        rb = GetComponent<Rigidbody>();
+        if (rb == null) enabled = false;
         playerStateModel.SetIsDashing(false);
     }
 
-    void OnEnable()
-    { 
-        InputEvents.DashAttemptEvent.AddListener(InitiateDash);
-    }
+    void OnEnable() => InputEvents.DashAttemptEvent.AddListener(InitiateDash);
+    void OnDisable() => InputEvents.DashAttemptEvent.RemoveListener(InitiateDash);
 
-    void OnDisable()
-    { 
-        InputEvents.DashAttemptEvent.RemoveListener(InitiateDash);
-        
-        if (_currentDashCoroutine != null)
-        {
-            StopCoroutine(_currentDashCoroutine);
-            // РЎР±СЂРѕСЃ СЃРѕСЃС‚РѕСЏРЅРёСЏ, РµСЃР»Рё РѕС‚РєР»СЋС‡Р°РµРјСЃСЏ РІРѕ РІСЂРµРјСЏ РґСЌС€Р°
-            playerStateModel.SetIsDashing(false); 
-            _isDashAvailable = true;
-        }
-    }
-
-    /// <summary>
-    /// Р’С‹Р·С‹РІР°РµС‚СЃСЏ РїСЂРё СЃСЂР°Р±Р°С‚С‹РІР°РЅРёРё DashAttemptEvent.
-    /// </summary>
     private void InitiateDash()
     {
-        if (_rb == null || !_isDashAvailable || playerStateModel.IsDashing || playerStateModel.IsSliding || playerStateModel.IsSlamming)
-        {
-            return;
-        }
-        
-        if (_currentDashCoroutine != null)
-        {
-            StopCoroutine(_currentDashCoroutine);
-        }
-        
-        _currentDashCoroutine = StartCoroutine(DashCoroutine());
+        if (rb == null || !isDashAvailable || playerStateModel.IsDashing || playerStateModel.IsSliding || playerStateModel.IsSlamming) return;
+        if (currentDashCoroutine != null) StopCoroutine(currentDashCoroutine);
+        currentDashCoroutine = StartCoroutine(DashCoroutine());
     }
 
     private IEnumerator DashCoroutine()
     {
-        _isDashAvailable = false;
+        isDashAvailable = false;
         playerStateModel.SetIsDashing(true);
         AbilityEvents.OnAbilityStarted.Invoke();
-        
-        // 1. РќРђР§РђР›Рћ Р”Р­РЁРђ
-        playerStateModel.SetIsDashing(true); 
 
-        // РћРїСЂРµРґРµР»РµРЅРёРµ РЅР°РїСЂР°РІР»РµРЅРёСЏ
-        Vector3 dashDirection = transform.forward; 
+        // Получаем направление взгляда игрока
+        Vector3 baseDirection = transform.forward;
 
-        if (allowHorizontalDashOnly)
+        // ОБНОВЛЕНИЕ: Ограничиваем вертикальную составляющую
+        // Сохраняем только горизонтальное направление (убираем вертикальную составляющую)
+        baseDirection.y = 0f;
+
+        // Нормализуем только если есть достаточная длина
+        if (baseDirection.sqrMagnitude > 0.01f)
         {
-            dashDirection.y = 0f;
+            baseDirection.Normalize();
         }
-        dashDirection.Normalize();
-
-        // С‡С‚РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ 
-        float finalDashPower = playerStateModel.CurrentDashPower;
-        float dashDuration = playerSettingsData.dashDuration;
-        float dashCooldown = playerSettingsData.dashCooldown;
-        
-        _rb.AddForce(dashDirection * finalDashPower, ForceMode.Impulse);
-        
-        float dashTimer = dashDuration;
-        
-        while (dashTimer > 0)
+        else
         {
-            dashTimer -= Time.deltaTime;
-            
-            float accelerationMagnitude = (finalDashPower * 0.5f) * (dashTimer / dashDuration);
-            _rb.AddForce(dashDirection * accelerationMagnitude, ForceMode.Acceleration);
-            
+            // Если смотрим прямо вверх/вниз, используем текущее горизонтальное направление движения
+            Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+            if (horizontalVelocity.sqrMagnitude > 0.01f)
+            {
+                baseDirection = horizontalVelocity.normalized;
+            }
+            else
+            {
+                baseDirection = Vector3.forward;
+            }
+        }
+
+        float power = playerStateModel.CurrentDashPower;
+        float duration = playerStateModel.settings.dashDuration;
+        float cooldown = playerStateModel.settings.dashCooldown;
+
+        // Очищаем вертикальную скорость при начале рывка
+        rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        rb.AddForce(baseDirection * power, ForceMode.Impulse);
+
+        float timer = duration;
+        while (timer > 0f)
+        {
+            timer -= Time.deltaTime;
+
+            // В течение рывка продолжаем применять силу только в горизонтальной плоскости
+            Vector3 currentDir = baseDirection;
+            currentDir.y = 0f; // Обеспечиваем, что направление остается горизонтальным
+
+            float accel = power * 0.6f * (timer / duration);
+            rb.AddForce(currentDir * accel, ForceMode.Acceleration);
+
+            // ДОПОЛНИТЕЛЬНО: Ограничиваем вертикальную скорость в течение всего рывка
+            if (Mathf.Abs(rb.linearVelocity.y) > 2f) // Макс вертикальная скорость 2 м/с
+            {
+                rb.linearVelocity = new Vector3(
+                    rb.linearVelocity.x,
+                    Mathf.Sign(rb.linearVelocity.y) * 2f,
+                    rb.linearVelocity.z
+                );
+            }
+
             yield return null;
         }
-        
-        playerStateModel.SetIsDashing(false); 
-        
-        float dashCooldownTimer = dashCooldown;
-        while (dashCooldownTimer > 0)
+
+        playerStateModel.SetIsDashing(false);
+
+        float cdTimer = cooldown;
+        while (cdTimer > 0f)
         {
-            dashCooldownTimer -= Time.deltaTime;
+            cdTimer -= Time.deltaTime;
             yield return null;
         }
 
-        _isDashAvailable = true;
-        Debug.Log("[Dash] Dash is now available.");
+        isDashAvailable = true;
+        currentDashCoroutine = null;
     }
 }

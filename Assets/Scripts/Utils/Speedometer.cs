@@ -15,7 +15,7 @@ public class Speedometer : MonoBehaviour
     private void Update()
     {
         
-        Vector3 velH = rb.velocity;
+        Vector3 velH = rb.linearVelocity;
         velH.y = 0f;
         float units = velH.magnitude;
         speedLabel.text = $"Speed: {units:F1}";
