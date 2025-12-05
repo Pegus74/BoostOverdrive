@@ -31,9 +31,5 @@ public class SlamCollisionHandler : MonoBehaviour
             
             AbilityEvents.SlamDestructibleHitEvent.Invoke(impactPoint); 
         }
-        else if (other.CompareTag("Ground") || other.CompareTag("Untagged")) 
-        {
-            AbilityEvents.SlamSolidHitEvent.Invoke(); 
-        }
     }
 }

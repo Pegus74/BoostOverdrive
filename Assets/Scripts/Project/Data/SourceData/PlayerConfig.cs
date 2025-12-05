@@ -35,7 +35,6 @@ public class PlayerConfig : ScriptableObject
     public float slideCooldown = 0.5f;
     
     [Header("Настройки Slam")]
-    public float slamDuration = 0.15f;
     public float slamCooldown = 1.0f;
     public float slamSlowdownDuration = 0.5f;
     public float destructibleWallReboundMultiplier = 100.0f;
