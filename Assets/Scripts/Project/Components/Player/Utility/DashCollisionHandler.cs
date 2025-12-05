@@ -1,8 +1,6 @@
 using UnityEngine;
 
-/// <summary>
-/// Обрабатывает коллизии во время дэша и вызывает разрушение стены при активном стиле
-/// </summary>
+
 public class DashCollisionHandler : MonoBehaviour
 {
     public PlayerStateModel playerStateModel; 

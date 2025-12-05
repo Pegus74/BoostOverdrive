@@ -1,164 +1,96 @@
-using System;
 using UnityEngine;
 
 public class PlayerStateModel : MonoBehaviour
 {
-    private float _currentWalkSpeed;
-    private float _currentJumpPower;
-    private float _currentDashPower;
-    private float _currentSlamPower;
+    [Header("Settings")]
+    public PlayerConfig settings;
+
+    private float _walkSpeed;
+    private float _jumpPower;
+    private float _dashPower;
+    private float _slamPower;
     private float _movementSpeedModifier = 1f;
-    
+
+    private int _currentStyleIndex = 0;
     private bool _isGrounded;
     private bool _isDashing;
     private bool _isSliding;
     private bool _isSlamming;
-    private bool _isWalking;
-    private bool isChargingJump;
+    private bool _isChargingJump;
 
-    private int _currentStyleIndex = 0;
-    
+    public bool playerCanMove = true;
+
+    private Vector3 _groundNormal = Vector3.up;
+    private float _coyoteCounter;
+    private float _jumpBufferCounter;
+
     private Component _lastWallJumpedFrom;
 
-    private Vector3 groundNormal;
-    
-    public float CurrentWalkSpeed => _currentWalkSpeed;
-    public float CurrentJumpPower => _currentJumpPower;
-    public float CurrentDashPower => _currentDashPower;
-    public float CurrentSlamPower => _currentSlamPower;
+    public float CurrentWalkSpeed => _walkSpeed * _movementSpeedModifier;
+    public float CurrentJumpPower => _jumpPower;
+    public float CurrentDashPower => _dashPower;
+    public float CurrentSlamPower => _slamPower;
     public float MovementSpeedModifier => _movementSpeedModifier;
-    
+
+    public int CurrentStyleIndex => _currentStyleIndex;
     public bool IsGrounded => _isGrounded;
     public bool IsDashing => _isDashing;
     public bool IsSliding => _isSliding;
     public bool IsSlamming => _isSlamming;
-    public bool IsChargingJump => isChargingJump;
+    public bool IsChargingJump => _isChargingJump;
 
-    public bool IsWalking()
-    {
-        if (_currentWalkSpeed > 0.01f)
-            _isWalking = true;
-        else 
-            _isWalking = false;
-        return _isWalking;
-    }
-
-    public int CurrentStyleIndex => _currentStyleIndex;
-    
+    public Vector3 GroundNormal => _groundNormal;
+    public float CoyoteCounter => _coyoteCounter;
+    public float JumpBufferCounter => _jumpBufferCounter;
     public Component LastWallJumpedFrom => _lastWallJumpedFrom;
-    public Vector3 GroundNormal => groundNormal;
-    
-    // [Header("Уведомления об Изменении Состояния")]
-    // // public IntEvent OnStyleChangedEvent; 
-    // // public BoolEvent OnGroundedStateChangedEvent;
 
+    public void SetWalkSpeed(float value) => _walkSpeed = value;
+    public void SetJumpPower(float value) => _jumpPower = value;
+    public void SetDashPower(float value) => _dashPower = value;
+    public void SetSlamPower(float value) => _slamPower = value;
+    public void SetMovementSpeedModifier(float value) => _movementSpeedModifier = value;
+    public void SetStyleIndex(int value) => _currentStyleIndex = value;
 
-    private void OnEnable()
+    public void SetIsGrounded(bool value) => _isGrounded = value;
+    public void SetIsDashing(bool value) => _isDashing = value;
+    public void SetIsSliding(bool value) => _isSliding = value;
+    public void SetIsSlamming(bool value) => _isSlamming = value;
+    public void SetIsChargingJump(bool value) => _isChargingJump = value;
+
+    public void SetGroundNormal(Vector3 normal) => _groundNormal = normal;
+    public void SetLastWallJumpedFrom(Component wall) => _lastWallJumpedFrom = wall;
+
+    public void UpdateCoyoteTime(float deltaTime)
     {
-        _lastWallJumpedFrom = null;
+        if (_isGrounded) _coyoteCounter = settings.coyoteTime;
+        else if (_coyoteCounter > 0f) _coyoteCounter -= deltaTime;
     }
 
-    public void SetWalkSpeed(float newSpeed)
+    public void UpdateJumpBuffer(float deltaTime)
     {
-        if (_currentWalkSpeed != newSpeed)
+        if (_jumpBufferCounter > 0f) _jumpBufferCounter -= deltaTime;
+    }
+
+    public void BufferJump() => _jumpBufferCounter = settings.jumpBufferTime;
+    public void ResetJumpBuffer() => _jumpBufferCounter = 0f;
+    public void ResetCoyoteTime() => _coyoteCounter = 0f;
+
+    private void Start()
+    {
+        if (settings != null)
         {
-            _currentWalkSpeed = newSpeed;
-            Debug.Log($"[Model] Walk Speed updated to: {newSpeed}");
-        }
-    }
-    
-    public void SetJumpPower(float newPower)
-    {
-        _currentJumpPower = newPower;
-        Debug.Log($"[Model] Jump Speed updated to: {newPower}");
-    }
-
-    public void SetIsChargingJump(bool charging)
-    {
-        isChargingJump = charging;
-    }
-
-
-    public void SetDashPower(float newPower)
-    {
-        if (_currentDashPower != newPower)
-        {
-            _currentDashPower = newPower;
-            Debug.Log($"[Model] Dash Multiplier updated to: {newPower}");
-        }
-    }
-
-    public void SetSlamPower(float newPower)
-    {
-        if (_currentSlamPower != newPower)
-        {
-            _currentSlamPower = newPower;
-            Debug.Log($"[Model] Slam Multiplier updated to: {newPower}");
+            ApplyStyleToModel(0);
         }
     }
 
-    public void SetMovementSpeedModifier(float newSpeedModifier)
+    public void ApplyStyleToModel(int index)
     {
-        _movementSpeedModifier = newSpeedModifier;
+        if (settings == null || settings.styleDataAssets == null || index >= settings.styleDataAssets.Length) return;
+        var style = settings.styleDataAssets[index];
+        SetWalkSpeed(style.walkSpeed);
+        SetJumpPower(style.jumpPower);
+        SetDashPower(style.dashPower);
+        SetSlamPower(style.slamPower);
+        SetStyleIndex(index);
     }
-    
-    public void SetIsGrounded(bool isGrounded)
-    {
-        if (_isGrounded != isGrounded)
-        {
-            _isGrounded = isGrounded;
-            Debug.Log($"[Model] IsGrounded updated to: {isGrounded}");
-        }
-    }
-    
-    public void SetIsDashing(bool isDashing)
-    {
-        if (_isDashing != isDashing)
-        {
-            _isDashing = isDashing;
-            Debug.Log($"[Model] isDashing updated to: {isDashing}");
-        }
-    }
-
-    public void SetIsSliding(bool isSliding)
-    {
-        if (_isSliding != isSliding)
-        {
-            _isSliding = isSliding;
-            Debug.Log($"[Model] isSliding updated to: {isSliding}");
-        }
-    }
-
-    public void SetIsSlamming(bool isSlamming)
-    {
-        if (_isSlamming != isSlamming)
-        {
-            _isSlamming = isSlamming;
-            Debug.Log($"[Model] isSlamming updated to: {isSlamming}");
-        }
-    }
-    
-    public void SetStyleIndex(int newIndex)
-    {
-        if (_currentStyleIndex != newIndex)
-        {
-            _currentStyleIndex = newIndex;
-            Debug.Log($"[Model] Style Index updated to: {newIndex}");
-        }
-    }
-
-    public void SetLastWallJumpedFrom(Component newWall)
-    {
-        if (_lastWallJumpedFrom != newWall)
-        {
-            _lastWallJumpedFrom = newWall;
-            Debug.Log($"[Model] LastWallJumpedFrom updated to: {newWall}");
-        }
-    }
-    
-    public void SetGroundNormal(Vector3 normal)
-    {
-        groundNormal = normal;
-    }
-    
 }

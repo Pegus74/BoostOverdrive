@@ -1,14 +1,12 @@
 using UnityEngine;
 using System.Collections;
 
-/// <summary>
-/// Управляет способностью CrawlSlide
-/// </summary>
+
 public class CrawlSlideSystem : MonoBehaviour
 {
     [Header("Model & Settings")]
     public PlayerStateModel playerStateModel; 
-    public PlayerSettingsData playerSettingsData; 
+   
     
     public Transform visualModelTransform; 
     public Camera playerCamera; 
@@ -87,18 +85,18 @@ public class CrawlSlideSystem : MonoBehaviour
         _currentSlideCoroutine = StartCoroutine(CrawlSlideCoroutine());
     }
     
-    // --- Coroutine для пошагового выполнения способности ---
+
     private IEnumerator CrawlSlideCoroutine()
     {
         _isSlideAvailable = false;
         playerStateModel.SetIsSliding(true); 
         AbilityEvents.OnAbilityStarted.Invoke();
 
-        // === РАСЧЕТ ЦЕЛЕВЫХ ПАРАМЕТРОВ НА ОСНОВЕ СТИЛЯ ===
+
         int styleIndex = playerStateModel.CurrentStyleIndex;
-        float transitionDuration = playerSettingsData.squatTransitionDuration;
+        float transitionDuration = playerStateModel.settings.squatTransitionDuration;
         
-        float targetScaleY = playerSettingsData.squatHeightScale;
+        float targetScaleY = playerStateModel.settings.squatHeightScale;
         float targetHeight = _originalColliderHeight * targetScaleY;
         
         float verticalShiftMagnitude = (_originalColliderHeight - targetHeight) / 2f; 
@@ -156,9 +154,9 @@ public class CrawlSlideSystem : MonoBehaviour
         Vector3 slideDirection = transform.forward;
         slideDirection.y = 0f; 
         slideDirection.Normalize();
-        _rb.AddForce(slideDirection * playerSettingsData.slideBaseImpulse, ForceMode.Impulse);
+        _rb.AddForce(slideDirection * playerStateModel.settings.slideBaseImpulse, ForceMode.Impulse);
         
-        yield return new WaitForSeconds(playerSettingsData.slideDuration); 
+        yield return new WaitForSeconds(playerStateModel.settings.slideDuration); 
         
         // 3. ФАЗА ВОССТАНОВЛЕНИЯ (UNSQUAT UP)
         
@@ -202,16 +200,14 @@ public class CrawlSlideSystem : MonoBehaviour
         
         
         // 4. ФАЗА ПЕРЕЗАРЯДКИ (COOLDOWN)
-        yield return new WaitForSeconds(playerSettingsData.slideCooldown);
+        yield return new WaitForSeconds(playerStateModel.settings.slideCooldown);
 
         _isSlideAvailable = true;
         Debug.Log("[Slide] CrawlSlide is now available.");
         _currentSlideCoroutine = null;
     }
     
-    /// <summary>
-    /// Вспомогательная функция для плавного изменения размеров/позиции
-    /// </summary>
+
     private void UpdateTransformAndCollider(float t, float targetScaleY, float targetHeight, float targetCenterY, 
         float targetVisualModelLocalY, float targetCameraY, float targetRootY, float startRootY,
         float startScaleY = -1f, float startHeight = -1f, float startCenterY = -1f, 
@@ -252,9 +248,7 @@ public class CrawlSlideSystem : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Сбрасывает состояние игрока к исходному
-    /// </summary>
+
     private void ResetPlayerToOriginalState(float finalRootY = -1f)
     {
         if (finalRootY != -1f && _rootPositionAdjustmentY != 0f) 

@@ -10,21 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e29f413c970d4fd9a006eed13df880bd, type: 3}
-  m_Name: DefaultSettings
+  m_Name: 
   m_EditorClassIdentifier: 
+  styleDataAssets:
+  - {fileID: 11400000, guid: 87eb25c8cc0aa7db8a8d6c5e0f46ffa3, type: 2}
+  - {fileID: 11400000, guid: b533809eb98bac9f3813aa72f903394a, type: 2}
   mouseSensitivity: 2
-  maxLookAngle: 80
+  maxLookAngle: 50
   bobSpeed: 5
   invertCamera: 0
   lockCursor: 1
   cameraCanMove: 1
   crosshair: 1
-  crosshairImage: {fileID: 21300000, guid: be4ce60e2c9768c44b9b10b9c5258045, type: 3}
+  crosshairImage: {fileID: 0}
   crosshairColor: {r: 1, g: 1, b: 1, a: 1}
   maxVelocityChange: 10
-  acceleration: 40
+  acceleration: 20
   playerCanMove: 1
   enableJump: 1
+  enableAirJump: 0
   dashDuration: 0.15
   dashCooldown: 1
   slideBaseImpulse: 10
@@ -35,7 +39,14 @@ MonoBehaviour:
   slamDuration: 0.15
   slamCooldown: 1
   slamSlowdownDuration: 0.5
-  destructibleWallReboundMultiplier: 10
+  destructibleWallReboundMultiplier: 100
   raycastCheckDistance: 1
   horizontalForceHands: 10
   verticalForceLegs: 15
+  enableChargedJump: 0
+  chargeSpeed: 2
+  minJumpPowerPercent: 0.35
+  groundStickForce: 8
+  groundStickMaxSlope: 75
+  coyoteTime: 0.15
+  jumpBufferTime: 0.2

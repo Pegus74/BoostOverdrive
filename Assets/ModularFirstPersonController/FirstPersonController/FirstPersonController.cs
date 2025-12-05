@@ -327,10 +327,10 @@ public class FirstPersonController : MonoBehaviour
                 isDashing = true;
                 energyBar.RemoveEnergy();
                 dashTimer = mm.dashDuration;
-                Vector3 currentVelocity = rb.velocity;
+                Vector3 currentVelocity = rb.linearVelocity;
                 Vector3 dashVelocity = dashDirection * mm.dashPower;
                 dashVelocity.y = currentVelocity.y;
-                rb.velocity = dashVelocity;
+                rb.linearVelocity = dashVelocity;
             }
             if (isDashing)
             {
@@ -386,10 +386,10 @@ public class FirstPersonController : MonoBehaviour
 
             if (isSlamming && !slamImpactOccurred && !isReboundingFromSlam)
             {
-                Vector3 currentVelocity = rb.velocity;
+                Vector3 currentVelocity = rb.linearVelocity;
                 currentVelocity.x = 0f;
                 currentVelocity.z = 0f;
-                rb.velocity = currentVelocity;
+                rb.linearVelocity = currentVelocity;
 
                 rb.AddForce(Vector3.down * (mm.slamPower * 0.8f), ForceMode.Acceleration);
             }
@@ -450,10 +450,10 @@ public class FirstPersonController : MonoBehaviour
         #region Crawl Slide Movement
         if (isSliding)
         {
-            float verticalVelocity = rb.velocity.y;
+            float verticalVelocity = rb.linearVelocity.y;
             float currentTargetSpeed = walkSpeed * speedModifier;
 
-            Vector3 horizontalVelocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+            Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
 
             if (horizontalVelocity.magnitude > currentTargetSpeed)
             {
@@ -464,12 +464,12 @@ public class FirstPersonController : MonoBehaviour
                     newHorizontalVelocity = newHorizontalVelocity.normalized * currentTargetSpeed;
                 }
 
-                rb.velocity = newHorizontalVelocity + Vector3.up * verticalVelocity;
+                rb.linearVelocity = newHorizontalVelocity + Vector3.up * verticalVelocity;
             }
             else if (horizontalVelocity.magnitude < currentTargetSpeed && horizontalVelocity.magnitude > 0.1f)
             {
                 Vector3 newHorizontalVelocity = Vector3.MoveTowards(horizontalVelocity, horizontalVelocity.normalized * currentTargetSpeed, Time.fixedDeltaTime * 2f);
-                rb.velocity = newHorizontalVelocity + Vector3.up * verticalVelocity;
+                rb.linearVelocity = newHorizontalVelocity + Vector3.up * verticalVelocity;
             }
 
             return;
@@ -487,7 +487,7 @@ public class FirstPersonController : MonoBehaviour
 
             target = transform.TransformDirection(target) * walkSpeed * speedModifier + externalImpulse;
 
-            Vector3 velocity = rb.velocity;
+            Vector3 velocity = rb.linearVelocity;
             Vector3 velocityChange = target - velocity;
             velocityChange.x = Mathf.Clamp(velocityChange.x, -maxVelocityChange, maxVelocityChange);
             velocityChange.z = Mathf.Clamp(velocityChange.z, -maxVelocityChange, maxVelocityChange);
@@ -499,18 +499,18 @@ public class FirstPersonController : MonoBehaviour
         
         if (isDashing)
         {
-            Vector3 velocity = rb.velocity;
+            Vector3 velocity = rb.linearVelocity;
             velocity.y = Mathf.Clamp(velocity.y, -5f, 5f); 
-            rb.velocity = velocity;
+            rb.linearVelocity = velocity;
             CheckDashCollisions();
         }
         externalImpulse = Vector3.Lerp(externalImpulse, Vector3.zero, 5f * Time.fixedDeltaTime);
         if (isSlamming && !slamImpactOccurred && !isReboundingFromSlam)
         {
-            Vector3 currentVelocity = rb.velocity;
+            Vector3 currentVelocity = rb.linearVelocity;
             currentVelocity.x = 0f;
             currentVelocity.z = 0f;
-            rb.velocity = currentVelocity;
+            rb.linearVelocity = currentVelocity;
 
             rb.AddForce(Vector3.down * mm.slamPower * 0.5f, ForceMode.Acceleration);
         }
@@ -668,10 +668,10 @@ public class FirstPersonController : MonoBehaviour
         energyBar.RemoveEnergy();
         slamImpactOccurred = false;
         isReboundingFromSlam = false; 
-        Vector3 currentVelocity = rb.velocity;
+        Vector3 currentVelocity = rb.linearVelocity;
         currentVelocity.x = 0f;
         currentVelocity.z = 0f;
-        rb.velocity = currentVelocity;
+        rb.linearVelocity = currentVelocity;
         rb.AddForce(Vector3.down * mm.slamPower, ForceMode.Impulse);
     }
 
@@ -681,9 +681,9 @@ public class FirstPersonController : MonoBehaviour
         isReboundingFromSlam = false; 
         slamCooldownTimer = mm.slamCooldown;
         slamImpactOccurred = false;
-        Vector3 currentVelocity = rb.velocity;
+        Vector3 currentVelocity = rb.linearVelocity;
         currentVelocity.y = Mathf.Min(currentVelocity.y, 0f);
-        rb.velocity = currentVelocity;
+        rb.linearVelocity = currentVelocity;
     }
 
     public bool IsSlamming() => isSlamming;
@@ -751,7 +751,7 @@ public class FirstPersonController : MonoBehaviour
 
     public Vector3 GetCurrentHorizontalVelocity()
     {
-        Vector3 vel = rb.velocity;
+        Vector3 vel = rb.linearVelocity;
         vel.y = 0;
         return vel;
     }
@@ -801,9 +801,9 @@ public class FirstPersonController : MonoBehaviour
             DestructibleWall wall = collision.gameObject.GetComponent<DestructibleWall>();
             if (wall != null)
             {
-                Vector3 horizontalVelocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+                Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
                 wall.DestroyWall();
-                rb.velocity = new Vector3(horizontalVelocity.x, rb.velocity.y, horizontalVelocity.z);
+                rb.linearVelocity = new Vector3(horizontalVelocity.x, rb.linearVelocity.y, horizontalVelocity.z);
                 rb.AddForce(dashDirection * mm.dashPower * 0.5f, ForceMode.Impulse);
             }
         }
@@ -919,11 +919,11 @@ public class FirstPersonController : MonoBehaviour
         Vector3 reflection = Vector3.Reflect(dashDirection, hit.normal);
         reflection.y = 0; 
         reflection.Normalize();
-        Vector3 currentVelocity = rb.velocity;
+        Vector3 currentVelocity = rb.linearVelocity;
         currentVelocity.x = reflection.x * mm.dashPower * 0.3f;
         currentVelocity.z = reflection.z * mm.dashPower * 0.3f;
         currentVelocity.y = Mathf.Min(currentVelocity.y, 2f); 
-        rb.velocity = currentVelocity;
+        rb.linearVelocity = currentVelocity;
         isDashing = false;
     }
 
@@ -947,10 +947,10 @@ public class FirstPersonController : MonoBehaviour
         dashDirection.Normalize();
         isDashing = true;
         dashTimer = mm.dashDuration;
-        Vector3 currentVelocity = rb.velocity;
+        Vector3 currentVelocity = rb.linearVelocity;
         Vector3 dashVelocity = dashDirection * mm.dashPower;
         dashVelocity.y = currentVelocity.y * 0.5f;
-        rb.velocity = dashVelocity;
+        rb.linearVelocity = dashVelocity;
         dashCooldownTimer = mm.dashCooldown;
         if (slamIndicatorInstance != null)
         {

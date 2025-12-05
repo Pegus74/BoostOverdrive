@@ -57,7 +57,7 @@ public class BoostTileHandler : MonoBehaviour
     {
         float lingerTime = obstaclesSettingsData.boostTileGroundLingerTime;
         
-        if (playerRb != null && playerRb.velocity.y > 0.1f)
+        if (playerRb != null && playerRb.linearVelocity.y > 0.1f)
         {
             lingerTime = obstaclesSettingsData.boostTileJumpLingerTime;
             Debug.Log($"[Boost Tile] Jump detected. Linger time: {lingerTime}s");

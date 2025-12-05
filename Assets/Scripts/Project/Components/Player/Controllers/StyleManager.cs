@@ -1,65 +1,21 @@
 using UnityEngine;
 
-/// <summary>
-/// Слушает ввод ToggleStyleAttemptEvent, 
-/// переключает стили, читает данные из PlayerStyleData 
-/// и записывает текущие параметры в PlayerStateModel.
-/// </summary>
 public class StyleManager : MonoBehaviour
 {
-    [Header("Model")]
     public PlayerStateModel playerStateModel;
-    
-    [Tooltip("Массив неизменяемых данных о стилях")]
-    public PlayerStyleData[] styleDataAssets; 
-    private int currentStyleIndex = 0;
-    
-    private PlayerInputController playerInputController;
+
+    private void OnEnable() => InputEvents.ToggleStyleAttemptEvent.AddListener(SwitchStyle);
+    private void OnDisable() => InputEvents.ToggleStyleAttemptEvent.RemoveListener(SwitchStyle);
 
     private void Awake()
     {
-        playerInputController = FindObjectOfType<PlayerInputController>();
-        if (playerStateModel == null || styleDataAssets == null || styleDataAssets.Length == 0)
-        {
-            enabled = false;
-        }
+        if (playerStateModel == null || playerStateModel.settings?.styleDataAssets == null) enabled = false;
+        else playerStateModel.ApplyStyleToModel(0);
     }
 
-    private void OnEnable()
-    {
-        InputEvents.ToggleStyleAttemptEvent.AddListener(SwitchStyle);
-        ApplyStyleToModel(currentStyleIndex);
-    }
-
-    private void OnDisable()
-    { 
-        InputEvents.ToggleStyleAttemptEvent.RemoveListener(SwitchStyle);
-    }
-    
-    /// <summary>
-    /// Вызывается по событию ввода ToggleStyleAttemptEvent и обновляет стиль
-    /// </summary>
     private void SwitchStyle()
     {
-        int newStyleIndex = (playerStateModel.CurrentStyleIndex + 1) % styleDataAssets.Length;
-        ApplyStyleToModel(newStyleIndex);
-    }
-
-    /// <summary>
-    /// Применяет данные стиля к PlayerStateModel.
-    /// </summary>
-    private void ApplyStyleToModel(int index)
-    {
-        if (index < 0 || index >= styleDataAssets.Length) return;
-
-        PlayerStyleData style = styleDataAssets[index];
-
-        // 1. Обновляем рабочие параметры в Модели
-        playerStateModel.SetWalkSpeed(style.walkSpeed);
-        playerStateModel.SetJumpPower(style.jumpPower);
-        playerStateModel.SetDashPower(style.dashPower);
-        playerStateModel.SetSlamPower(style.slamPower);
-        // SetStyleIndex также автоматически вызывает OnStyleChangedEvent(index)
-        playerStateModel.SetStyleIndex(index);
+        int newIndex = (playerStateModel.CurrentStyleIndex + 1) % playerStateModel.settings.styleDataAssets.Length;
+        playerStateModel.ApplyStyleToModel(newIndex);
     }
 }

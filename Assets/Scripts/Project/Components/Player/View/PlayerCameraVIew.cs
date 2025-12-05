@@ -6,7 +6,7 @@ public class PlayerCameraView : MonoBehaviour
 {
     [Header("Model & Settings")]
     public PlayerMovementController playerMovementController; 
-    public PlayerSettingsData playerSettingsData;
+    public PlayerConfig playerSettingsData;
     
     [Header("Camera Components")]
     public Camera playerCamera;

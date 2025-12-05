@@ -5,7 +5,6 @@ public class ChargedJumpController : MonoBehaviour
 {
     [Header("Model & Settings")]
     public PlayerStateModel playerStateModel;
-    public PlayerSettingsData playerSettingsData;
 
     [Header("Input Events")]
     public UnityEvent JumpAttemptEvent;
@@ -29,7 +28,7 @@ public class ChargedJumpController : MonoBehaviour
 
     private void OnDisable()
     {
-        // ИСПРАВЛЕНО: используем RemoveListener вместо UnregisterListener
+
         JumpAttemptEvent?.RemoveListener(HandleJumpInput);
         JumpCanceledEvent?.RemoveListener(HandleJumpCancel);
 
@@ -49,7 +48,7 @@ public class ChargedJumpController : MonoBehaviour
 
     private void HandleJumpInput()
     {
-        if (!playerSettingsData.enableChargedJump || !playerStateModel.IsGrounded || isCharging)
+        if (!playerStateModel.settings.enableChargedJump || !playerStateModel.IsGrounded || isCharging)
             return;
 
         StartCharging();
@@ -70,7 +69,7 @@ public class ChargedJumpController : MonoBehaviour
         chargeStartTime = Time.time;
 
         OnChargeStart?.Invoke();
-        playerStateModel.SetIsChargingJump(true);
+        //playerStateModel.SetIsChargingJump(true);
     }
 
     private void UpdateCharging()
@@ -81,7 +80,7 @@ public class ChargedJumpController : MonoBehaviour
             return;
         }
 
-        currentCharge += playerSettingsData.chargeSpeed * Time.deltaTime;
+        currentCharge += playerStateModel.settings.chargeSpeed * Time.deltaTime;
         currentCharge = Mathf.Clamp01(currentCharge);
 
         ChargedJumpUI ui = FindObjectOfType<ChargedJumpUI>();
@@ -120,7 +119,7 @@ public class ChargedJumpController : MonoBehaviour
 
     private float GetMinJumpPower()
     {
-        return playerStateModel.CurrentJumpPower * playerSettingsData.minJumpPowerPercent;
+        return playerStateModel.CurrentJumpPower * playerStateModel.settings.minJumpPowerPercent;
     }
 
     private float GetMaxJumpPower()

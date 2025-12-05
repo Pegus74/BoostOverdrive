@@ -8,80 +8,65 @@ public class GroundCheckComponent : MonoBehaviour
     [Header("Ground Check Settings")]
     [SerializeField] LayerMask groundLayer;
     [Range(0f, 90f)]
-    [SerializeField] float maxSlopeAngle = 45f; // Максимальный угол наклона поверхности, чтобы считаться землей
-    private Vector3 currentGroundNormal;
-    
-    private Rigidbody rb;
+    [SerializeField] float maxSlopeAngle = 45f;
+
     private bool isGrounded = false;
-    
+    private Vector3 lastValidNormal = Vector3.up;
+
     private void Awake()
     {
-        rb = GetComponent<Rigidbody>();
-        if (rb == null)
-        {
+        if (GetComponent<Rigidbody>() == null)
             enabled = false;
-        }
     }
-    
+
     private void OnCollisionEnter(Collision collision)
     {
-        CheckForGroundContact(collision, true);
+        EvaluateGroundContact(collision);
     }
 
     private void OnCollisionStay(Collision collision)
     {
-        CheckForGroundContact(collision, true);
+        EvaluateGroundContact(collision);
     }
 
     private void OnCollisionExit(Collision collision)
     {
-        isGrounded = false;
-        currentGroundNormal = Vector3.up;
-        playerStateModel.SetGroundNormal(Vector3.up);
+        if (((1 << collision.gameObject.layer) & groundLayer) != 0)
+        {
+            TryResetGroundedState();
+        }
     }
-    
+
     private void FixedUpdate()
     {
-        playerStateModel?.SetIsGrounded(isGrounded);
+        playerStateModel.SetIsGrounded(isGrounded);
+        playerStateModel.SetGroundNormal(isGrounded ? lastValidNormal : Vector3.up);
+        if (isGrounded && !playerStateModel.IsGrounded)
+        {
+            playerStateModel.UpdateCoyoteTime(0.15f); 
+        }
     }
-    
-    /// <summary>
-    /// Проверяет, является ли точка контакта землей, и обновляет локальное состояние.
-    /// </summary>
-    private void CheckForGroundContact(Collision collision, bool isEntering)
+
+    private void EvaluateGroundContact(Collision collision)
     {
-        if (playerStateModel == null) return;
-
-        if (((1 << collision.gameObject.layer) & groundLayer) == 0)
-            return;
-
-        bool contactFound = false;
-        Vector3 bestNormal = Vector3.up;
+        if (((1 << collision.gameObject.layer) & groundLayer) == 0) return;
 
         foreach (ContactPoint contact in collision.contacts)
         {
             float angle = Vector3.Angle(contact.normal, Vector3.up);
-
-            if (angle < maxSlopeAngle)
+            if (angle <= maxSlopeAngle)
             {
-                contactFound = true;
-                bestNormal = contact.normal;
+                isGrounded = true;
+                lastValidNormal = contact.normal;
                 playerStateModel.SetLastWallJumpedFrom(null);
-                break;
+                return;
             }
         }
+    }
 
-        if (contactFound)
-        {
-            isGrounded = true;
-            currentGroundNormal = bestNormal;
-            playerStateModel.SetGroundNormal(bestNormal);
-        }
-        else if (isEntering)
-        {
-            isGrounded = false;
-            currentGroundNormal = Vector3.up;
-            playerStateModel.SetGroundNormal(Vector3.up);
-        }
+    private void TryResetGroundedState()
+    {
+        isGrounded = false;
+        lastValidNormal = Vector3.up;
     }
 }

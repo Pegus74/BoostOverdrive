@@ -1,8 +1,10 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "NewPlayerSettings", menuName = "GameData/Player Settings Data")]
-public class PlayerSettingsData : ScriptableObject
+[CreateAssetMenu(fileName = "NewPlayerSettings", menuName = "GameData/Player Config Data")]
+public class PlayerConfig : ScriptableObject
 {
+    public PlayerStyleData[] styleDataAssets;
+
     [Header("Настройки Камеры")]
     public float mouseSensitivity = 2f;
     public float maxLookAngle = 50f;
@@ -47,5 +49,16 @@ public class PlayerSettingsData : ScriptableObject
     public bool enableChargedJump = true;
     public float chargeSpeed = 2f;
     public float minJumpPowerPercent = 0.35f;
+
+    [Header("Настройки прилипания к склону")]
+    public float groundStickForce = 8f;       
+    public float groundStickMaxSlope = 75f;
+
+    [Header("Настройки буфера прыжка")]
+    public float coyoteTime = 0.15f;
+    public float jumpBufferTime = 0.2f;
+ 
+   
+
 
 }

@@ -1,15 +1,11 @@
 using UnityEngine;
 using System.Collections;
 
-/// <summary>
-/// Реализует способность "Slam": быстрое ускорение игрока строго вниз.
-/// Управляет доступностью способности, ее движением и реакцией на коллизии (через события).
-/// </summary>
 public class SlamSystem : MonoBehaviour
 {
     [Header("Model & Settings")]
     public PlayerStateModel playerStateModel;
-    public PlayerSettingsData playerSettingsData;
+  
     
     private PlayerInputController playerInputController;
     
@@ -75,9 +71,9 @@ public class SlamSystem : MonoBehaviour
 
         Vector3 slamDirection = Vector3.down; 
         float finalSlamPower = playerStateModel.CurrentSlamPower;
-        float slamDuration = playerSettingsData.slamDuration;
+        float slamDuration = playerStateModel.settings.slamDuration;
         
-        _rb.velocity = new Vector3(_rb.velocity.x, 0f, _rb.velocity.z);
+        _rb.linearVelocity = new Vector3(_rb.linearVelocity.x, 0f, _rb.linearVelocity.z);
         _rb.AddForce(slamDirection * finalSlamPower, ForceMode.Impulse);
         
         float slamTimer = slamDuration;
@@ -103,9 +99,6 @@ public class SlamSystem : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Вызывается при SlamDestructibleHitEvent
-    /// </summary>
     private void StopSlamOnDestructibleHit(Vector3 impactPoint)
     {
         if (!playerStateModel.IsSlamming) return;
@@ -117,17 +110,14 @@ public class SlamSystem : MonoBehaviour
         playerStateModel.SetIsSlamming(false);
 
         // Отброс игрока 
-        _rb.velocity = new Vector3(_rb.velocity.x, 0f, _rb.velocity.z); 
+        _rb.linearVelocity = new Vector3(_rb.linearVelocity.x, 0f, _rb.linearVelocity.z); 
         
-        Vector3 reboundForce = Vector3.up * playerSettingsData.destructibleWallReboundMultiplier;
+        Vector3 reboundForce = Vector3.up * playerStateModel.settings.destructibleWallReboundMultiplier;
         _rb.AddForce(reboundForce, ForceMode.Impulse); 
         
         _currentSlamCoroutine = StartCoroutine(SlamCooldownRoutine());
     }
     
-    /// <summary>
-    /// Вызывается при SlamSolidHitEvent
-    /// </summary>
     private void StopSlamOnSolidHit()
     {
         if (!playerStateModel.IsSlamming) return;
@@ -143,10 +133,10 @@ public class SlamSystem : MonoBehaviour
     
     private IEnumerator SlamSlowdownRoutine()
     {
-        float slowdownDuration = playerSettingsData.slamSlowdownDuration;
+        float slowdownDuration = playerStateModel.settings.slamSlowdownDuration;
         float timer = 0f;
         
-        Vector3 initialVelocity = _rb.velocity;
+        Vector3 initialVelocity = _rb.linearVelocity;
         
         while (timer < slowdownDuration)
         {
@@ -154,7 +144,7 @@ public class SlamSystem : MonoBehaviour
             float t = timer / slowdownDuration;
             
             // Плавно гасим скорость
-            _rb.velocity = Vector3.Lerp(initialVelocity, Vector3.zero, t * 0.9f); 
+            _rb.linearVelocity = Vector3.Lerp(initialVelocity, Vector3.zero, t * 0.9f); 
             
             yield return null;
         }
@@ -164,7 +154,7 @@ public class SlamSystem : MonoBehaviour
     
     private IEnumerator SlamCooldownRoutine()
     {
-        float slamCooldownTimer = playerSettingsData.slamCooldown;
+        float slamCooldownTimer = playerStateModel.settings.slamCooldown;
         while (slamCooldownTimer > 0)
         {
             slamCooldownTimer -= Time.deltaTime;
