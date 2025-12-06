@@ -8,7 +8,7 @@ public class PlayerInputController : MonoBehaviour
     [Header("GameState")]
     [SerializeField] private GameStateEvent GameStateChangedEvent;
 
-    private PlayerControls playerControls; // Pattern - Provider
+    private PlayerControls playerControls;
 
     private void Awake()
     {
@@ -19,11 +19,17 @@ public class PlayerInputController : MonoBehaviour
 
         playerControls.Gameplay.Look.performed += OnLook;
         playerControls.Gameplay.Look.canceled += OnLook;
+        
         playerControls.Gameplay.Jump.canceled += OnJumpCanceled;
         playerControls.Gameplay.Jump.performed += OnJump;
+        
         playerControls.Gameplay.Dash.performed += OnDash;
-        playerControls.Gameplay.Slide.performed += OnSlide;
+        
+        playerControls.Gameplay.Slide.performed += OnSlidePerformed;
+        playerControls.Gameplay.Slide.canceled += OnSlideCanceled;
+        
         playerControls.Gameplay.Slam.performed += OnSlam;
+        
         playerControls.Gameplay.ToggleStyle.performed += OnToggleStyle;
         
         playerControls.Gameplay.Pause.performed += OnPause;
@@ -54,11 +60,17 @@ public class PlayerInputController : MonoBehaviour
         
         playerControls.Gameplay.Look.performed -= OnLook;
         playerControls.Gameplay.Look.canceled -= OnLook;
+        
         playerControls.Gameplay.Jump.canceled -= OnJumpCanceled;
         playerControls.Gameplay.Jump.performed -= OnJump;
+        
         playerControls.Gameplay.Dash.performed -= OnDash;
-        playerControls.Gameplay.Slide.performed -= OnSlide;
+        
+        playerControls.Gameplay.Slide.performed -= OnSlidePerformed;
+        playerControls.Gameplay.Slide.canceled -= OnSlideCanceled;
+        
         playerControls.Gameplay.Slam.performed -= OnSlam;
+        
         playerControls.Gameplay.ToggleStyle.performed -= OnToggleStyle;
         
         playerControls.Gameplay.Pause.performed -= OnPause;
@@ -95,9 +107,14 @@ public class PlayerInputController : MonoBehaviour
         InputEvents.SlamAttemptEvent.Invoke();
     }
     
-    private void OnSlide(InputAction.CallbackContext context)
+    private void OnSlidePerformed(InputAction.CallbackContext context)
     {
         InputEvents.SlideAttemptEvent.Invoke();
+    }
+
+    private void OnSlideCanceled(InputAction.CallbackContext context)
+    {
+        InputEvents.SlideCanceledEvent.Invoke();
     }
 
     private void OnToggleStyle(InputAction.CallbackContext context)
