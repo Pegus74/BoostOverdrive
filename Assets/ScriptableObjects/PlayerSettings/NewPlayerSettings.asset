@@ -25,21 +25,20 @@ MonoBehaviour:
   crosshairImage: {fileID: 0}
   crosshairColor: {r: 1, g: 1, b: 1, a: 1}
   maxVelocityChange: 10
-  acceleration: 20
+  acceleration: 50
   playerCanMove: 1
   enableJump: 1
   enableAirJump: 0
   dashDuration: 0.15
   dashCooldown: 1
-  slideDuration: 1.5
-  initialSpeedMultiplier: 1.2
-  finalSpeedMultiplier: 1
+  slideDuration: 3
+  SlideSpeedMultiplier: 1.2
+  FinalSlideSpeedMultiplier: 1
   squatHeightScale: 0.5
   squatTransitionDuration: 0.3
-  slideFrictionMultiplier: 0.95
   slamCooldown: 1
   slamSlowdownDuration: 0.5
-  destructibleWallReboundMultiplier: 100
+  destructibleWallReboundMultiplier: 10
   raycastCheckDistance: 1
   horizontalForceHands: 10
   verticalForceLegs: 15
