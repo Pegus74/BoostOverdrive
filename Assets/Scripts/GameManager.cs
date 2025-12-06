@@ -18,7 +18,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private CollectableSystem collectableSystem;
     [SerializeField] private CollectableUI collectableUI;
-
+    private Dictionary<string, int> levelCoinTotals = new Dictionary<string, int>();
     public static GameManager Instance;
 
     public enum State
@@ -134,6 +134,10 @@ public class GameManager : MonoBehaviour
             FindMusicManager();
         }
         SetupCollectablesUI();
+        if (collectableUI != null)
+        {
+            collectableUI.UpdateAllUI();
+        }
         if (scene.name != "MainMenu" && !levelNames.Contains(scene.name))
         {
             levelNames.Add(scene.name);
@@ -177,6 +181,10 @@ public class GameManager : MonoBehaviour
             Debug.LogError("TimerManager not found in scene!");
         }
 
+    }
+    public string GetCurrentLevelName()
+    {
+        return currentLevelName;
     }
 
     #region Collectables

@@ -15,14 +15,10 @@ public class Collectable : MonoBehaviour
         levelName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
         uniqueId = $"{gameObject.name}_{transform.position.x:F2}_{transform.position.y:F2}_{transform.position.z:F2}";
+
         if (IsAlreadyCollected())
         {
             gameObject.SetActive(false);
-            Debug.Log($"Monetka {uniqueId} uje sobrana, skryvayu");
-        }
-        else
-        {
-            Debug.Log($"Monetka {uniqueId} gotova k sboru");
         }
     }
 
@@ -37,14 +33,7 @@ public class Collectable : MonoBehaviour
     private bool IsAlreadyCollected()
     {
         string key = $"Coin_{levelName}_{uniqueId}";
-        bool collected = PlayerPrefs.GetInt(key, 0) == 1;
-
-        if (collected)
-        {
-            Debug.Log($"Monetka {uniqueId} uje sobrana (key: {key})");
-        }
-
-        return collected;
+        return PlayerPrefs.GetInt(key, 0) == 1;
     }
 
     private void Collect()
@@ -52,11 +41,10 @@ public class Collectable : MonoBehaviour
         if (isCollected) return;
 
         isCollected = true;
-        Debug.Log($"Sobiraem monetku: {uniqueId} na urovne: {levelName}");
-
         collectableSystem.CollectCoin(levelName, uniqueId);
         gameObject.SetActive(false);
     }
+
     public string GetCoinId()
     {
         return uniqueId;
@@ -65,7 +53,6 @@ public class Collectable : MonoBehaviour
     public static int CountAllCoinsOnLevel()
     {
         Collectable[] allCoins = FindObjectsOfType<Collectable>(true);
-        Debug.Log($"Vsego monetok na urovne: {allCoins.Length}");
         return allCoins.Length;
     }
 }
