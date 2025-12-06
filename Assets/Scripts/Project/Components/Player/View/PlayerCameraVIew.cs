@@ -68,11 +68,13 @@ public class PlayerCameraView : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (NewGameManager.Instance.GetCurrentState() == GameState.Playing && currentLookInput != Vector2.zero)
+        if (GameManager.Instance != null &&
+            GameManager.Instance.GetCurrentState() == GameManager.State.Playing &&
+            currentLookInput != Vector2.zero)
         {
             ApplyLookRotation(currentLookInput);
         }
-        
+
         HeadBob();
     }
 
