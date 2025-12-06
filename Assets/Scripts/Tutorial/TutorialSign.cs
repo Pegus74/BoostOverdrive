@@ -1,27 +1,21 @@
-using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
-using TMPro;
 
 public class TutorialSign : MonoBehaviour
 {
-    [Header("Настройки")]
     [SerializeField] private Transform player;
     [SerializeField] private float activationDistance = 3f;
     [SerializeField] private float rotationSpeed = 5f;
     [SerializeField] private TutorialType tutorialType = TutorialType.Standard;
 
-    [Header("Визуал")]
-    [SerializeField] private CanvasGroup canvasGroup;
-    [SerializeField] private TextMeshProUGUI titleText;
-    [SerializeField] private TextMeshProUGUI descriptionText;
-    [SerializeField] private GameObject arrowIndicator;
+    [SerializeField] private CanvasGroup visualsCanvasGroup;
+    [SerializeField] private CanvasGroup textCanvasGroup;
 
-    [Header("Collider Settings")]
+    [SerializeField] private bool textNoFadeOut = true;
+
     [SerializeField] private Collider triggerCollider;
     [SerializeField] private bool hideOnTouch = true;
 
-    [Header("Fade Out Settings")]
     [SerializeField] private bool enableFadeOut = false;
     [SerializeField] private float fadeOutStartDistance = 1.5f;
     [SerializeField] private float fadeOutEndDistance = 0.5f;
@@ -47,6 +41,12 @@ public class TutorialSign : MonoBehaviour
     {
         InitializeSign();
         SaveInitialState();
+
+        if (visualsCanvasGroup == null)
+        {
+            visualsCanvasGroup = GetComponent<CanvasGroup>();
+        }
+
         if (triggerCollider == null)
         {
             triggerCollider = GetComponent<Collider>();
@@ -57,6 +57,7 @@ public class TutorialSign : MonoBehaviour
                 triggerCollider = boxCollider;
             }
         }
+
         if (triggerCollider != null)
         {
             triggerCollider.isTrigger = true;
@@ -74,7 +75,7 @@ public class TutorialSign : MonoBehaviour
             if (!isHiddenByTouch)
             {
                 HandleActivation();
-                HandleFadeOut(); 
+                HandleFadeOut();
             }
         }
     }
@@ -136,6 +137,7 @@ public class TutorialSign : MonoBehaviour
         IsActive = false;
         StartActivationAnimation(false);
     }
+
     public void SetPlayer(Transform newPlayer)
     {
         player = newPlayer;
@@ -182,7 +184,7 @@ public class TutorialSign : MonoBehaviour
 
     private void HandleFadeOut()
     {
-        if (!enableFadeOut || !IsActive || canvasGroup == null) return;
+        if (!enableFadeOut || !IsActive) return;
 
         CurrentDistanceToPlayer = Vector3.Distance(transform.position, player.position);
 
@@ -200,11 +202,31 @@ public class TutorialSign : MonoBehaviour
                                    (fadeOutStartDistance - fadeOutEndDistance));
                 fadeProgress = Mathf.Clamp01(fadeProgress);
             }
-            canvasGroup.alpha = 1f - fadeProgress;
+
+            if (visualsCanvasGroup != null)
+            {
+                visualsCanvasGroup.alpha = 1f - fadeProgress;
+            }
+
+            if (textCanvasGroup != null && textNoFadeOut)
+            {
+                textCanvasGroup.alpha = 1f;
+            }
+            else if (textCanvasGroup != null)
+            {
+                textCanvasGroup.alpha = 1f - fadeProgress;
+            }
         }
         else
         {
-            canvasGroup.alpha = 1f;
+            if (visualsCanvasGroup != null)
+            {
+                visualsCanvasGroup.alpha = 1f;
+            }
+            if (textCanvasGroup != null)
+            {
+                textCanvasGroup.alpha = 1f;
+            }
         }
     }
 
@@ -220,7 +242,8 @@ public class TutorialSign : MonoBehaviour
     {
         float duration = 0.5f;
         float elapsed = 0f;
-        float startAlpha = canvasGroup != null ? canvasGroup.alpha : 0f;
+        float visualsStartAlpha = visualsCanvasGroup != null ? visualsCanvasGroup.alpha : 0f;
+        float textStartAlpha = textCanvasGroup != null ? textCanvasGroup.alpha : 0f;
         float targetAlpha = activate ? 1f : 0f;
 
         Vector3 startScale = transform.localScale;
@@ -232,29 +255,41 @@ public class TutorialSign : MonoBehaviour
             float t = elapsed / duration;
             float smoothT = Mathf.SmoothStep(0f, 1f, t);
 
-            if (canvasGroup != null)
-                canvasGroup.alpha = Mathf.Lerp(startAlpha, targetAlpha, smoothT);
+            if (visualsCanvasGroup != null)
+                visualsCanvasGroup.alpha = Mathf.Lerp(visualsStartAlpha, targetAlpha, smoothT);
+
+            if (textCanvasGroup != null)
+                textCanvasGroup.alpha = Mathf.Lerp(textStartAlpha, targetAlpha, smoothT);
+
             transform.localScale = Vector3.Lerp(startScale, targetScale, smoothT);
 
             yield return null;
         }
+
         SetSignActive(activate, false);
     }
 
     private void SetSignActive(bool active, bool immediate = false)
     {
-        if (canvasGroup != null)
+        if (visualsCanvasGroup != null)
         {
             if (immediate)
             {
-                canvasGroup.alpha = active ? 1f : 0f;
+                visualsCanvasGroup.alpha = active ? 1f : 0f;
             }
-            canvasGroup.interactable = active;
-            canvasGroup.blocksRaycasts = active;
+            visualsCanvasGroup.interactable = active;
+            visualsCanvasGroup.blocksRaycasts = active;
         }
 
-        if (arrowIndicator != null)
-            arrowIndicator.SetActive(active);
+        if (textCanvasGroup != null)
+        {
+            if (immediate)
+            {
+                textCanvasGroup.alpha = active ? 1f : 0f;
+            }
+            textCanvasGroup.interactable = active;
+            textCanvasGroup.blocksRaycasts = active;
+        }
     }
 
     private void TryFindPlayer()
@@ -265,7 +300,6 @@ public class TutorialSign : MonoBehaviour
         if (playerObj != null)
         {
             player = playerObj.transform;
-            Debug.Log($"Player found automatically for {gameObject.name}");
         }
     }
 
@@ -274,7 +308,6 @@ public class TutorialSign : MonoBehaviour
         Gizmos.color = IsActive ? Color.green : new Color(1f, 0.5f, 0f, 0.5f);
         Gizmos.DrawWireSphere(transform.position, activationDistance);
 
-       
         if (enableFadeOut)
         {
             Gizmos.color = new Color(1f, 0f, 0f, 0.3f);
