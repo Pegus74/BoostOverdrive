@@ -8,7 +8,7 @@ public class PlayerConfig : ScriptableObject
 
     [Header("Настройки Камеры")]
     public float mouseSensitivity = 2f;
-    public float maxLookAngle = 50f;
+    public float maxLookAngle = 60f;
     public float bobSpeed = 5f;
     public bool invertCamera = false;
     public bool lockCursor = true;
@@ -58,7 +58,6 @@ public class PlayerConfig : ScriptableObject
     public float coyoteTime = 0.15f;
     public float jumpBufferTime = 0.2f;
  
-   
 
 
 }
