@@ -20,6 +20,7 @@ public class SpeedModifierController : MonoBehaviour
     {
         if (playerStateModel != null)
         {
+            Debug.Log("new modifier: " + newModifier);
             playerStateModel.SetMovementSpeedModifier(newModifier);
         }
     }

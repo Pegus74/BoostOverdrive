@@ -5,18 +5,13 @@ public class SlamSystem : MonoBehaviour
 {
     [Header("Model & Settings")]
     public PlayerStateModel playerStateModel;
-  
     
-    private PlayerInputController playerInputController;
-    
-
     private Rigidbody _rb;
     private bool _isSlamAvailable = true;
     private Coroutine _currentSlamCoroutine;
 
     void Awake()
     {
-        playerInputController = FindObjectOfType<PlayerInputController>();
         _rb = GetComponent<Rigidbody>();
         if (_rb == null)
         {
@@ -71,20 +66,13 @@ public class SlamSystem : MonoBehaviour
 
         Vector3 slamDirection = Vector3.down; 
         float finalSlamPower = playerStateModel.CurrentSlamPower;
-        float slamDuration = playerStateModel.settings.slamDuration;
         
         _rb.linearVelocity = new Vector3(_rb.linearVelocity.x, 0f, _rb.linearVelocity.z);
         _rb.AddForce(slamDirection * finalSlamPower, ForceMode.Impulse);
         
-        float slamTimer = slamDuration;
         
-        while (slamTimer > 0 && playerStateModel.IsSlamming) 
+        while (playerStateModel.IsSlamming && !playerStateModel.IsGrounded) 
         {
-            slamTimer -= Time.deltaTime;
-            
-            float accelerationMagnitude = (finalSlamPower * 0.5f) * (slamTimer / slamDuration);
-            _rb.AddForce(slamDirection * accelerationMagnitude, ForceMode.Acceleration);
-            
             yield return null;
         }
         
@@ -143,7 +131,6 @@ public class SlamSystem : MonoBehaviour
             timer += Time.deltaTime;
             float t = timer / slowdownDuration;
             
-            // Плавно гасим скорость
             _rb.linearVelocity = Vector3.Lerp(initialVelocity, Vector3.zero, t * 0.9f); 
             
             yield return null;

@@ -13,7 +13,9 @@ public static class InputEvents
     
     public static UnityEvent DashAttemptEvent = new UnityEvent(); 
     public static UnityEvent SlamAttemptEvent = new UnityEvent();
+    
     public static UnityEvent SlideAttemptEvent = new UnityEvent();
+    public static UnityEvent SlideCanceledEvent = new UnityEvent();
     
     public static UnityEvent ToggleStyleAttemptEvent = new UnityEvent();
     

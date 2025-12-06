@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [CreateAssetMenu(fileName = "NewPlayerSettings", menuName = "GameData/Player Config Data")]
 public class PlayerConfig : ScriptableObject
@@ -28,14 +29,13 @@ public class PlayerConfig : ScriptableObject
     public float dashCooldown = 1.0f;
     
     [Header("Настройки CrawlSlide")]
-    public float slideBaseImpulse = 10f;
-    public float slideDuration = 1.5f;
+    public float slideDuration = 2f;
+    [FormerlySerializedAs("initialSpeedMultiplier")] public float SlideSpeedMultiplier = 1.2f;
+    public float FinalSlideSpeedMultiplier = 1f;
     public float squatHeightScale = 0.5f;
-    public float squatTransitionDuration = 0.3f;
-    public float slideCooldown = 0.5f;
+    public float squatTransitionDuration = 0.5f;
     
     [Header("Настройки Slam")]
-    public float slamDuration = 0.15f;
     public float slamCooldown = 1.0f;
     public float slamSlowdownDuration = 0.5f;
     public float destructibleWallReboundMultiplier = 100.0f;

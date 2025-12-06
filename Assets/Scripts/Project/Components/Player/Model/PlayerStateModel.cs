@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PlayerStateModel : MonoBehaviour
@@ -25,6 +26,22 @@ public class PlayerStateModel : MonoBehaviour
     private float _jumpBufferCounter;
 
     private Component _lastWallJumpedFrom;
+
+    private Rigidbody _rb;
+    
+    private void Start()
+    {
+        if (settings != null)
+        {
+            ApplyStyleToModel(0);
+        }
+    }
+
+    private void Awake()
+    {
+        _rb = GetComponent<Rigidbody>();
+    }
+
 
     public float CurrentWalkSpeed => _walkSpeed * _movementSpeedModifier;
     public float CurrentJumpPower => _jumpPower;
@@ -74,13 +91,14 @@ public class PlayerStateModel : MonoBehaviour
     public void BufferJump() => _jumpBufferCounter = settings.jumpBufferTime;
     public void ResetJumpBuffer() => _jumpBufferCounter = 0f;
     public void ResetCoyoteTime() => _coyoteCounter = 0f;
-
-    private void Start()
+    
+    public Vector3 GetForwardVector() => transform.forward;
+    
+    public Vector3 GetCurrentHorizontalVelocity()
     {
-        if (settings != null)
-        {
-            ApplyStyleToModel(0);
-        }
+        Vector3 vel = _rb.linearVelocity;
+        vel.y = 0;
+        return vel;
     }
 
     public void ApplyStyleToModel(int index)

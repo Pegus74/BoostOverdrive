@@ -5,271 +5,193 @@ using System.Collections;
 public class CrawlSlideSystem : MonoBehaviour
 {
     [Header("Model & Settings")]
-    public PlayerStateModel playerStateModel; 
-   
-    
-    public Transform visualModelTransform; 
+    public PlayerStateModel playerStateModel;
+
+    public PlayerConfig pc;
     public Camera playerCamera; 
     
-    private PlayerInputController playerInputController;
-    
-    
-    private Rigidbody _rb;
-    private CapsuleCollider _capsuleCollider;
+    public Rigidbody _rb;
     private bool _isSlideAvailable = true;
     private Coroutine _currentSlideCoroutine;
     
-    private float _originalColliderHeight;
-    private float _originalColliderCenterY;
-    private Vector3 _originalModelScale;
-    private float _originalCameraLocalY;
-    private float _originalVisualModelLocalY; 
+    public Transform cap;
+    private Vector3 capsuleDefaultPos;
+    private Vector3 capsuleDefaultScale;
+    private Vector3 originalScale;
     
-    private float _rootPositionAdjustmentY = 0f; 
+    private float _rootPositionAdjustmentY = 0f;
 
+    private float timer = 0;
+    
     void Awake()
     {
-        playerInputController = FindObjectOfType<PlayerInputController>();
         _rb = GetComponent<Rigidbody>();
-        _capsuleCollider = GetComponent<CapsuleCollider>();
-
-        if (_rb == null || _capsuleCollider == null)
-        {
-            enabled = false;
-        }
+        originalScale = transform.localScale;
         
-        // Сохранение исходных параметров
-        if (_capsuleCollider != null)
-        {
-            _originalColliderHeight = _capsuleCollider.height;
-            _originalColliderCenterY = _capsuleCollider.center.y;
-        }
-        if (visualModelTransform != null)
-        {
-            _originalModelScale = visualModelTransform.localScale;
-            _originalVisualModelLocalY = visualModelTransform.localPosition.y; 
-        }
-        if (playerCamera != null)
-        {
-            _originalCameraLocalY = playerCamera.transform.localPosition.y;
-        }
-
+        capsuleDefaultPos = cap.localPosition;
+        capsuleDefaultScale = cap.localScale;
+        
         playerStateModel.SetIsSliding(false);
     }
 
     void OnEnable()
     { 
         InputEvents.SlideAttemptEvent.AddListener(InitiateCrawlSlide);
+        InputEvents.SlideCanceledEvent.AddListener(StopCrawlSlide);
     }
 
     void OnDisable()
     { 
-        InputEvents.SlideAttemptEvent.AddListener(InitiateCrawlSlide);
-        
-        if (_currentSlideCoroutine != null)
-        {
-            StopCoroutine(_currentSlideCoroutine);
-            ResetPlayerToOriginalState(); 
-            playerStateModel.SetIsSliding(false); 
-            _isSlideAvailable = true;
-        }
+        InputEvents.SlideAttemptEvent.RemoveListener(InitiateCrawlSlide);
+        InputEvents.SlideCanceledEvent.RemoveListener(StopCrawlSlide);
     }
 
     private void InitiateCrawlSlide()
     {
-        if (!_isSlideAvailable || playerStateModel.IsSliding || !playerStateModel.IsGrounded)
+        if (!playerStateModel.IsSliding && !playerStateModel.IsDashing)
         {
-            return;
+            if (_currentSlideCoroutine != null) StopCoroutine(_currentSlideCoroutine);
+            _currentSlideCoroutine = StartCoroutine(CrawlSlideCoroutine());
         }
-        
-        _currentSlideCoroutine = StartCoroutine(CrawlSlideCoroutine());
+    }
+
+    private void StopCrawlSlide()
+    {
+        if (playerStateModel.IsSliding)
+        {
+            if (_currentSlideCoroutine != null) StopCoroutine(_currentSlideCoroutine);
+            _currentSlideCoroutine = StartCoroutine(StopCrawlSlideCoroutine());
+        }
     }
     
-
+    
     private IEnumerator CrawlSlideCoroutine()
     {
-        _isSlideAvailable = false;
-        playerStateModel.SetIsSliding(true); 
-        AbilityEvents.OnAbilityStarted.Invoke();
+        playerStateModel.SetIsSliding(true);
 
+        Vector3 originalScale = cap.localScale;
+        Vector3 targetScale = originalScale;
+        targetScale.y *= pc.squatHeightScale;
 
-        int styleIndex = playerStateModel.CurrentStyleIndex;
-        float transitionDuration = playerStateModel.settings.squatTransitionDuration;
+        Vector3 originalPos = cap.localPosition;
+        Vector3 targetPos = originalPos;
+
+        float delta = originalScale.y - targetScale.y;
+
+        int currentStyleIndex = playerStateModel.CurrentStyleIndex;
         
-        float targetScaleY = playerStateModel.settings.squatHeightScale;
-        float targetHeight = _originalColliderHeight * targetScaleY;
-        
-        float verticalShiftMagnitude = (_originalColliderHeight - targetHeight) / 2f; 
-        float shiftDirection = 0f;
-        
-        if (styleIndex == 0) 
+        if (currentStyleIndex == 1)
         {
-            shiftDirection = -1f;
-            _rootPositionAdjustmentY = 0f; 
-            Debug.Log("[CrawlSlide] Squatting to the Bottom (Legs Style)");
+            targetPos.y = originalPos.y - delta * 0.5f;
         }
-        else 
+        else
         {
-            shiftDirection = 1f;
-            _rootPositionAdjustmentY = -verticalShiftMagnitude; 
-            Debug.Log("[CrawlSlide] Squatting to the Top (Hands Style) with Root Adjustment");
+            targetPos.y = originalPos.y + delta * 0.5f;
         }
+        
+        if (currentStyleIndex == 0 && playerStateModel.IsGrounded)
+            _rb.useGravity = false;
+        
 
-        float verticalShift = verticalShiftMagnitude * shiftDirection;
-        
-        float targetCenterY = _originalColliderCenterY + verticalShift; 
-        
-        float targetVisualModelLocalY = _originalVisualModelLocalY + verticalShift; 
-        
-        if (styleIndex != 0)
+        targetPos.y = Mathf.Max(targetPos.y, capsuleDefaultPos.y);
+
+        float t = 0f;
+
+        while (t < pc.squatTransitionDuration)
         {
-            targetVisualModelLocalY += verticalShiftMagnitude; 
-        }
+            t += Time.deltaTime;
+            float progress = t / pc.squatTransitionDuration;
 
-        float targetCameraY = _originalCameraLocalY + verticalShift; 
-        
-        Vector3 initialRootPosition = transform.position;
-        float targetRootY = initialRootPosition.y + _rootPositionAdjustmentY;
-        
-        // 1. ФАЗА СЖАТИЯ (SQUAT DOWN)
-        _rb.isKinematic = true; 
-        
-        float timer = 0f;
-        while (timer < transitionDuration)
-        {
-            timer += Time.deltaTime;
-            float t = timer / transitionDuration;
-            
-            UpdateTransformAndCollider(t, targetScaleY, targetHeight, targetCenterY, targetVisualModelLocalY, targetCameraY, targetRootY, initialRootPosition.y);
-
-            yield return null; 
-        }
-
-        UpdateTransformAndCollider(1f, targetScaleY, targetHeight, targetCenterY, targetVisualModelLocalY, targetCameraY, targetRootY, initialRootPosition.y);
-        
-        // 2. ФАЗА СКОЛЬЖЕНИЯ (SLIDE)
-        
-        _rb.isKinematic = false;
-        
-        Vector3 slideDirection = transform.forward;
-        slideDirection.y = 0f; 
-        slideDirection.Normalize();
-        _rb.AddForce(slideDirection * playerStateModel.settings.slideBaseImpulse, ForceMode.Impulse);
-        
-        yield return new WaitForSeconds(playerStateModel.settings.slideDuration); 
-        
-        // 3. ФАЗА ВОССТАНОВЛЕНИЯ (UNSQUAT UP)
-        
-        playerStateModel.SetIsSliding(false);
-        _rb.isKinematic = true; 
-        
-        // Целевые значения - исходные
-        targetScaleY = _originalModelScale.y;
-        targetHeight = _originalColliderHeight;
-        targetCenterY = _originalColliderCenterY;
-        targetVisualModelLocalY = _originalVisualModelLocalY;
-        targetCameraY = _originalCameraLocalY;
-        targetRootY = initialRootPosition.y; 
-        
-        // Сохраняем начальные значения для восстановления
-        float startRestoreHeight = _capsuleCollider.height;
-        float startRestoreCenterY = _capsuleCollider.center.y;
-        float startRestoreScaleY = visualModelTransform.localScale.y;
-        float startRestoreVisualModelY = visualModelTransform.localPosition.y;
-        float startRestoreCameraY = playerCamera.transform.localPosition.y;
-        float startRestoreRootY = transform.position.y; 
-
-        timer = 0f;
-        while (timer < transitionDuration)
-        {
-            timer += Time.deltaTime;
-            float t = timer / transitionDuration;
-            
-            UpdateTransformAndCollider(t, targetScaleY, targetHeight, targetCenterY, targetVisualModelLocalY, targetCameraY, targetRootY, startRestoreRootY,
-                startRestoreScaleY, startRestoreHeight, startRestoreCenterY, startRestoreVisualModelY, startRestoreCameraY);
+            cap.localScale = Vector3.Lerp(originalScale, targetScale, progress);
+            cap.localPosition = Vector3.Lerp(originalPos, targetPos, progress);
 
             yield return null;
         }
-        
-        ResetPlayerToOriginalState(targetRootY); 
-        
-        yield return null; 
 
-        _rb.isKinematic = false;
-        _rootPositionAdjustmentY = 0f; 
-        
-        
-        // 4. ФАЗА ПЕРЕЗАРЯДКИ (COOLDOWN)
-        yield return new WaitForSeconds(playerStateModel.settings.slideCooldown);
+        cap.localScale = targetScale;
+        cap.localPosition = targetPos;
 
-        _isSlideAvailable = true;
-        Debug.Log("[Slide] CrawlSlide is now available.");
-        _currentSlideCoroutine = null;
-    }
-    
+        if (currentStyleIndex == 0)
+        {
+            _rb.useGravity = true;
+        }
 
-    private void UpdateTransformAndCollider(float t, float targetScaleY, float targetHeight, float targetCenterY, 
-        float targetVisualModelLocalY, float targetCameraY, float targetRootY, float startRootY,
-        float startScaleY = -1f, float startHeight = -1f, float startCenterY = -1f, 
-        float startVisualModelLocalY = -1f, float startCameraY = -1f)
-    {
-        if (startScaleY == -1f) startScaleY = _originalModelScale.y;
-        if (startHeight == -1f) startHeight = _originalColliderHeight;
-        if (startCenterY == -1f) startCenterY = _originalColliderCenterY;
-        if (startVisualModelLocalY == -1f) startVisualModelLocalY = _originalVisualModelLocalY; 
-        if (startCameraY == -1f) startCameraY = _originalCameraLocalY;
-        
-        if (_rootPositionAdjustmentY != 0f) 
+        float initialSpeed = playerStateModel.CurrentWalkSpeed * playerStateModel.MovementSpeedModifier;
+        Vector3 slideDirection = playerStateModel.GetForwardVector();
+        slideDirection.y = 0;
+        slideDirection.Normalize();
+
+        Vector3 currentHorizontalVelocity = playerStateModel.GetCurrentHorizontalVelocity();
+        float requiredForce = initialSpeed - currentHorizontalVelocity.magnitude;
+
+        if (requiredForce > 0)
         {
-            float currentRootY = Mathf.Lerp(startRootY, targetRootY, t);
-            transform.position = new Vector3(transform.position.x, currentRootY, transform.position.z);
+            PlayerEvents.OnPlayerSpeedModifierChange.Invoke(pc.SlideSpeedMultiplier);
+            _rb.AddForce(slideDirection * requiredForce, ForceMode.VelocityChange);
         }
+
         
-        if (_capsuleCollider != null)
+        timer = 0f;
+        while (playerStateModel.IsSliding)
         {
-            _capsuleCollider.height = Mathf.Lerp(startHeight, targetHeight, t);
-            _capsuleCollider.center = new Vector3(_capsuleCollider.center.x, Mathf.Lerp(startCenterY, targetCenterY, t), _capsuleCollider.center.z);
-        }
-        
-        if (visualModelTransform != null)
-        {
-            float currentYScale = Mathf.Lerp(startScaleY, targetScaleY, t);
-            visualModelTransform.localScale = new Vector3(_originalModelScale.x, currentYScale, _originalModelScale.z);
-            
-            float currentYPos = Mathf.Lerp(startVisualModelLocalY, targetVisualModelLocalY, t);
-            visualModelTransform.localPosition = new Vector3(visualModelTransform.localPosition.x, currentYPos, visualModelTransform.localPosition.z);
-        }
-        
-        if (playerCamera != null)
-        {
-            float currentCameraY = Mathf.Lerp(startCameraY, targetCameraY, t);
-            Vector3 localPos = playerCamera.transform.localPosition;
-            playerCamera.transform.localPosition = new Vector3(localPos.x, currentCameraY, localPos.z);
+            timer += Time.deltaTime;
+
+            float currentSpeedLerp = Mathf.Lerp(pc.SlideSpeedMultiplier, 1.0f, timer / (pc.slideDuration));
+
+            if (timer < pc.slideDuration)
+            {
+                PlayerEvents.OnPlayerSpeedModifierChange.Invoke(currentSpeedLerp);
+            }
+            else
+            {
+                PlayerEvents.OnPlayerSpeedModifierChange.Invoke(pc.FinalSlideSpeedMultiplier);
+            }
+
+            yield return null;
         }
     }
     
-
-    private void ResetPlayerToOriginalState(float finalRootY = -1f)
+    private IEnumerator StopCrawlSlideCoroutine()
     {
-        if (finalRootY != -1f && _rootPositionAdjustmentY != 0f) 
+        playerStateModel.SetIsSliding(false);
+        Vector3 currentScale = cap.localScale;
+
+        Vector3 targetScale = originalScale;
+        Vector3 targetPos = capsuleDefaultPos;
+
+        float delta = originalScale.y - currentScale.y;
+
+        int currentStyleIndex = playerStateModel.CurrentStyleIndex;
+        
+
+        if (currentStyleIndex == 1)
         {
-            transform.position = new Vector3(transform.position.x, finalRootY, transform.position.z);
+            targetPos.y = capsuleDefaultPos.y + delta * 0.5f;
+        }
+        else
+        {
+            targetPos.y = capsuleDefaultPos.y - delta * 0.5f;
         }
         
-        if (_capsuleCollider != null)
+
+        targetPos.y = Mathf.Max(targetPos.y, capsuleDefaultPos.y);
+
+        float t = 0f;
+
+        while (t < pc.squatTransitionDuration)
         {
-            _capsuleCollider.height = _originalColliderHeight;
-            _capsuleCollider.center = new Vector3(_capsuleCollider.center.x, _originalColliderCenterY, _capsuleCollider.center.z); 
+            t += Time.deltaTime;
+            float progress = t / pc.squatTransitionDuration;
+
+            cap.localScale = Vector3.Lerp(currentScale, targetScale, progress);
+
+            yield return null;
         }
-        if (visualModelTransform != null)
-        {
-            visualModelTransform.localScale = _originalModelScale;
-            visualModelTransform.localPosition = new Vector3(visualModelTransform.localPosition.x, _originalVisualModelLocalY, visualModelTransform.localPosition.z);
-        }
-        if (playerCamera != null)
-        {
-            Vector3 localPos = playerCamera.transform.localPosition;
-            playerCamera.transform.localPosition = new Vector3(localPos.x, _originalCameraLocalY, localPos.z);
-        }
+
+        cap.localScale = capsuleDefaultScale;
+
+        PlayerEvents.OnPlayerSpeedModifierChange.Invoke(1.0f);
     }
+    
+    
 }

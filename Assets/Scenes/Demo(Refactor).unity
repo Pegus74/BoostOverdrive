@@ -4356,8 +4356,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerStateModel: {fileID: 8571536540697160807}
-  visualModelTransform: {fileID: 1135952862549686186}
+  pc: {fileID: 11400000, guid: 0eb58b9a6e13822438ae970453e77cc6, type: 2}
   playerCamera: {fileID: 4164208336333350519}
+  _rb: {fileID: 7479458730913387505}
+  cap: {fileID: 1135952862549686186}
 --- !u!1 &1039753630
 GameObject:
   m_ObjectHideFlags: 0
@@ -10007,7 +10009,7 @@ MonoBehaviour:
   playerSettingsData: {fileID: 11400000, guid: 0eb58b9a6e13822438ae970453e77cc6, type: 2}
   playerCamera: {fileID: 4164208336333350519}
   joint: {fileID: 6955201677007353701}
-  bobAmount: {x: 0, y: 0.05, z: 0}
+  bobAmount: {x: 0, y: 0.1, z: 0}
 --- !u!114 &1573506294349146447
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10601,7 +10603,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 90
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
