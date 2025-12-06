@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BoostTile : MonoBehaviour
+public class OldBoostTile : MonoBehaviour
 {
     public float accelMultiplier = 1.3f;  
-    public float lingerTimeWalk = 0.5f;   // Время длительности буста после ходьбы 
-    public float lingerTimeJump = 0.2f;   // Время длительности буста после прыжка 
+    public float lingerTimeWalk = 0.5f;   // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 
+    public float lingerTimeJump = 0.2f;   // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))

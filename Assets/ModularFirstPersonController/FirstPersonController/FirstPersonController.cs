@@ -795,6 +795,7 @@ public class FirstPersonController : MonoBehaviour
     
     private void OnCollisionEnter(Collision collision)
     {
+
         if (isDashing && styleManager != null && styleManager.CurrentStyle.canBreakWallsWithDash)
         {
             DestructibleWall wall = collision.gameObject.GetComponent<DestructibleWall>();
@@ -809,6 +810,7 @@ public class FirstPersonController : MonoBehaviour
         if (isSlamming && styleManager != null && styleManager.CurrentStyle.canBreakWallsWithSlam && !slamImpactOccurred)
         {
             DestructibleWall wall = collision.gameObject.GetComponent<DestructibleWall>();
+            Debug.Log("AAFAFFA");
             if (wall != null)
             {
                 slamImpactOccurred = true;

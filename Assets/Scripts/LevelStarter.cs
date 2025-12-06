@@ -2,38 +2,38 @@ using UnityEngine;
 
 public class LevelStarter : MonoBehaviour
 {
-    [Header("References (автопоиск если не назначено)")]
+    [Header("References (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)")]
     public TimerManager timerManager;
     public EnergyBar energyBar;
     public Canvas timerCanvas;
 
-    [Header("Настройки поиска")]
+    [Header("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")]
     public string timerCanvasName = "Timer";
     public bool searchInChildren = true;
 
     void Awake()
     {
-        // Поиск TimerManager
+        // пїЅпїЅпїЅпїЅпїЅ TimerManager
         if (timerManager == null)
         {
             timerManager = FindObjectOfType<TimerManager>();
             if (timerManager == null)
             {
-                Debug.LogWarning("LevelStarter: TimerManager не найден на сцене!");
+                Debug.LogWarning("LevelStarter: TimerManager пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ!");
             }
         }
 
-        // Поиск EnergyBar
+        // пїЅпїЅпїЅпїЅпїЅ EnergyBar
         if (energyBar == null)
         {
             energyBar = FindObjectOfType<EnergyBar>();
             if (energyBar == null)
             {
-                Debug.LogWarning("LevelStarter: EnergyBar не найден на сцене!");
+                Debug.LogWarning("LevelStarter: EnergyBar пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ!");
             }
         }
 
-        // Поиск Timer Canvas
+        // пїЅпїЅпїЅпїЅпїЅ Timer Canvas
         if (timerCanvas == null)
         {
             GameObject timerObj = GameObject.Find(timerCanvasName);
@@ -48,25 +48,25 @@ public class LevelStarter : MonoBehaviour
 
             if (timerCanvas == null)
             {
-                Debug.LogWarning($"LevelStarter: Canvas с именем '{timerCanvasName}' не найден!");
+                Debug.LogWarning($"LevelStarter: Canvas пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ '{timerCanvasName}' пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ!");
             }
         }
     }
 
     void Start()
     {
-        // Проверяем GameManager
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ GameManager
         if (GameManager.Instance == null)
         {
-            Debug.LogError("LevelStarter: GameManager.Instance не найден!");
+            Debug.LogError("LevelStarter: GameManager.Instance пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ!");
             return;
         }
 
-        // Устанавливаем состояние игры
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
         GameManager.Instance.currentState = GameManager.State.Playing;
         GameManager.Instance.UpdateGameState();
 
-        // Настраиваем режим игры
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
         if (GameManager.Instance.GetCurrentGameMode() == GameManager.GameMode.Classic)
         {
             SetupClassicMode();
@@ -79,7 +79,7 @@ public class LevelStarter : MonoBehaviour
 
     private void SetupClassicMode()
     {
-        Debug.Log("LevelStarter: Настройка Classic режима");
+        Debug.Log("LevelStarter: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ Classic пїЅпїЅпїЅпїЅпїЅпїЅ");
 
         // Timer
         if (timerManager != null)
@@ -90,7 +90,7 @@ public class LevelStarter : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Classic режим: TimerManager не найден!");
+            Debug.LogWarning("Classic пїЅпїЅпїЅпїЅпїЅ: TimerManager пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ!");
         }
 
         // Timer Canvas
@@ -100,7 +100,7 @@ public class LevelStarter : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Classic режим: Timer Canvas не найден!");
+            Debug.LogWarning("Classic пїЅпїЅпїЅпїЅпїЅ: Timer Canvas пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ!");
         }
 
         // Energy Bar
@@ -113,7 +113,7 @@ public class LevelStarter : MonoBehaviour
 
     private void SetupHardMode()
     {
-        Debug.Log("LevelStarter: Настройка Hard режима");
+        Debug.Log("LevelStarter: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ Hard пїЅпїЅпїЅпїЅпїЅпїЅ");
 
         // Energy Bar
         if (energyBar != null)
@@ -123,23 +123,25 @@ public class LevelStarter : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Hard режим: EnergyBar не найден!");
+            Debug.LogWarning("Hard пїЅпїЅпїЅпїЅпїЅ: EnergyBar пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ!");
         }
 
         // Timer Canvas
         if (timerCanvas != null)
         {
             timerCanvas.enabled = false;
+            Debug.Log("A123");
         }
 
         // Timer Manager
         if (timerManager != null)
         {
             timerManager.enabled = false;
+            Debug.Log("B123");
         }
     }
 
-    // Метод для ручного поиска компонентов (можно вызвать из инспектора)
+    // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
     public void FindComponentsManually()
     {
         timerManager = FindObjectOfType<TimerManager>();
@@ -151,8 +153,8 @@ public class LevelStarter : MonoBehaviour
             timerCanvas = timerObj.GetComponent<Canvas>();
         }
 
-        Debug.Log($"LevelStarter: TimerManager найден: {timerManager != null}");
-        Debug.Log($"LevelStarter: EnergyBar найден: {energyBar != null}");
-        Debug.Log($"LevelStarter: TimerCanvas найден: {timerCanvas != null}");
+        Debug.Log($"LevelStarter: TimerManager пїЅпїЅпїЅпїЅпїЅпїЅ: {timerManager != null}");
+        Debug.Log($"LevelStarter: EnergyBar пїЅпїЅпїЅпїЅпїЅпїЅ: {energyBar != null}");
+        Debug.Log($"LevelStarter: TimerCanvas пїЅпїЅпїЅпїЅпїЅпїЅ: {timerCanvas != null}");
     }
 }

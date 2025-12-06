@@ -36,7 +36,7 @@ public class GameManager : MonoBehaviour
         Hard
     }
     
-    private GameMode currentGameMode = GameMode.Classic;
+    [SerializeField] private GameMode currentGameMode = GameMode.Classic;
 
     private void Awake()
     {
