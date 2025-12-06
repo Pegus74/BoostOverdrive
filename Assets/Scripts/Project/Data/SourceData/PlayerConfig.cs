@@ -19,7 +19,7 @@ public class PlayerConfig : ScriptableObject
     
     [Header("Настройки Движения")]
     public float maxVelocityChange = 10f;
-    public float acceleration = 20f;
+    public float acceleration = 50f;
     public bool playerCanMove = true;
     public bool enableJump = true;
     public bool enableAirJump = false;
@@ -38,7 +38,7 @@ public class PlayerConfig : ScriptableObject
     [Header("Настройки Slam")]
     public float slamCooldown = 1.0f;
     public float slamSlowdownDuration = 0.5f;
-    public float destructibleWallReboundMultiplier = 100.0f;
+    public float destructibleWallReboundMultiplier = 10.0f;
     
     [Header("Настройки Взаимодействия со Стенами")]
     public float raycastCheckDistance = 1.0f;

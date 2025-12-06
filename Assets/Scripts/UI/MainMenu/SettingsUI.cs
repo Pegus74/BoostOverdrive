@@ -8,11 +8,19 @@ public class SettingsUI : MonoBehaviour
     [Header("UI")]
     [SerializeField] private Toggle fullscreenToggle;
     [SerializeField] private TMP_Dropdown resolutionDropdown;
+    [SerializeField] private Button changeModeButton;
 
     private Resolution[] resolutions;
+    
 
     private void Start()
     {
+        Debug.Log("Menu Start");
+        changeModeButton.onClick.AddListener(() =>
+        {
+            NewGameManager.Instance.ChangeGameMode();
+        });
+        
         resolutions = Screen.resolutions;
         resolutionDropdown.ClearOptions();
         var options = new List<string>();
@@ -47,4 +55,6 @@ public class SettingsUI : MonoBehaviour
         Screen.SetResolution(res.width, res.height, Screen.fullScreen);
         PlayerPrefs.SetString("Resolution", res.width + "x" + res.height);
     }
+    
+    
 }

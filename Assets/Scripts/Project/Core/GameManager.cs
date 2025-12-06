@@ -12,6 +12,7 @@ public class NewGameManager : MonoBehaviour
     
     private void Awake()
     {
+        Debug.Log("GM Awake");
         if (Instance == null)
         {
             Instance = this;
@@ -24,7 +25,6 @@ public class NewGameManager : MonoBehaviour
             SceneManager.sceneLoaded -= OnSceneLoaded;
             Destroy(gameObject);
         }
-        
     }
 
     private void OnDestroy()
@@ -47,7 +47,11 @@ public class NewGameManager : MonoBehaviour
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         currentLevelName = scene.name;
-        currentState = GameState.Playing;
+        Time.timeScale = 1f;
+        if (currentLevelName == "MainMenuRefactor")
+            currentState = GameState.Menu;
+        else
+            currentState = GameState.Playing;
         UpdateGameState();
     }
     
@@ -65,6 +69,7 @@ public class NewGameManager : MonoBehaviour
     public void PlayerWin()
     {
         currentState = GameState.GameWon;
+        TimerController.Instance.StopTimer();
         UpdateGameState();
     }
 
@@ -99,7 +104,8 @@ public class NewGameManager : MonoBehaviour
 
     public void BackToMenu()
     {
-        Time.timeScale = 1f; 
+        Time.timeScale = 1f;
+        currentState = GameState.Menu;
         
         SceneManager.LoadScene("MainMenuRefactor");
     }
@@ -109,7 +115,6 @@ public class NewGameManager : MonoBehaviour
         bool isClassic = (currentMode == GameMode.Classic);
         currentMode = isClassic ? GameMode.Hard : GameMode.Classic;
         Debug.Log("[GameManager] GameMode Changed to: " + currentMode);
-        RestartLevel();
     }
 
     public GameState GetCurrentState() => currentState;
@@ -119,4 +124,5 @@ public class NewGameManager : MonoBehaviour
     public string GetCurrentLevelName() => currentLevelName;
     
     #endregion
+    
 }
