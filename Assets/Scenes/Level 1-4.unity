@@ -285,6 +285,18 @@ PrefabInstance:
       propertyPath: energyBar
       value: 
       objectReference: {fileID: 1623683832}
+    - target: {fileID: 4459864850019384740, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
+      propertyPath: enableDash
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4459864850019384740, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
+      propertyPath: enableSlam
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4459864850019384740, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
+      propertyPath: enableCrawlSlide
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4459864850019384750, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
       propertyPath: m_Name
       value: FirstPersonController (2)
@@ -7632,6 +7644,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41cde69dac7d482a9b4f3e54c4b8d4b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  timerManager: {fileID: 0}
+  energyBar: {fileID: 0}
+  timerCanvas: {fileID: 0}
+  timerCanvasName: Timer
+  searchInChildren: 1
 --- !u!4 &1095400022
 Transform:
   m_ObjectHideFlags: 0

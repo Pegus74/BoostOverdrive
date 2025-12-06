@@ -2381,6 +2381,22 @@ PrefabInstance:
       propertyPath: energyBar
       value: 
       objectReference: {fileID: 1301571974}
+    - target: {fileID: 4459864850019384740, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
+      propertyPath: enableDash
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4459864850019384740, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
+      propertyPath: enableSlam
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4459864850019384740, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
+      propertyPath: enableCrawlSlide
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4459864850019384740, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
+      propertyPath: enableChargedJump
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4459864850019384750, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
       propertyPath: m_Name
       value: FirstPersonController (2)
@@ -8859,6 +8875,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41cde69dac7d482a9b4f3e54c4b8d4b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  timerManager: {fileID: 0}
+  energyBar: {fileID: 0}
+  timerCanvas: {fileID: 0}
+  timerCanvasName: Timer
+  searchInChildren: 1
 --- !u!4 &1170733917
 Transform:
   m_ObjectHideFlags: 0
@@ -8896,12 +8917,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b5432d9b73d9e548ae3755804bf41d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  activationDistance: 1
-  playerLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  raycastCheckDistance: 1
-  mm: {fileID: 11400000, guid: 3d5d607f94ab2b68da80c8bc30880b61, type: 2}
 --- !u!1 &1250457935
 GameObject:
   m_ObjectHideFlags: 0
