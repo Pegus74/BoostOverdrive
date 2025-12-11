@@ -69,7 +69,8 @@ public class NewGameManager : MonoBehaviour
     public void PlayerWin()
     {
         currentState = GameState.GameWon;
-        TimerController.Instance.StopTimer();
+        if  (currentMode == GameMode.Classic)
+            TimerController.Instance.StopTimer();
         UpdateGameState();
     }
 
