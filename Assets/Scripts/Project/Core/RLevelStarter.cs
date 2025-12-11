@@ -11,17 +11,16 @@ public class RLevelStarter : MonoBehaviour
     void Start()
     {
         string levelName = NewGameManager.Instance.GetCurrentLevelName();
+        Debug.Log(levelName);
         
         if (levelName == "MainMenuRefactor")
         {
             GameEvents.OnMenuMusicStart.Invoke();
             return;
         }
-
         GameEvents.OnGameMusicStart.Invoke();
         
         TimerController.Instance.InitForLevel(levelName);
-        
         if (NewGameManager.Instance.GetCurrentGameMode() == GameMode.Classic)
         {
             GameEvents.OnClassicModeStart.Invoke();

@@ -14,14 +14,12 @@ public class TimerController : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-    }
-
-    private void Start()
-    {
+        
         startCalled = true;
         
         if (pendingLevelName != null)
         {
+            Debug.Log("Start");
             InitForLevel_Internal(pendingLevelName);
             pendingLevelName = null;
         }
@@ -29,6 +27,7 @@ public class TimerController : MonoBehaviour
 
     public void InitForLevel(string levelName)
     {
+        Debug.Log("InitForLevelExternal");
         if (!startCalled)
         {
             pendingLevelName = levelName;
@@ -40,10 +39,12 @@ public class TimerController : MonoBehaviour
 
     private void InitForLevel_Internal(string levelName)
     {
+        Debug.Log("InitForLevel_Internal");
         model = new TimerModel(levelName);
 
         if (view == null)
         {
+            Debug.LogError("View is null");
             return;
         }
         
@@ -68,6 +69,7 @@ public class TimerController : MonoBehaviour
 
         model.ResetTime();
         isRunning = true;
+        Debug.Log("Starting timer");
     }
 
     public void StopTimer()
@@ -78,6 +80,7 @@ public class TimerController : MonoBehaviour
         isRunning = false;
         model.TrySaveBest();
         view.UpdateBest(model.BestTime);
+        Debug.Log("Stopping timer");
     }
     
     public void StopTimerWithoutSave()
