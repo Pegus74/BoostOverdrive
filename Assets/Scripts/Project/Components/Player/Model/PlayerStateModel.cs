@@ -55,7 +55,7 @@ public class PlayerStateModel : MonoBehaviour
     public bool IsSliding => _isSliding;
     public bool IsSlamming => _isSlamming;
     public bool IsChargingJump => _isChargingJump;
-
+    
     public Vector3 GroundNormal => _groundNormal;
     public float CoyoteCounter => _coyoteCounter;
     public float JumpBufferCounter => _jumpBufferCounter;

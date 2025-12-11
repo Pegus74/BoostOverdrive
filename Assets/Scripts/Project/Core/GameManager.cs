@@ -8,11 +8,13 @@ public class NewGameManager : MonoBehaviour
     [SerializeField] private GameState currentState = GameState.Playing;
     [SerializeField] private GameMode currentMode = GameMode.Classic;
     
+    [SerializeField] private int maxGlobalCoins = 10;
+    
     private string currentLevelName;
+    private int nextLevel;
     
     private void Awake()
     {
-        Debug.Log("GM Awake");
         if (Instance == null)
         {
             Instance = this;
@@ -68,8 +70,13 @@ public class NewGameManager : MonoBehaviour
     
     public void PlayerWin()
     {
+        nextLevel = SceneManager.GetActiveScene().buildIndex + 1;
+        PlayerPrefs.SetInt("ContinueLevel", nextLevel);
+        PlayerPrefs.Save();
+        
         currentState = GameState.GameWon;
-        TimerController.Instance.StopTimer();
+        if  (currentMode == GameMode.Classic)
+            TimerController.Instance.StopTimer();
         UpdateGameState();
     }
 
@@ -85,6 +92,12 @@ public class NewGameManager : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
+    public void LoadNextLevel()
+    {
+        Debug.Log("Prefs");
+        SceneManager.LoadScene(nextLevel);
+    }
+    
     public void TogglePause()
     {
         if (currentState != GameState.Playing && currentState != GameState.Paused && currentState != GameState.GameWon)

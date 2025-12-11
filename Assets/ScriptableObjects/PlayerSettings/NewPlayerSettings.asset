@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: NewPlayerSettings
   m_EditorClassIdentifier: 
   styleDataAssets:
-  - {fileID: 11400000, guid: 87eb25c8cc0aa7db8a8d6c5e0f46ffa3, type: 2}
   - {fileID: 11400000, guid: b533809eb98bac9f3813aa72f903394a, type: 2}
+  - {fileID: 11400000, guid: 87eb25c8cc0aa7db8a8d6c5e0f46ffa3, type: 2}
   mouseSensitivity: 2
   maxLookAngle: 60
   bobSpeed: 10
@@ -29,14 +29,17 @@ MonoBehaviour:
   playerCanMove: 1
   enableJump: 1
   enableAirJump: 0
+  enableDash: 1
   dashDuration: 0.15
   dashCooldown: 1
+  enableCrawlSlide: 1
   slideDuration: 3
   SlideSpeedMultiplier: 1.2
   FinalSlideSpeedMultiplier: 1
   squatHeightScale: 0.5
   squatTransitionDuration: 0.3
-  slamCooldown: 1
+  enableSlam: 1
+  slamCooldown: 0.1
   slamSlowdownDuration: 0.5
   destructibleWallReboundMultiplier: 10
   raycastCheckDistance: 1
