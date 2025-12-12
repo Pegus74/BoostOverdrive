@@ -5,7 +5,7 @@ using UnityEngine;
 public class DestructibleWall : MonoBehaviour
 {
     [Header("Parts")]
-    public GameObject[] wallParts; // ������� � ���������� ��� ����-����� �����
+    public GameObject[] wallParts;
 
     [Header("Explosion")]
     public float explosionForce = 12f;
@@ -13,7 +13,7 @@ public class DestructibleWall : MonoBehaviour
     public float upwardsModifier = 2f;
 
     [Header("Collider")]
-    public Collider wallCollider; // �������� ��������� ����� (���� ���������)
+    public Collider wallCollider; 
 
     private Vector3[] originalLocalPositions;
     private Quaternion[] originalLocalRotations;
@@ -35,7 +35,7 @@ public class DestructibleWall : MonoBehaviour
 
     private void Awake()
     {
-        // ����-������� �����, ���� �� ���������
+
         if (wallParts == null || wallParts.Length == 0)
         {
             wallParts = new GameObject[transform.childCount];
@@ -45,7 +45,6 @@ public class DestructibleWall : MonoBehaviour
             }
         }
 
-        // ��������� �������� ������
         originalLocalPositions = new Vector3[wallParts.Length];
         originalLocalRotations = new Quaternion[wallParts.Length];
         originalLocalScales = new Vector3[wallParts.Length];
@@ -62,10 +61,7 @@ public class DestructibleWall : MonoBehaviour
 
     private void Start()
     {
-        // ����������� ����: ���������� ����� ��� �������� ������
         ResetWall();
-
-        // �������� ���������, ���� �����
         if (wallCollider != null)
         {
             wallCollider.enabled = true;
@@ -74,7 +70,6 @@ public class DestructibleWall : MonoBehaviour
 
     private void Update()
     {
-        // ��� �����: R = ������������� �����
         if (isDestroyed && Input.GetKeyDown(KeyCode.R))
         {
             ResetWall();
@@ -97,8 +92,6 @@ public class DestructibleWall : MonoBehaviour
     {
         isDestroyed = true;
         if (wallCollider != null) wallCollider.enabled = false;
-
-        // ��������� ���������� �����
         if (wallCollider != null)
             wallCollider.enabled = false;
         Collider mainCol = GetComponent<Collider>();
@@ -109,7 +102,6 @@ public class DestructibleWall : MonoBehaviour
         {
             if (part == null) continue;
 
-            // ���� scale: ������������� ��������������� ����� �������
             Transform t = part.transform;
             int index = System.Array.IndexOf(wallParts, part);
             t.localScale = originalLocalScales[index];
@@ -123,10 +115,8 @@ public class DestructibleWall : MonoBehaviour
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
 
-            // �����
             rb.AddExplosionForce(force, center, explosionRadius, upwardsModifier, ForceMode.Impulse);
 
-            // ���� ������ ��� ������
             part.layer = LayerMask.NameToLayer("IgnorePlayer");
         }
     }
@@ -135,7 +125,6 @@ public class DestructibleWall : MonoBehaviour
     {
         isDestroyed = false;
 
-        // �������� ����������
         if (wallCollider != null)
             wallCollider.enabled = true;
         Collider mainCol = GetComponent<Collider>();

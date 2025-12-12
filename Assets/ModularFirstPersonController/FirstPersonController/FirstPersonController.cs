@@ -685,17 +685,17 @@ public class FirstPersonController : MonoBehaviour
 
         energyBar.RemoveEnergy();
 
-        // Аккуратно расширяем только X и Z
+ 
         Vector3 slamScale = capsuleNormalScale;
         slamScale.x *= slamHitboxWidthMultiplier;
         slamScale.z *= slamHitboxWidthMultiplier;
         cap.localScale = slamScale;
 
-        // Сбрасываем предыдущий возврат, если был
+
         if (revertHitboxCoroutine != null)
             StopCoroutine(revertHitboxCoroutine);
 
-        // Лёгкое гашение горизонтальной скорости — слэм должен быть тяжёлым
+    
         Vector3 vel = rb.linearVelocity;
         vel.x *= 0.5f;
         vel.z *= 0.5f;
@@ -712,13 +712,12 @@ public class FirstPersonController : MonoBehaviour
         slamImpactOccurred = false;
         slamCooldownTimer = mm.slamCooldown;
 
-        // Гасим горизонталку при приземлении
         Vector3 vel = rb.linearVelocity;
         vel.x *= 0.3f;
         vel.z *= 0.3f;
         rb.linearVelocity = vel;
 
-        // Плавно возвращаем хитбокс через короткое время (даже если не попали в стену)
+
         if (slamHitboxActive)
         {
             if (revertHitboxCoroutine != null)
@@ -730,7 +729,7 @@ public class FirstPersonController : MonoBehaviour
     private IEnumerator RevertHitboxAfterDelay()
     {
         yield return new WaitForSeconds(slamHitboxDuration);
-        if (slamHitboxActive) // на случай, если уже начали приседание
+        if (slamHitboxActive) 
         {
             cap.localScale = capsuleNormalScale;
             slamHitboxActive = false;
