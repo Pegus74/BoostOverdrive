@@ -773,7 +773,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rb: {fileID: 0}
   mm: {fileID: 11400000, guid: 3d5d607f94ab2b68da80c8bc30880b61, type: 2}
-  energyBar: {fileID: 0}
+  energyBar: {fileID: 6633481694689927502}
+  slamWallLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  slamHitboxWidthMultiplier: 2.1
+  slamHitboxDuration: 0.25
   playerCamera: {fileID: 4459864851310106426}
   fov: 60
   invertCamera: 0
