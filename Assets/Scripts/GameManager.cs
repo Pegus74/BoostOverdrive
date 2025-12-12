@@ -423,12 +423,22 @@ public class GameManager : MonoBehaviour
         HideTimerUI();
         Time.timeScale = 1f;
         SceneManager.LoadScene("NewMenu");
+        SceneManager.sceneLoaded += OnReturnToMenuUpdateCoins;
+    }
+    private void OnReturnToMenuUpdateCoins(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "NewMenu" || scene.name.Contains("Menu"))
+        {
+            FindObjectOfType<CollectableUI>()?.UpdateAllUI();
+
+            SceneManager.sceneLoaded -= OnReturnToMenuUpdateCoins;
+        }
     }
 
     #endregion
-    
-    #region GameMode
-    
+
+        #region GameMode
+
     public void ChangeGameMode()
     {
         bool isClassic = (currentGameMode == GameMode.Classic);

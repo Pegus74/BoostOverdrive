@@ -1298,7 +1298,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -447, y: 217}
+  m_AnchoredPosition: {x: -447, y: 28}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &100381069
@@ -4574,6 +4574,8 @@ GameObject:
   - component: {fileID: 378292422}
   - component: {fileID: 378292421}
   - component: {fileID: 378292420}
+  - component: {fileID: 378292424}
+  - component: {fileID: 378292423}
   m_Layer: 0
   m_Name: GameManager 2 (1)
   m_TagString: Untagged
@@ -4614,8 +4616,8 @@ MonoBehaviour:
   lastSceneName: 
   musicManager: {fileID: 0}
   levelNames: []
-  collectableSystem: {fileID: 0}
-  collectableUI: {fileID: 0}
+  collectableSystem: {fileID: 11400000, guid: 975d2f6047e69bc428bf1f5df5b09108, type: 2}
+  collectableUI: {fileID: 378292424}
   currentState: 0
   currentGameMode: 0
 --- !u!4 &378292422
@@ -4637,6 +4639,37 @@ Transform:
   - {fileID: 1309395355}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &378292423
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 378292419}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6035270143451f4eaac4a23caac0275, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CollectableUIAutoSetup
+  pauseCanvas: {fileID: 1509919270}
+  existingPauseText: {fileID: 0}
+  existingResetButton: {fileID: 0}
+--- !u!114 &378292424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 378292419}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07ababc39674ec7439f93933ba97bb8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CollectableUI
+  collectableSystem: {fileID: 11400000, guid: 975d2f6047e69bc428bf1f5df5b09108, type: 2}
+  pauseMenuCollectablesText: {fileID: 0}
+  resetLevelCoinsButton: {fileID: 0}
+  mainMenuCollectablesText: {fileID: 0}
 --- !u!1001 &385339598
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5629,7 +5662,7 @@ GameObject:
   - component: {fileID: 457585266}
   - component: {fileID: 457585265}
   m_Layer: 5
-  m_Name: Pause
+  m_Name: PauseCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
