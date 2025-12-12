@@ -20,7 +20,19 @@ public class FirstPersonController : MonoBehaviour
 
     [SerializeField] private MetricsMaster mm;
     public EnergyBar energyBar;
-    
+
+
+    [SerializeField] private LayerMask slamWallLayerMask = ~0;
+
+  
+    [SerializeField, Range(1f, 3f)] private float slamHitboxWidthMultiplier = 2.1f;   
+    [SerializeField, Range(0.05f, 0.4f)] private float slamHitboxDuration = 0.25f;   
+    private Vector3 capsuleNormalScale;
+    private bool slamHitboxActive = false;
+    private Coroutine revertHitboxCoroutine;
+
+
+
     [HideInInspector]
     public Component LastWallJumpedFrom { get; private set; } = null;
 
@@ -186,21 +198,24 @@ public class FirstPersonController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         styleManager = GetComponent<StyleController>();
         crosshairObject = GetComponentInChildren<Image>();
-       
+
         playerCamera.fieldOfView = fov;
         jointOriginalPos = joint.localPosition;
-        
+
         currentScene = SceneManager.GetActiveScene();
         originalScale = transform.localScale;
+
+        capsuleNormalScale = cap.localScale;
+        capsuleDefaultPos = cap.localPosition;
+        capsuleDefaultScale = cap.localScale;
+
         if (slamIndicatorPrefab != null)
         {
             slamIndicatorInstance = Instantiate(slamIndicatorPrefab);
-            slamIndicatorInstance.SetActive(false);  
+            slamIndicatorInstance.SetActive(false);
         }
-        
-        capsuleDefaultPos = cap.localPosition;
-        capsuleDefaultScale = cap.localScale;
     }
+
 
     private void Start()
     {
@@ -385,11 +400,7 @@ public class FirstPersonController : MonoBehaviour
 
             if (isSlamming && !slamImpactOccurred && !isReboundingFromSlam)
             {
-                Vector3 currentVelocity = rb.linearVelocity;
-                currentVelocity.x = 0f;
-                currentVelocity.z = 0f;
-                rb.linearVelocity = currentVelocity;
-
+            
                 rb.AddForce(Vector3.down * (mm.slamPower * 0.8f), ForceMode.Acceleration);
             }
         }
@@ -503,13 +514,16 @@ public class FirstPersonController : MonoBehaviour
             rb.linearVelocity = velocity;
             CheckDashCollisions();
         }
+
+        if (isSlamming && !slamImpactOccurred && styleManager?.CurrentStyle?.canBreakWallsWithSlam == true)
+        {
+            CheckSlamSideWalls();
+        }
+
         externalImpulse = Vector3.Lerp(externalImpulse, Vector3.zero, 5f * Time.fixedDeltaTime);
         if (isSlamming && !slamImpactOccurred && !isReboundingFromSlam)
         {
-            Vector3 currentVelocity = rb.linearVelocity;
-            currentVelocity.x = 0f;
-            currentVelocity.z = 0f;
-            rb.linearVelocity = currentVelocity;
+          
 
             rb.AddForce(Vector3.down * mm.slamPower * 0.5f, ForceMode.Acceleration);
         }
@@ -660,29 +674,68 @@ public class FirstPersonController : MonoBehaviour
     }
 
 
-
     private void StartSlam()
     {
+        if (isSlamming) return;
+
         isSlamming = true;
-        energyBar.RemoveEnergy();
         slamImpactOccurred = false;
-        isReboundingFromSlam = false; 
-        Vector3 currentVelocity = rb.linearVelocity;
-        currentVelocity.x = 0f;
-        currentVelocity.z = 0f;
-        rb.linearVelocity = currentVelocity;
+        isReboundingFromSlam = false;
+        slamHitboxActive = true;
+
+        energyBar.RemoveEnergy();
+
+        // Аккуратно расширяем только X и Z
+        Vector3 slamScale = capsuleNormalScale;
+        slamScale.x *= slamHitboxWidthMultiplier;
+        slamScale.z *= slamHitboxWidthMultiplier;
+        cap.localScale = slamScale;
+
+        // Сбрасываем предыдущий возврат, если был
+        if (revertHitboxCoroutine != null)
+            StopCoroutine(revertHitboxCoroutine);
+
+        // Лёгкое гашение горизонтальной скорости — слэм должен быть тяжёлым
+        Vector3 vel = rb.linearVelocity;
+        vel.x *= 0.5f;
+        vel.z *= 0.5f;
+        rb.linearVelocity = vel;
+
         rb.AddForce(Vector3.down * mm.slamPower, ForceMode.Impulse);
     }
-
     private void EndSlam()
     {
+        if (!isSlamming) return;
+
         isSlamming = false;
-        isReboundingFromSlam = false; 
-        slamCooldownTimer = mm.slamCooldown;
+        isReboundingFromSlam = false;
         slamImpactOccurred = false;
-        Vector3 currentVelocity = rb.linearVelocity;
-        currentVelocity.y = Mathf.Min(currentVelocity.y, 0f);
-        rb.linearVelocity = currentVelocity;
+        slamCooldownTimer = mm.slamCooldown;
+
+        // Гасим горизонталку при приземлении
+        Vector3 vel = rb.linearVelocity;
+        vel.x *= 0.3f;
+        vel.z *= 0.3f;
+        rb.linearVelocity = vel;
+
+        // Плавно возвращаем хитбокс через короткое время (даже если не попали в стену)
+        if (slamHitboxActive)
+        {
+            if (revertHitboxCoroutine != null)
+                StopCoroutine(revertHitboxCoroutine);
+            revertHitboxCoroutine = StartCoroutine(RevertHitboxAfterDelay());
+        }
+    }
+
+    private IEnumerator RevertHitboxAfterDelay()
+    {
+        yield return new WaitForSeconds(slamHitboxDuration);
+        if (slamHitboxActive) // на случай, если уже начали приседание
+        {
+            cap.localScale = capsuleNormalScale;
+            slamHitboxActive = false;
+        }
+        revertHitboxCoroutine = null;
     }
 
     public bool IsSlamming() => isSlamming;
@@ -817,6 +870,10 @@ public class FirstPersonController : MonoBehaviour
                 wall.DestroyWallFromSlam(impactPoint);
                 rb.AddForce(Vector3.up * mm.slamPower * reboundMultiplier, ForceMode.Impulse);
             }
+        }
+        if (isSlamming)
+        {
+            Debug.Log($"Slam collision with {collision.gameObject.name}, canBreakSlam: {styleManager?.CurrentStyle?.canBreakWallsWithSlam}, impactOccurred: {slamImpactOccurred}");
         }
     }
 
@@ -1091,4 +1148,46 @@ public class FirstPersonController : MonoBehaviour
 
         ResetSpeedModifier();
     }
+
+    private void CheckSlamSideWalls()
+    {
+        if (slamImpactOccurred || styleManager == null || !styleManager.CurrentStyle.canBreakWallsWithSlam)
+            return;
+
+        Vector3 feetOrigin = transform.position - Vector3.up * (cap.localScale.y * 0.5f - 0.1f);
+        float checkRadius = cap.localScale.x * 0.6f; 
+        if (Physics.SphereCast(feetOrigin, checkRadius, Vector3.down, out RaycastHit hit,
+                               3f, slamWallLayerMask, QueryTriggerInteraction.Ignore))
+        {
+            DestructibleWall wall = hit.collider.GetComponent<DestructibleWall>();
+            if (wall == null || wall.isDestroyed)
+                return;
+
+           
+            float angleWithUp = Vector3.Angle(hit.normal, Vector3.up);
+            bool isHorizontalSurface = angleWithUp < 45f;
+            bool isFallingFastDown = rb.linearVelocity.y < -8f; 
+
+            if (!isHorizontalSurface || (isHorizontalSurface && isFallingFastDown))
+            {
+                slamImpactOccurred = true;
+                isReboundingFromSlam = true;
+
+                wall.DestroyWallFromSlam(hit.point);
+                rb.AddForce(Vector3.up * mm.slamPower * reboundMultiplier * 1.4f, ForceMode.Impulse);
+
+                cap.localScale = capsuleNormalScale;
+                slamHitboxActive = false;
+                if (revertHitboxCoroutine != null)
+                {
+                    StopCoroutine(revertHitboxCoroutine);
+                    revertHitboxCoroutine = null;
+                }
+
+                Debug.Log($"SLAM → BROKE WALL (horizontal: {isHorizontalSurface}): {wall.name}");
+                return;
+            }
+        }
+    }
+
 }
