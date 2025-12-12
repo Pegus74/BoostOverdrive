@@ -1387,9 +1387,9 @@ PrefabInstance:
       value: DestWall (2)
       objectReference: {fileID: 0}
     - target: {fileID: 4945178332137235685, guid: 3bb6e4845b2d99840b014c0b580986f9, type: 3}
-      propertyPath: useGravity
-      value: 0
-      objectReference: {fileID: 0}
+      propertyPath: wallCollider
+      value: 
+      objectReference: {fileID: 1794779598}
     - target: {fileID: 5402872072260230318, guid: 3bb6e4845b2d99840b014c0b580986f9, type: 3}
       propertyPath: m_Layer
       value: 3
@@ -4660,8 +4660,20 @@ PrefabInstance:
       value: -3.999939
       objectReference: {fileID: 0}
     - target: {fileID: 4336363850922320038, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
+      propertyPath: m_Radius
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4336363850922320038, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
       propertyPath: m_Enabled
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4336363850922320038, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
+      propertyPath: m_Center.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4336363850922320038, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
+      propertyPath: m_Center.z
+      value: -0.18820596
       objectReference: {fileID: 0}
     - target: {fileID: 4336363850922320038, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
       propertyPath: m_Material
@@ -4735,6 +4747,10 @@ PrefabInstance:
       propertyPath: energyBar
       value: 
       objectReference: {fileID: 1837606133}
+    - target: {fileID: 4459864850019384740, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
+      propertyPath: slamIndicatorPrefab
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4459864850019384750, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
       propertyPath: m_Name
       value: FirstPersonController (1)
@@ -5560,6 +5576,11 @@ Transform:
   - {fileID: 533210977}
   m_Father: {fileID: 841781652}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1622373026 stripped
+BoxCollider:
+  m_CorrespondingSourceObject: {fileID: 3347566047212932284, guid: 3bb6e4845b2d99840b014c0b580986f9, type: 3}
+  m_PrefabInstance: {fileID: 6374448698480395416}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1629106247
 GameObject:
   m_ObjectHideFlags: 0
@@ -6193,6 +6214,11 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1788064893}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!65 &1794779598 stripped
+BoxCollider:
+  m_CorrespondingSourceObject: {fileID: 3347566047212932284, guid: 3bb6e4845b2d99840b014c0b580986f9, type: 3}
+  m_PrefabInstance: {fileID: 435157587}
+  m_PrefabAsset: {fileID: 0}
 --- !u!43 &1805283168
 Mesh:
   m_ObjectHideFlags: 0
@@ -10069,6 +10095,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: DestWall
       objectReference: {fileID: 0}
+    - target: {fileID: 4945178332137235685, guid: 3bb6e4845b2d99840b014c0b580986f9, type: 3}
+      propertyPath: wallCollider
+      value: 
+      objectReference: {fileID: 1622373026}
     - target: {fileID: 5402872072260230318, guid: 3bb6e4845b2d99840b014c0b580986f9, type: 3}
       propertyPath: m_Layer
       value: 3

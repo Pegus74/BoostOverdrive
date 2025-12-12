@@ -4,12 +4,20 @@ using UnityEngine;
 
 public class DestructibleWall : MonoBehaviour
 {
-    public List<GameObject> wallParts = new List<GameObject>();
-    private List<WallPartData> initPartData = new List<WallPartData>();
-    public Collider wallCollider;
-    public float explosionForce = 10f;
+    [Header("Parts")]
+    public GameObject[] wallParts; // ������� � ���������� ��� ����-����� �����
+
+    [Header("Explosion")]
+    public float explosionForce = 12f;
     public float explosionRadius = 5f;
-    public float upwardModifier = 1f;
+    public float upwardsModifier = 2f;
+
+    [Header("Collider")]
+    public Collider wallCollider; // �������� ��������� ����� (���� ���������)
+
+    private Vector3[] originalLocalPositions;
+    private Quaternion[] originalLocalRotations;
+    private Vector3[] originalLocalScales;
     public bool isDestroyed = false;
     public float debrisLifetime = 5f;
     public bool useGravity = true;
@@ -25,164 +33,134 @@ public class DestructibleWall : MonoBehaviour
         public Collider partCollider;
     }
 
-    void Start()
+    private void Awake()
     {
-        if (wallCollider == null)
+        // ����-������� �����, ���� �� ���������
+        if (wallParts == null || wallParts.Length == 0)
         {
-            wallCollider = GetComponent<BoxCollider>();
-            if (wallCollider == null)
+            wallParts = new GameObject[transform.childCount];
+            for (int i = 0; i < transform.childCount; i++)
             {
-                wallCollider = GetComponent<Collider>();
+                wallParts[i] = transform.GetChild(i).gameObject;
             }
         }
 
-        if (wallParts.Count == 0)
-        {
-            foreach (Transform child in transform)
-            {
-                wallParts.Add(child.gameObject);
-            }
-        }
+        // ��������� �������� ������
+        originalLocalPositions = new Vector3[wallParts.Length];
+        originalLocalRotations = new Quaternion[wallParts.Length];
+        originalLocalScales = new Vector3[wallParts.Length];
 
-        if (wallParts.Count > 0 && initPartData.Count == 0)
+        for (int i = 0; i < wallParts.Length; i++)
         {
-            foreach (GameObject part in wallParts)
-            {
-                WallPartData data = new WallPartData
-                {
-                    part = part,
-                    initPosition = part.transform.localPosition,
-                    rotation = part.transform.localRotation,
-                    initScale = part.transform.localScale,
-                    partCollider = part.GetComponent<Collider>()
-                };
-                initPartData.Add(data);
-            }
+            if (wallParts[i] == null) continue;
+            Transform t = wallParts[i].transform;
+            originalLocalPositions[i] = t.localPosition;
+            originalLocalRotations[i] = t.localRotation;
+            originalLocalScales[i] = t.localScale;
         }
+    }
 
+    private void Start()
+    {
+        // ����������� ����: ���������� ����� ��� �������� ������
+        ResetWall();
+
+        // �������� ���������, ���� �����
         if (wallCollider != null)
         {
             wallCollider.enabled = true;
         }
-        ResetWall();
     }
 
-    void Update()
+    private void Update()
     {
+        // ��� �����: R = ������������� �����
         if (isDestroyed && Input.GetKeyDown(KeyCode.R))
         {
             ResetWall();
         }
     }
 
-    private void ResetWall()
-    {
-        isDestroyed = false;
-        StopAllCoroutines();
-
-        if (wallCollider != null)
-        {
-            wallCollider.enabled = true;
-        }
-
-        foreach (WallPartData data in initPartData)
-        {
-            GameObject part = data.part;
-            if (part != null)
-            {
-                if (!part.activeSelf) part.SetActive(true);
-
-                Rigidbody rb = part.GetComponent<Rigidbody>();
-                if (rb != null) Destroy(rb);
-
-                if (data.partCollider != null)
-                    data.partCollider.enabled = true;
-
-                part.transform.localPosition = data.initPosition;
-                part.transform.localRotation = data.rotation;
-                part.transform.localScale = data.initScale;
-                part.layer = LayerMask.NameToLayer("Default");
-            }
-        }
-    }
-
     public void DestroyWall()
     {
         if (isDestroyed) return;
-        isDestroyed = true;
-        if (wallCollider != null) wallCollider.enabled = false;
-
-        StartCoroutine(DestroyWallCoroutine(transform.position));
+        Explode(explosionForce, transform.position);
     }
 
     public void DestroyWallFromSlam(Vector3 impactPoint)
     {
         if (isDestroyed) return;
+        Explode(explosionForce * 1.3f, impactPoint);
+    }
+
+    private void Explode(float force, Vector3 center)
+    {
         isDestroyed = true;
         if (wallCollider != null) wallCollider.enabled = false;
 
-        StartCoroutine(DestroyWallCoroutine(impactPoint, 1.2f, 2f));
+        // ��������� ���������� �����
+        if (wallCollider != null)
+            wallCollider.enabled = false;
+        Collider mainCol = GetComponent<Collider>();
+        if (mainCol != null)
+            mainCol.enabled = false;
+
+        foreach (GameObject part in wallParts)
+        {
+            if (part == null) continue;
+
+            // ���� scale: ������������� ��������������� ����� �������
+            Transform t = part.transform;
+            int index = System.Array.IndexOf(wallParts, part);
+            t.localScale = originalLocalScales[index];
+
+            Rigidbody rb = part.GetComponent<Rigidbody>();
+            if (rb == null)
+                rb = part.AddComponent<Rigidbody>();
+
+            rb.isKinematic = false;
+            rb.useGravity = true;
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+
+            // �����
+            rb.AddExplosionForce(force, center, explosionRadius, upwardsModifier, ForceMode.Impulse);
+
+            // ���� ������ ��� ������
+            part.layer = LayerMask.NameToLayer("IgnorePlayer");
+        }
     }
 
-    private IEnumerator DestroyWallCoroutine(Vector3 explosionPoint, float forceMultiplier = 1f, float upwardMod = 1f)
+    public void ResetWall()
     {
-        int cubeLayer = LayerMask.NameToLayer("IgnorePlayer");
-        List<Rigidbody> rigidbodies = new List<Rigidbody>();
-        List<Collider> colliders = new List<Collider>();
+        isDestroyed = false;
 
-        foreach (GameObject part in wallParts)
+        // �������� ����������
+        if (wallCollider != null)
+            wallCollider.enabled = true;
+        Collider mainCol = GetComponent<Collider>();
+        if (mainCol != null)
+            mainCol.enabled = true;
+
+        for (int i = 0; i < wallParts.Length; i++)
         {
-            if (part != null && part.activeSelf)
+            GameObject part = wallParts[i];
+            if (part == null) continue;
+
+            Transform t = part.transform;
+            t.localPosition = originalLocalPositions[i];
+            t.localRotation = originalLocalRotations[i];
+            t.localScale = originalLocalScales[i];
+
+            Rigidbody rb = part.GetComponent<Rigidbody>();
+            if (rb != null)
             {
-                part.layer = cubeLayer;
-
-                Collider partCollider = part.GetComponent<Collider>();
-                if (partCollider != null)
-                {
-                    colliders.Add(partCollider);
-                    partCollider.enabled = false;
-                }
-
-                Rigidbody rb = part.GetComponent<Rigidbody>();
-                if (rb == null) rb = part.AddComponent<Rigidbody>();
-
-                rb.isKinematic = false;
-                rb.useGravity = useGravity;
-                rb.mass = 1f;
-                rb.linearDamping = 0.5f;
-                rb.angularDamping = 0.5f;
-
-                Vector3 randomTorque = new Vector3(
-                    Random.Range(-100f, 100f),
-                    Random.Range(-100f, 100f),
-                    Random.Range(-100f, 100f)
-                );
-                rb.AddTorque(randomTorque, ForceMode.Impulse);
-
-                rb.AddExplosionForce(
-                    explosionForce * forceMultiplier,
-                    explosionPoint,
-                    explosionRadius,
-                    upwardMod,
-                    ForceMode.Impulse
-                );
-
-                rigidbodies.Add(rb);
+                rb.isKinematic = true;
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
             }
-        }
 
-        yield return new WaitForSeconds(enableColliderDelay);
-
-        foreach (Collider col in colliders)
-        {
-            if (col != null) col.enabled = true;
-        }
-
-        yield return new WaitForSeconds(debrisLifetime - enableColliderDelay);
-
-        foreach (GameObject part in wallParts)
-        {
-            if (part != null) part.SetActive(false);
+            part.layer = LayerMask.NameToLayer("Default");
         }
     }
 }
