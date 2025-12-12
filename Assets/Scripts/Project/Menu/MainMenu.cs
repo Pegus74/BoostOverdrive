@@ -1,46 +1,21 @@
 using UnityEngine;
-using UnityEngine.ProBuilder.MeshOperations;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
-    [Header("Canvas")] 
-    [SerializeField] private Canvas firstEnterCanvas;
+    [Header("Canvas")]
     [SerializeField] private Canvas mainCanvas;
+    [SerializeField] private Canvas selectLevelCanvas;
     [SerializeField] private Canvas settingsCanvas;
-    [SerializeField] private Canvas collectablesCanvas;
 
     public void OnQuitClicked() => Application.Quit();
     public void LoadScene(string sceneName) => SceneManager.LoadScene(sceneName);
 
-    
     private void Awake()
     {
-        if (PlayerPrefs.HasKey("ContinueLevel"))
-        {
-            mainCanvas.gameObject.SetActive(true);
-            firstEnterCanvas.gameObject.SetActive(false);
-        }
-        else
-        {
-            mainCanvas.gameObject.SetActive(false);
-            firstEnterCanvas.gameObject.SetActive(true);
-        }
-            
         settingsCanvas.gameObject.SetActive(false);
-        collectablesCanvas.gameObject.SetActive(false);
-    }
-
-    public void ContinueGame()
-    {
-        SceneManager.LoadScene("HUB");
-    }
-
-    public void StartNewGame()
-    {
-        PlayerPrefs.DeleteAll();
-        LoadScene("level1");
+        selectLevelCanvas.gameObject.SetActive(false);
     }
 
     public void ShowSettings()
@@ -55,15 +30,15 @@ public class MainMenu : MonoBehaviour
         mainCanvas.gameObject.SetActive(true);
     }
 
-    public void ShowCollectables()
+    public void ShowLevelMenu()
     {
         mainCanvas.gameObject.SetActive(false);
-        collectablesCanvas.gameObject.SetActive(true); // 
+        selectLevelCanvas.gameObject.SetActive(true);
     }
 
-    public void HideCollectables()
+    public void HideLevelMenu()
     {
-        collectablesCanvas.gameObject.SetActive(false);
+        selectLevelCanvas.gameObject.SetActive(false);
         mainCanvas.gameObject.SetActive(true);
     }
 }

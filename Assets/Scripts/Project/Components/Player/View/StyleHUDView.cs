@@ -1,42 +1,37 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// View: Слушает OnStyleChangedEvent из PlayerStateModel и обновляет UI
+/// </summary>
 public class StyleHUDView : MonoBehaviour
 {
-    [Header("UI Elements")]
-    public Image LegstyleUI;
-    public Image HandsStyleUI;
-
-    private Image activeImage;
-    private Image prevImage;
-    
-    private void OnEnable() => PlayerEvents.OnStyleChangedEvent.AddListener(UpdateStyleUI);
-    private void OnDisable() => PlayerEvents.OnStyleChangedEvent.RemoveListener(UpdateStyleUI);
-
-    private void Awake()
-    {
-        if (LegstyleUI == null || HandsStyleUI == null)
-        {
-            Debug.LogError("[StyleHUDView] Images not found");
-        }
-        
-        activeImage = LegstyleUI;
-        prevImage =  HandsStyleUI;
-        activeImage.gameObject.SetActive(true);
-        prevImage.gameObject.SetActive(false);
-    }
-    
-    private void UpdateStyleUI()
-    {
-        (activeImage, prevImage) = (prevImage, activeImage);
-        
-        if (activeImage != null)
-            activeImage.gameObject.SetActive(true);
-    
-        if (prevImage != null)
-            prevImage.gameObject.SetActive(false);
-
-        
-        Debug.Log($"[StyleHUDView] updated. Active Index:");
-    }
+    // [Header("Model")]
+    // public PlayerStateModel playerStateModel; 
+    //
+    // [Header("UI Elements")]
+    // public Image LegstyleUI;
+    // public Image HandsStyleUI;
+    //
+    // private void OnEnable()
+    // {
+    //     playerStateModel?.OnStyleChangedEvent.RegisterListener(UpdateStyleUI);
+    //     UpdateStyleUI(playerStateModel.CurrentStyleIndex);
+    // }
+    //
+    // private void OnDisable()
+    // {
+    //     playerStateModel?.OnStyleChangedEvent.UnregisterListener(UpdateStyleUI);
+    // }
+    //
+    // private void UpdateStyleUI(int newStyleIndex)
+    // {
+    //     if (LegstyleUI != null && HandsStyleUI != null)
+    //     {
+    //         LegstyleUI.gameObject.SetActive(newStyleIndex == 0);
+    //         HandsStyleUI.gameObject.SetActive(newStyleIndex == 1);
+    //     }
+    //     
+    //     Debug.Log($"StyleHUDView updated. Active Index: {newStyleIndex}");
+    // }
 }

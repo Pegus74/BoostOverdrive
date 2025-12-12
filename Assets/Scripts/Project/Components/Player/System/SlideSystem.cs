@@ -80,7 +80,7 @@ public class CrawlSlideSystem : MonoBehaviour
 
         int currentStyleIndex = playerStateModel.CurrentStyleIndex;
         
-        if (currentStyleIndex == 0)
+        if (currentStyleIndex == 1)
         {
             targetPos.y = originalPos.y - delta * 0.5f;
         }
@@ -89,7 +89,7 @@ public class CrawlSlideSystem : MonoBehaviour
             targetPos.y = originalPos.y + delta * 0.5f;
         }
         
-        if (currentStyleIndex == 1 && playerStateModel.IsGrounded)
+        if (currentStyleIndex == 0 && playerStateModel.IsGrounded)
             _rb.useGravity = false;
         
 
@@ -111,7 +111,7 @@ public class CrawlSlideSystem : MonoBehaviour
         cap.localScale = targetScale;
         cap.localPosition = targetPos;
 
-        if (currentStyleIndex == 1)
+        if (currentStyleIndex == 0)
         {
             _rb.useGravity = true;
         }
@@ -164,7 +164,7 @@ public class CrawlSlideSystem : MonoBehaviour
         int currentStyleIndex = playerStateModel.CurrentStyleIndex;
         
 
-        if (currentStyleIndex == 0)
+        if (currentStyleIndex == 1)
         {
             targetPos.y = capsuleDefaultPos.y + delta * 0.5f;
         }
