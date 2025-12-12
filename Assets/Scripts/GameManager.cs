@@ -20,13 +20,16 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CollectableUI collectableUI;
     private Dictionary<string, int> levelCoinTotals = new Dictionary<string, int>();
     public static GameManager Instance;
+    
+    private int nextLevel;
 
     public enum State
     {
         Playing,
         Paused,
         GameOver,
-        GameWin
+        GameWin,
+        Menu
     }
     public State currentState = State.Playing;
     
@@ -36,7 +39,7 @@ public class GameManager : MonoBehaviour
         Hard
     }
     
-    private GameMode currentGameMode = GameMode.Classic;
+    [SerializeField] private GameMode currentGameMode = GameMode.Classic;
 
     private void Awake()
     {
@@ -91,7 +94,7 @@ public class GameManager : MonoBehaviour
         if (gameWinCanvas != null) gameWinCanvas.gameObject.SetActive(false);
         if (pauseCanvas != null) pauseCanvas.gameObject.SetActive(false);
 
-        Debug.Log($" GameOver: {gameOverCanvas != null}, GameWin: {gameWinCanvas != null}, Pause: {pauseCanvas != null}");
+        //Debug.Log($" GameOver: {gameOverCanvas != null}, GameWin: {gameWinCanvas != null}, Pause: {pauseCanvas != null}");
     }
     private void OnDestroy()
     {
@@ -142,10 +145,10 @@ public class GameManager : MonoBehaviour
         {
             levelNames.Add(scene.name);
         }
-        if (scene.name == "MainMenu")
+        if (scene.name == "NewMenu")
         {
             currentLevelName = null;
-            currentState = State.Playing;
+            currentState = State.Menu;
             InitializeUI();
             StopAllTimers();
             HideTimerUI();
@@ -321,6 +324,10 @@ public class GameManager : MonoBehaviour
     #region Win
     public void PlayerWin(string levelName = null)
     {
+        nextLevel = SceneManager.GetActiveScene().buildIndex + 1;
+        PlayerPrefs.SetInt("ContinueLevel", nextLevel);
+        PlayerPrefs.Save();
+        
         currentState = State.GameWin;
         if (levelName != null)
         {
@@ -415,13 +422,23 @@ public class GameManager : MonoBehaviour
         StopAllTimers();
         HideTimerUI();
         Time.timeScale = 1f;
-        SceneManager.LoadScene("MainMenu");
+        SceneManager.LoadScene("NewMenu");
+        SceneManager.sceneLoaded += OnReturnToMenuUpdateCoins;
+    }
+    private void OnReturnToMenuUpdateCoins(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "NewMenu" || scene.name.Contains("Menu"))
+        {
+            FindObjectOfType<CollectableUI>()?.UpdateAllUI();
+
+            SceneManager.sceneLoaded -= OnReturnToMenuUpdateCoins;
+        }
     }
 
     #endregion
-    
-    #region GameMode
-    
+
+        #region GameMode
+
     public void ChangeGameMode()
     {
         bool isClassic = (currentGameMode == GameMode.Classic);
