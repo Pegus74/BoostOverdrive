@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LevelStarter : MonoBehaviour
 {
@@ -13,6 +14,8 @@ public class LevelStarter : MonoBehaviour
 
     void Awake()
     {
+        FindComponentsManually();
+        
         // ����� TimerManager
         if (timerManager == null)
         {
@@ -80,6 +83,26 @@ public class LevelStarter : MonoBehaviour
     private void SetupClassicMode()
     {
         Debug.Log("LevelStarter: ��������� Classic ������");
+        Debug.Log(SceneManager.GetActiveScene().name);
+        
+        if (SceneManager.GetActiveScene().name == "HUB")
+        {
+            energyBar.Hide();
+            energyBar.enabled = false;
+            if (timerCanvas != null)
+            {
+                timerCanvas.enabled = false;
+                Debug.Log("A123");
+            }
+
+            // Timer Manager
+            if (timerManager != null)
+            {
+                timerManager.enabled = false;
+                Debug.Log("B123");
+            }
+            
+        }
 
         // Timer
         if (timerManager != null)
@@ -114,6 +137,25 @@ public class LevelStarter : MonoBehaviour
     private void SetupHardMode()
     {
         Debug.Log("LevelStarter: ��������� Hard ������");
+        
+        if (SceneManager.GetActiveScene().name == "HUB")
+        {
+            energyBar.Hide();
+            energyBar.enabled = false;
+            if (timerCanvas != null)
+            {
+                timerCanvas.enabled = false;
+                Debug.Log("A123");
+            }
+
+            // Timer Manager
+            if (timerManager != null)
+            {
+                timerManager.enabled = false;
+                Debug.Log("B123");
+            }
+            
+        }
 
         // Energy Bar
         if (energyBar != null)
@@ -150,6 +192,7 @@ public class LevelStarter : MonoBehaviour
         GameObject timerObj = GameObject.Find(timerCanvasName);
         if (timerObj != null)
         {
+            Debug.Log("SDELANO");
             timerCanvas = timerObj.GetComponent<Canvas>();
         }
 
