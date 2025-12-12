@@ -5,7 +5,7 @@ public class DashCollisionHandler : MonoBehaviour
 {
     public PlayerStateModel playerStateModel; 
     
-    private const int HandStyleIndex = 0;
+    private const int HandStyleIndex = 1;
 
     private void Awake()
     {

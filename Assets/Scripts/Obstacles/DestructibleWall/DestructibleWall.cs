@@ -5,7 +5,7 @@ using UnityEngine;
 public class DestructibleWall : MonoBehaviour
 {
     [Header("Parts")]
-    public GameObject[] wallParts; // Заполни в инспекторе или авто-найдёт детей
+    public GameObject[] wallParts; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 
     [Header("Explosion")]
     public float explosionForce = 12f;
@@ -13,16 +13,29 @@ public class DestructibleWall : MonoBehaviour
     public float upwardsModifier = 2f;
 
     [Header("Collider")]
-    public Collider wallCollider; // Основной коллайдер стены (если отдельный)
+    public Collider wallCollider; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
 
     private Vector3[] originalLocalPositions;
     private Quaternion[] originalLocalRotations;
     private Vector3[] originalLocalScales;
     public bool isDestroyed = false;
+    public float debrisLifetime = 5f;
+    public bool useGravity = true;
+    public float enableColliderDelay = 0.5f;
+
+    [System.Serializable]
+    private class WallPartData
+    {
+        public GameObject part;
+        public Vector3 initPosition;
+        public Quaternion rotation;
+        public Vector3 initScale;
+        public Collider partCollider;
+    }
 
     private void Awake()
     {
-        // Авто-находим части, если не заполнены
+        // пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         if (wallParts == null || wallParts.Length == 0)
         {
             wallParts = new GameObject[transform.childCount];
@@ -32,7 +45,7 @@ public class DestructibleWall : MonoBehaviour
             }
         }
 
-        // Сохраняем исходные данные
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
         originalLocalPositions = new Vector3[wallParts.Length];
         originalLocalRotations = new Quaternion[wallParts.Length];
         originalLocalScales = new Vector3[wallParts.Length];
@@ -49,10 +62,10 @@ public class DestructibleWall : MonoBehaviour
 
     private void Start()
     {
-        // КРИТИЧЕСКИЙ ФИКС: сбрасываем стену при загрузке уровня
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
         ResetWall();
 
-        // Включаем коллайдер, если задан
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
         if (wallCollider != null)
         {
             wallCollider.enabled = true;
@@ -61,7 +74,7 @@ public class DestructibleWall : MonoBehaviour
 
     private void Update()
     {
-        // Для теста: R = перезагрузить стену
+        // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ: R = пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
         if (isDestroyed && Input.GetKeyDown(KeyCode.R))
         {
             ResetWall();
@@ -83,8 +96,9 @@ public class DestructibleWall : MonoBehaviour
     private void Explode(float force, Vector3 center)
     {
         isDestroyed = true;
+        if (wallCollider != null) wallCollider.enabled = false;
 
-        // Отключаем коллайдеры стены
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
         if (wallCollider != null)
             wallCollider.enabled = false;
         Collider mainCol = GetComponent<Collider>();
@@ -95,7 +109,7 @@ public class DestructibleWall : MonoBehaviour
         {
             if (part == null) continue;
 
-            // ФИКС scale: принудительно восстанавливаем перед физикой
+            // пїЅпїЅпїЅпїЅ scale: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             Transform t = part.transform;
             int index = System.Array.IndexOf(wallParts, part);
             t.localScale = originalLocalScales[index];
@@ -109,10 +123,10 @@ public class DestructibleWall : MonoBehaviour
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
 
-            // Взрыв
+            // пїЅпїЅпїЅпїЅпїЅ
             rb.AddExplosionForce(force, center, explosionRadius, upwardsModifier, ForceMode.Impulse);
 
-            // Слой игнора для игрока
+            // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
             part.layer = LayerMask.NameToLayer("IgnorePlayer");
         }
     }
@@ -121,7 +135,7 @@ public class DestructibleWall : MonoBehaviour
     {
         isDestroyed = false;
 
-        // Включаем коллайдеры
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         if (wallCollider != null)
             wallCollider.enabled = true;
         Collider mainCol = GetComponent<Collider>();

@@ -36,7 +36,7 @@ public class GameManager : MonoBehaviour
         Hard
     }
     
-    private GameMode currentGameMode = GameMode.Classic;
+    [SerializeField] private GameMode currentGameMode = GameMode.Classic;
 
     private void Awake()
     {
@@ -91,7 +91,7 @@ public class GameManager : MonoBehaviour
         if (gameWinCanvas != null) gameWinCanvas.gameObject.SetActive(false);
         if (pauseCanvas != null) pauseCanvas.gameObject.SetActive(false);
 
-        Debug.Log($" GameOver: {gameOverCanvas != null}, GameWin: {gameWinCanvas != null}, Pause: {pauseCanvas != null}");
+        //Debug.Log($" GameOver: {gameOverCanvas != null}, GameWin: {gameWinCanvas != null}, Pause: {pauseCanvas != null}");
     }
     private void OnDestroy()
     {

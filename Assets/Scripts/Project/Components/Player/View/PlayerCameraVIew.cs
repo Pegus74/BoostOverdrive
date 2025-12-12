@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
@@ -5,19 +6,19 @@ using UnityEngine.Events;
 public class PlayerCameraView : MonoBehaviour
 {
     [Header("Model & Settings")]
-    public PlayerMovementController playerMovementController; 
+    public PlayerMovementController playerMovementController;
     public PlayerConfig playerSettingsData;
-    
+
     [Header("Camera Components")]
     public Camera playerCamera;
 
     public Transform joint;
     private PlayerInputController playerInputController;
-    
+
     // Углы вращения
     private float yaw = 0f;
     private float pitch = 0f;
-    
+
     // Ввод для обработки в Update()
     private Vector2 currentLookInput = Vector2.zero;
     private Image crosshairObject;
@@ -26,7 +27,7 @@ public class PlayerCameraView : MonoBehaviour
     private float timer = 0f;
     public Vector3 bobAmount = new Vector3(.15f, .05f, 0f);
     private Vector3 jointOriginalPos;
-    
+
 
     private void Awake()
     {
@@ -35,26 +36,26 @@ public class PlayerCameraView : MonoBehaviour
         {
             SetupCrosshair();
         }
-        
+
         if (playerSettingsData.lockCursor)
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
-        
+
         yaw = transform.localEulerAngles.y;
         pitch = playerCamera.transform.localEulerAngles.x;
-        
+
         jointOriginalPos = joint.localPosition;
     }
 
     private void OnEnable()
-    { 
+    {
         InputEvents.LookInputEvent.AddListener(OnLookInput);
     }
 
     private void OnDisable()
-    { 
+    {
         InputEvents.LookInputEvent.RemoveListener(OnLookInput);
     }
 
@@ -72,7 +73,7 @@ public class PlayerCameraView : MonoBehaviour
         {
             ApplyLookRotation(currentLookInput);
         }
-        
+
         HeadBob();
     }
 
@@ -83,15 +84,15 @@ public class PlayerCameraView : MonoBehaviour
     {
         float sensitivity = playerSettingsData.mouseSensitivity;
         float maxAngle = playerSettingsData.maxLookAngle;
-        
-        yaw += input.x * sensitivity; 
+
+        yaw += input.x * sensitivity;
         pitch += (playerSettingsData.invertCamera ? 1 : -1) * input.y * sensitivity;
         pitch = Mathf.Clamp(pitch, -maxAngle, maxAngle);
-        
+
         transform.localEulerAngles = new Vector3(0, yaw, 0);
         playerCamera.transform.localEulerAngles = new Vector3(pitch, 0, 0);
     }
-    
+
     private void HeadBob()
     {
         if (playerMovementController.IsWalking)
@@ -108,7 +109,7 @@ public class PlayerCameraView : MonoBehaviour
             joint.localPosition = Vector3.Lerp(joint.localPosition, jointOriginalPos, Time.deltaTime * playerSettingsData.bobSpeed);
         }
     }
-    
+
     /// <summary>
     /// Настройка crosshair
     /// </summary>
@@ -121,7 +122,7 @@ public class PlayerCameraView : MonoBehaviour
         crosshairObject = crosshairGO.AddComponent<Image>();
         crosshairObject.sprite = playerSettingsData.crosshairImage;
         crosshairObject.color = playerSettingsData.crosshairColor;
-        
-        crosshairObject.rectTransform.sizeDelta = new Vector2(2, 4); 
+
+        crosshairObject.rectTransform.sizeDelta = new Vector2(2, 4);
     }
 }

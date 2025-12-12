@@ -22,7 +22,7 @@ public class SlamCollisionHandler : MonoBehaviour
 
         RDestructibleWall wall = other.GetComponent<RDestructibleWall>();
         
-        if (wall != null && playerStateModel.CurrentStyleIndex == 0)
+        if (wall != null && playerStateModel.CurrentStyleIndex == 1)
         {
             Vector3 impactPoint = other.ClosestPoint(transform.position);
             
