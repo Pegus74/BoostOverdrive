@@ -18,7 +18,7 @@ public class SettingsUI : MonoBehaviour
         Debug.Log("Menu Start");
         changeModeButton.onClick.AddListener(() =>
         {
-            NewGameManager.Instance.ChangeGameMode();
+            GameManager.Instance.ChangeGameMode();
         });
         
         resolutions = Screen.resolutions;

@@ -2,19 +2,18 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 public class GoTo : MonoBehaviour
 {
-    public Transform targetPoint; 
+
     public KeyCode key = KeyCode.R;
 
     void Update()
     {
         if (Input.GetKeyDown(key))
-            Teleport();
+            Restart();
     }
 
-    void Teleport()
+    void Restart()
     {
-        transform.position = targetPoint.position;
-        if (TryGetComponent<Rigidbody>(out var rb))
-            rb.linearVelocity = Vector3.zero;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        
     }
 }

@@ -20,13 +20,16 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CollectableUI collectableUI;
     private Dictionary<string, int> levelCoinTotals = new Dictionary<string, int>();
     public static GameManager Instance;
+    
+    private int nextLevel;
 
     public enum State
     {
         Playing,
         Paused,
         GameOver,
-        GameWin
+        GameWin,
+        Menu
     }
     public State currentState = State.Playing;
     
@@ -142,10 +145,10 @@ public class GameManager : MonoBehaviour
         {
             levelNames.Add(scene.name);
         }
-        if (scene.name == "MainMenu")
+        if (scene.name == "NewMenu")
         {
             currentLevelName = null;
-            currentState = State.Playing;
+            currentState = State.Menu;
             InitializeUI();
             StopAllTimers();
             HideTimerUI();
@@ -321,6 +324,10 @@ public class GameManager : MonoBehaviour
     #region Win
     public void PlayerWin(string levelName = null)
     {
+        nextLevel = SceneManager.GetActiveScene().buildIndex + 1;
+        PlayerPrefs.SetInt("ContinueLevel", nextLevel);
+        PlayerPrefs.Save();
+        
         currentState = State.GameWin;
         if (levelName != null)
         {
@@ -415,7 +422,7 @@ public class GameManager : MonoBehaviour
         StopAllTimers();
         HideTimerUI();
         Time.timeScale = 1f;
-        SceneManager.LoadScene("MainMenu");
+        SceneManager.LoadScene("NewMenu");
     }
 
     #endregion
