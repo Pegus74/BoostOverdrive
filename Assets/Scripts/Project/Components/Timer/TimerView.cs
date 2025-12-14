@@ -27,9 +27,4 @@ public class TimerView : MonoBehaviour
 
         return $"{minutes:00}:{seconds:00}:{ms:00}";
     }
-
-    public void SetVisible(bool visible)
-    {
-        gameObject.SetActive(visible);
-    }
 }

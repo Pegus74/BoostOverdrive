@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 // TODO: �������� �� ���������
 
-public class SpringWallOrig : MonoBehaviour
+public class SpringWallOrig: MonoBehaviour
 {
     [Header("��������� �����")]
     public float activationDistance = 1.0f;

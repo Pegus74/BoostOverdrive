@@ -16,27 +16,21 @@ public class CollectableUI : MonoBehaviour
 
     private string currentLevelName;
     private int totalCoinsOnLevel = 0;
-    private Dictionary<string, int> levelCoinCache = new Dictionary<string, int>();
+    private readonly Dictionary<string, int> levelCoinCache = new();
 
     private void Start()
     {
         UpdateLevelName();
         CountCoinsOnLevel();
         UpdateAllUI();
-
-        if (resetLevelCoinsButton != null)
-        {
-            resetLevelCoinsButton.onClick.AddListener(ResetLevelCoins);
-            UpdateResetButtonVisibility();
-        }
+        SetupResetButton();
     }
 
     private void OnEnable()
     {
         if (collectableSystem != null)
-        {
             collectableSystem.OnCoinCollected.AddListener(OnCoinsUpdated);
-        }
+
         SceneManager.sceneLoaded += OnSceneLoaded;
         UpdateAllUI();
     }
@@ -44,17 +38,14 @@ public class CollectableUI : MonoBehaviour
     private void OnDisable()
     {
         if (collectableSystem != null)
-        {
             collectableSystem.OnCoinCollected.RemoveListener(OnCoinsUpdated);
-        }
+
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // Очищаем кэш при смене уровня
         levelCoinCache.Clear();
-
         UpdateLevelName();
         CountCoinsOnLevel();
         UpdateAllUI();
@@ -63,53 +54,36 @@ public class CollectableUI : MonoBehaviour
 
     private void UpdateLevelName()
     {
-        if (GameManager.Instance != null)
+        if (GameManager.Instance != null && !string.IsNullOrEmpty(GameManager.Instance.GetCurrentLevelName()))
         {
             currentLevelName = GameManager.Instance.GetCurrentLevelName();
         }
-
-        // Если все еще null, получаем из SceneManager
-        if (string.IsNullOrEmpty(currentLevelName))
+        else
         {
             currentLevelName = SceneManager.GetActiveScene().name;
         }
 
-        // Если и это не помогло, используем дефолтное значение
-        if (string.IsNullOrEmpty(currentLevelName))
-        {
-            currentLevelName = "UnknownLevel";
-        }
+        if (string.IsNullOrEmpty(currentLevelName) || currentLevelName == "MainMenu" || currentLevelName.Contains("Menu"))
+            currentLevelName = null; 
     }
 
     private void CountCoinsOnLevel()
     {
-        UpdateLevelName();
-
-        // Важно: Проверяем что currentLevelName не null/empty
         if (string.IsNullOrEmpty(currentLevelName))
         {
-            Debug.LogWarning("CountCoinsOnLevel: currentLevelName is null or empty!");
             totalCoinsOnLevel = 0;
             return;
         }
 
-        // Проверяем кэш
-        if (levelCoinCache.ContainsKey(currentLevelName))
+        if (levelCoinCache.TryGetValue(currentLevelName, out int cached))
         {
-            totalCoinsOnLevel = levelCoinCache[currentLevelName];
+            totalCoinsOnLevel = cached;
             return;
         }
 
-        // Кэшируем количество монет на уровне
-        // Используем FindObjectsOfType с includeInactive = true
-        // чтобы найти ВСЕ монеты, включая собранные (неактивные)
-        Collectable[] allCoins = GameObject.FindObjectsOfType<Collectable>(true);
-        totalCoinsOnLevel = allCoins.Length;
-
-        // Сохраняем в кэш
+        Collectable[] coins = FindObjectsOfType<Collectable>(true);
+        totalCoinsOnLevel = coins.Length;
         levelCoinCache[currentLevelName] = totalCoinsOnLevel;
-
-        Debug.Log($"Кэшировано монет для уровня '{currentLevelName}': {totalCoinsOnLevel}");
     }
 
     private void OnCoinsUpdated(int current, int max)
@@ -123,75 +97,66 @@ public class CollectableUI : MonoBehaviour
         UpdateMainMenuUI();
     }
 
-    public void UpdatePauseMenuUI()
+    private void UpdatePauseMenuUI()
     {
-        if (pauseMenuCollectablesText != null)
+        if (pauseMenuCollectablesText == null) return;
+
+        if (string.IsNullOrEmpty(currentLevelName) || collectableSystem == null)
         {
-            // Получаем актуальные данные
-            UpdateLevelName();
-            CountCoinsOnLevel();
-
-            // Проверяем что у нас есть валидный уровень
-            if (string.IsNullOrEmpty(currentLevelName) || collectableSystem == null)
-            {
-                pauseMenuCollectablesText.text = "Собрано: 0/0";
-                return;
-            }
-
-            int collectedOnLevel = collectableSystem.GetLevelCollectedCount(currentLevelName);
-
-            // Для отладки
-            Debug.Log($"Пауза UI - Уровень: {currentLevelName}, Собрано: {collectedOnLevel}/{totalCoinsOnLevel}");
-
-            pauseMenuCollectablesText.text = $"Собрано: {collectedOnLevel}/{totalCoinsOnLevel}";
+            pauseMenuCollectablesText.text = "Монеты: 0/0";
+            return;
         }
+
+        int collectedOnLevel = collectableSystem.GetLevelCollectedCount(currentLevelName);
+        pauseMenuCollectablesText.text = $"Монеты: {collectedOnLevel}/{totalCoinsOnLevel}";
     }
 
-    public void UpdateMainMenuUI()
+    private void UpdateMainMenuUI()
     {
-        if (mainMenuCollectablesText != null)
-        {
-            if (collectableSystem == null)
-            {
-                mainMenuCollectablesText.text = "Всего собрано: 0/0";
-                return;
-            }
+        if (mainMenuCollectablesText == null) return;
 
-            int collected = collectableSystem.GetCollectedCoins();
-            int max = collectableSystem.maxGlobalCoins;
-            mainMenuCollectablesText.text = $"Всего собрано: {collected}/{max}";
+        if (collectableSystem == null)
+        {
+            mainMenuCollectablesText.text = "Всего: 0/0";
+            return;
+        }
+
+        int totalCollected = collectableSystem.GetCollectedCoins();
+        int maxGlobal = collectableSystem.maxGlobalCoins;
+
+        mainMenuCollectablesText.text = $"Всего собрано: {totalCollected}/{maxGlobal}";
+
+        // PROCENT
+        // float percent = collectableSystem.GetCompletionPercentage();
+        // mainMenuCollectablesText.text = $"Прогресс: {totalCollected}/{maxGlobal} ({percent:F1}%)";
+    }
+
+    public void SetupResetButton()
+    {
+        if (resetLevelCoinsButton != null)
+        {
+            resetLevelCoinsButton.onClick.RemoveAllListeners();
+            resetLevelCoinsButton.onClick.AddListener(ResetLevelCoins);
+            UpdateResetButtonVisibility();
         }
     }
 
     private void UpdateResetButtonVisibility()
     {
-        if (resetLevelCoinsButton != null)
-        {
-            bool isMainMenu = string.IsNullOrEmpty(currentLevelName) || currentLevelName == "MainMenu";
-            resetLevelCoinsButton.gameObject.SetActive(!isMainMenu);
-        }
+        if (resetLevelCoinsButton == null) return;
+
+        bool inGameLevel = !string.IsNullOrEmpty(currentLevelName);
+        resetLevelCoinsButton.gameObject.SetActive(inGameLevel);
     }
 
     private void ResetLevelCoins()
     {
-        if (collectableSystem == null || string.IsNullOrEmpty(currentLevelName) || currentLevelName == "MainMenu")
-        {
-            Debug.LogWarning($"Cannot reset coins: collectableSystem={collectableSystem}, level={currentLevelName}");
+        if (collectableSystem == null || string.IsNullOrEmpty(currentLevelName))
             return;
-        }
 
-        Debug.Log($"Сброс монет для уровня: {currentLevelName}");
-
-        // Сбрасываем монеты
         collectableSystem.ResetLevelCoins(currentLevelName);
+        levelCoinCache.Remove(currentLevelName);
 
-        // Очищаем кэш для этого уровня
-        if (levelCoinCache.ContainsKey(currentLevelName))
-        {
-            levelCoinCache.Remove(currentLevelName);
-        }
-
-        // Перезагружаем уровень
         SceneManager.LoadScene(currentLevelName);
     }
 }

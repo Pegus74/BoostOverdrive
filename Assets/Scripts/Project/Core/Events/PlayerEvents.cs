@@ -5,5 +5,5 @@ public static class PlayerEvents
 {
     public static FloatEvent OnPlayerSpeedModifierChange = new FloatEvent();
     
-    public static UnityEvent OnStyleChangedEvent = new UnityEvent();
+    public static BoolEvent OnStyleChangedEvent = new BoolEvent();
 }

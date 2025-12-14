@@ -242,16 +242,31 @@ public class FirstPersonController : MonoBehaviour
         InitializeChargedJumpUI();
 
         #region EnablePower
-        if (currentScene.name == "level1")
+        Scene currentScene = SceneManager.GetActiveScene();
+
+        if (currentScene.name == "level1" ||
+            currentScene.name == "Level 1-6" ||
+            currentScene.name == "Level 1-9" ||
+            currentScene.name == "Level 1-4" ||
+            currentScene.name == "Level 1-5")
         {
             enableSlam = false;
             enableCrawlSlide = false;
             enableDash = false;
         }
-        else if (currentScene.name == "level2")
+        else if (currentScene.name == "level2" ||
+                 currentScene.name == "Level 1-10" ||
+                 currentScene.name == "Level 1-7")
         {
             enableSlam = false;
             enableCrawlSlide = false;
+           
+        }
+        else
+        {
+            enableSlam = true;
+            enableCrawlSlide = true;
+           
         }
         #endregion
 
@@ -795,7 +810,6 @@ public class FirstPersonController : MonoBehaviour
     
     private void OnCollisionEnter(Collision collision)
     {
-
         if (isDashing && styleManager != null && styleManager.CurrentStyle.canBreakWallsWithDash)
         {
             DestructibleWall wall = collision.gameObject.GetComponent<DestructibleWall>();
@@ -810,7 +824,6 @@ public class FirstPersonController : MonoBehaviour
         if (isSlamming && styleManager != null && styleManager.CurrentStyle.canBreakWallsWithSlam && !slamImpactOccurred)
         {
             DestructibleWall wall = collision.gameObject.GetComponent<DestructibleWall>();
-            Debug.Log("AAFAFFA");
             if (wall != null)
             {
                 slamImpactOccurred = true;

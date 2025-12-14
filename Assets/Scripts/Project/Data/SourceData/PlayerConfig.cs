@@ -25,12 +25,10 @@ public class PlayerConfig : ScriptableObject
     public bool enableAirJump = false;
 
     [Header("Настройки Dash")]
-    public bool enableDash = true;
     public float dashDuration = 0.15f;
     public float dashCooldown = 1.0f;
     
     [Header("Настройки CrawlSlide")]
-    public bool enableCrawlSlide = true;
     public float slideDuration = 2f;
     [FormerlySerializedAs("initialSpeedMultiplier")] public float SlideSpeedMultiplier = 1.2f;
     public float FinalSlideSpeedMultiplier = 1f;
@@ -38,7 +36,6 @@ public class PlayerConfig : ScriptableObject
     public float squatTransitionDuration = 0.5f;
     
     [Header("Настройки Slam")]
-    public bool enableSlam = true;
     public float slamCooldown = 1.0f;
     public float slamSlowdownDuration = 0.5f;
     public float destructibleWallReboundMultiplier = 10.0f;
