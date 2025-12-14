@@ -5,14 +5,15 @@ using UnityEngine;
 public class CrackedPlatformController : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] private float destroyDelay = 1.5f;
+    
+    public ObstaclesSettingsData obstaclesSettingsData;
 
     private CrackedPlatformModel model;
     private CrackedPlatformView view;
 
     private void Awake()
     {
-        model = new CrackedPlatformModel(destroyDelay);
+        model = new CrackedPlatformModel(obstaclesSettingsData.CrackPlatDestroyDelay);
         view = GetComponent<CrackedPlatformView>();
     }
 

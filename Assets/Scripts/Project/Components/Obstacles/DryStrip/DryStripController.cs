@@ -4,11 +4,10 @@ using UnityEngine;
 
 public class DryStripController : MonoBehaviour
 {
-    [Header("Settings")]
-    [SerializeField] private float destroyDelay = 1f;
-
-    [Header("Platforms (order matters!)")]
+    [Header("Platforms")]
     [SerializeField] private List<DryPlatformView> platforms;
+    
+    public ObstaclesSettingsData obstaclesSettingsData;
 
     private DryStripModel model;
     private bool[] destroyed;
@@ -46,7 +45,7 @@ public class DryStripController : MonoBehaviour
             platforms[i].PlayCrack();
             platforms[i].ShowCracked();
 
-            yield return new WaitForSeconds(destroyDelay);
+            yield return new WaitForSeconds(obstaclesSettingsData.DryStripDestroyDelay);
 
             if (platforms[i] != null)
                 platforms[i].DestroyPlatform();

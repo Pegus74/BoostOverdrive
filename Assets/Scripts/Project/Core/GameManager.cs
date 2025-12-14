@@ -49,6 +49,8 @@ public class NewGameManager : MonoBehaviour
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         currentLevelName = scene.name;
+        RMusicManager.Instance.SetVolume(0.25f);
+        RMusicManager.Instance.SetPitch(1f);
         Time.timeScale = 1f;
         if (currentLevelName == "MainMenuRefactor")
             currentState = GameState.Menu;
@@ -82,6 +84,8 @@ public class NewGameManager : MonoBehaviour
 
     public void PlayerDied()
     {
+        RMusicManager.Instance.SetVolume(0.1f);
+        RMusicManager.Instance.SetPitch(0.7f);
         currentState = GameState.GameOver;
         UpdateGameState();
     }
