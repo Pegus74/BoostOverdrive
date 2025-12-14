@@ -1,5 +1,6 @@
-using UnityEngine;
-using System.Collections;
+using UnityEngine;           
+using System.Collections;    
+using UnityEngine.Events;
 
 public class SpringWall : MonoBehaviour
 {
@@ -16,23 +17,18 @@ public class SpringWall : MonoBehaviour
     private void Awake()
     {
         wallCollider = GetComponent<Collider>();
-
-        // Автоматически находим игрока
         FindPlayer();
-
         Debug.Log($"SpringWall initialized. Activation distance: {settings.activationDistance}");
     }
 
     private void FindPlayer()
     {
-        // Сначала ищем по тегу
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
             playerStateModel = player.GetComponent<PlayerStateModel>();
         }
 
-        // Если не нашли по тегу, ищем в сцене
         if (playerStateModel == null)
         {
             playerStateModel = FindObjectOfType<PlayerStateModel>();
@@ -52,15 +48,12 @@ public class SpringWall : MonoBehaviour
     {
         if (playerStateModel == null)
         {
-            // Периодически пытаемся найти игрока, если потеряли
-            if (Time.frameCount % 60 == 0) // Каждую секунду
+            if (Time.frameCount % 60 == 0) 
             {
                 FindPlayer();
             }
             return;
         }
-
-        // Проверяем расстояние до игрока
         CheckPlayerDistance();
     }
 
@@ -72,7 +65,6 @@ public class SpringWall : MonoBehaviour
         bool wasInRange = isPlayerInRange;
         isPlayerInRange = (distance <= settings.activationDistance);
 
-        // Логируем изменение состояния
         if (isPlayerInRange && !wasInRange)
         {
             Debug.Log($"Player entered range. Distance: {distance}");
@@ -83,7 +75,6 @@ public class SpringWall : MonoBehaviour
         }
     }
 
-    // Основной метод для обнаружения прыжка от стены
     public bool TryDetectWallJump(out WallJumpData jumpData)
     {
         jumpData = new WallJumpData();
@@ -106,13 +97,14 @@ public class SpringWall : MonoBehaviour
             return false;
         }
 
+   
         if (playerStateModel.LastWallJumpedFrom == this)
         {
-            Debug.Log("Already jumped from this wall");
+            Debug.Log("Already jumped from this wall (need to touch ground first)");
             return false;
         }
 
-        // Используем OverlapSphere для обнаружения игрока рядом со стеной
+ 
         if (!IsPlayerNearWall())
         {
             Debug.Log("Player not near wall surface");
@@ -141,22 +133,6 @@ public class SpringWall : MonoBehaviour
     {
         if (playerStateModel == null) return false;
 
-        // Используем OverlapSphere для проверки наличия игрока в зоне стены
-        Collider[] hitColliders = Physics.OverlapSphere(
-            playerStateModel.transform.position,
-            settings.activationDistance * 0.5f, // Более маленький радиус для точности
-            settings.playerLayer
-        );
-
-        foreach (var collider in hitColliders)
-        {
-            if (collider == wallCollider)
-            {
-                return true;
-            }
-        }
-
-        // Дополнительная проверка - расстояние до ближайшей точки коллайдера
         Vector3 closestPoint = wallCollider.ClosestPoint(playerStateModel.transform.position);
         float distanceToWall = Vector3.Distance(playerStateModel.transform.position, closestPoint);
 
@@ -171,37 +147,9 @@ public class SpringWall : MonoBehaviour
         Vector3 playerPosition = playerStateModel.transform.position;
         Vector3 closestPoint = wallCollider.ClosestPoint(playerPosition);
 
-        // Вычисляем нормаль от ближайшей точки к игроку
-        Vector3 normal = (playerPosition - closestPoint).normalized;
-
-        // Для плоскостей можно использовать более точное определение
-        if (wallCollider is BoxCollider || wallCollider is MeshCollider)
-        {
-            // Пытаемся получить нормаль через Raycast
-            RaycastHit hit;
-            Vector3 rayDirection = (closestPoint - playerPosition).normalized;
-
-            if (Physics.Raycast(playerPosition, rayDirection, out hit, settings.activationDistance * 2f))
-            {
-                if (hit.collider == wallCollider)
-                {
-                    Debug.Log($"Using raycast normal: {hit.normal}");
-                    return hit.normal;
-                }
-            }
-        }
-
-        Debug.Log($"Using calculated normal: {normal}");
-        return normal;
+        return (playerPosition - closestPoint).normalized;
     }
 
-    private float GetPlayerDistance()
-    {
-        if (playerStateModel == null) return float.MaxValue;
-        return Vector3.Distance(transform.position, playerStateModel.transform.position);
-    }
-
-    // Корутина для модификатора скорости
     public IEnumerator ApplySpeedModifierCoroutine(PlayerStateModel model)
     {
         if (model == null) yield break;
@@ -217,45 +165,17 @@ public class SpringWall : MonoBehaviour
         model.SetMovementSpeedModifier(1f);
     }
 
+    private float GetPlayerDistance()
+    {
+        if (playerStateModel == null) return float.MaxValue;
+        return Vector3.Distance(transform.position, playerStateModel.transform.position);
+    }
+
     private void OnDrawGizmosSelected()
     {
         if (settings == null) return;
 
-        // Зона активации
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, settings.activationDistance);
-
-        // Зона обнаружения стены (меньшая)
-        if (playerStateModel != null)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(playerStateModel.transform.position, settings.activationDistance * 0.5f);
-        }
-
-        // Визуализация нормали
-        if (playerStateModel != null && wallCollider != null)
-        {
-            Vector3 closestPoint = wallCollider.ClosestPoint(playerStateModel.transform.position);
-            Vector3 normal = CalculateWallNormal();
-
-            Gizmos.color = Color.blue;
-            Gizmos.DrawLine(closestPoint, closestPoint + normal * 2f);
-
-            Gizmos.color = Color.green;
-            Gizmos.DrawLine(playerStateModel.transform.position, closestPoint);
-        }
-    }
-
-    private void OnDrawGizmos()
-    {
-        if (settings == null || playerStateModel == null) return;
-
-        // Всегда показываем связь со игроком когда в зоне
-        float distance = GetPlayerDistance();
-        if (distance <= settings.activationDistance)
-        {
-            Gizmos.color = Color.magenta;
-            Gizmos.DrawLine(transform.position, playerStateModel.transform.position);
-        }
     }
 }
