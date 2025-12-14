@@ -12,6 +12,8 @@ public class GroundCheckComponent : MonoBehaviour
 
     private bool isGrounded = false;
     private Vector3 lastValidNormal = Vector3.up;
+    
+    private bool hasValidGroundContactThisStep;
 
     private void Awake()
     {
@@ -39,30 +41,40 @@ public class GroundCheckComponent : MonoBehaviour
 
     private void FixedUpdate()
     {
+        bool wasGrounded = isGrounded;
+        isGrounded = hasValidGroundContactThisStep;
+
         playerStateModel.SetIsGrounded(isGrounded);
         playerStateModel.SetGroundNormal(isGrounded ? lastValidNormal : Vector3.up);
-        if (isGrounded && !playerStateModel.IsGrounded)
+
+        if (isGrounded && !wasGrounded)
         {
-            playerStateModel.UpdateCoyoteTime(0.15f); 
+            playerStateModel.UpdateCoyoteTime(0.15f);
         }
+
+        hasValidGroundContactThisStep = false;
     }
+
 
     private void EvaluateGroundContact(Collision collision)
     {
-        if (((1 << collision.gameObject.layer) & groundLayer) == 0) return;
+        if (((1 << collision.gameObject.layer) & groundLayer) == 0)
+            return;
 
         foreach (ContactPoint contact in collision.contacts)
         {
             float angle = Vector3.Angle(contact.normal, Vector3.up);
+
             if (angle <= maxSlopeAngle)
             {
-                isGrounded = true;
+                hasValidGroundContactThisStep = true;
                 lastValidNormal = contact.normal;
                 playerStateModel.SetLastWallJumpedFrom(null);
                 return;
             }
         }
     }
+
 
     private void TryResetGroundedState()
     {

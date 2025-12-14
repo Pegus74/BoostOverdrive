@@ -21,4 +21,10 @@ public class ObstaclesSettingsData : ScriptableObject
     
     public float horizontalForceLegs = 10f;
     public float verticalForceLegs = 15f;
+    
+    [Header("Настройки CrackedPlatform&DryStip")]
+    public float CrackPlatDestroyDelay = 1.0f;
+    
+    [Header("Настройки DryStip")]
+    public float DryStripDestroyDelay = 1.0f;
 }
