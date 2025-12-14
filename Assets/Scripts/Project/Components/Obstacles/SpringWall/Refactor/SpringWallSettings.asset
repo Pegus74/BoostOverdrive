@@ -12,13 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83c40ea28c1a4d546b5ad385bbe37f03, type: 3}
   m_Name: SpringWallSettings
   m_EditorClassIdentifier: 
-  activationDistance: 1
-  raycastCheckDistance: 1
-  playerLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  reboundForceHands: 10
-  extraAccelerationHands: 5
+  horizontalForceHands: 10
+  verticalForceHands: 5
   handsSpeedModifier: 0.7
   handsSpeedModifierDuration: 1
   horizontalForceLegs: 8

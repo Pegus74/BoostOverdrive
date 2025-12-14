@@ -1,6 +1,5 @@
-using UnityEngine;           
-using System.Collections;    
-using UnityEngine.Events;
+﻿using UnityEngine;
+using System.Collections;
 
 public class SpringWall : MonoBehaviour
 {
@@ -12,13 +11,12 @@ public class SpringWall : MonoBehaviour
 
     private Collider wallCollider;
     private PlayerStateModel playerStateModel;
-    private bool isPlayerInRange = false;
+    private Rigidbody playerRb;
 
     private void Awake()
     {
         wallCollider = GetComponent<Collider>();
         FindPlayer();
-        Debug.Log($"SpringWall initialized. Activation distance: {settings.activationDistance}");
     }
 
     private void FindPlayer()
@@ -27,96 +25,41 @@ public class SpringWall : MonoBehaviour
         if (player != null)
         {
             playerStateModel = player.GetComponent<PlayerStateModel>();
+            playerRb = player.GetComponent<Rigidbody>();
         }
 
         if (playerStateModel == null)
         {
             playerStateModel = FindObjectOfType<PlayerStateModel>();
-        }
-
-        if (playerStateModel != null)
-        {
-            Debug.Log($"Player found: {playerStateModel.gameObject.name}");
-        }
-        else
-        {
-            Debug.LogError("Player not found! Make sure player has PlayerStateModel component.");
-        }
-    }
-
-    private void Update()
-    {
-        if (playerStateModel == null)
-        {
-            if (Time.frameCount % 60 == 0) 
+            if (playerStateModel != null)
             {
-                FindPlayer();
+                playerRb = playerStateModel.GetComponent<Rigidbody>();
             }
-            return;
-        }
-        CheckPlayerDistance();
-    }
-
-    private void CheckPlayerDistance()
-    {
-        if (playerStateModel == null) return;
-
-        float distance = Vector3.Distance(transform.position, playerStateModel.transform.position);
-        bool wasInRange = isPlayerInRange;
-        isPlayerInRange = (distance <= settings.activationDistance);
-
-        if (isPlayerInRange && !wasInRange)
-        {
-            Debug.Log($"Player entered range. Distance: {distance}");
-        }
-        else if (!isPlayerInRange && wasInRange)
-        {
-            Debug.Log($"Player left range. Distance: {distance}");
         }
     }
+
 
     public bool TryDetectWallJump(out WallJumpData jumpData)
     {
         jumpData = new WallJumpData();
 
-        if (!isPlayerInRange)
+        if (playerStateModel == null || playerRb == null)
         {
-            Debug.Log($"Player not in range. Distance: {GetPlayerDistance()}");
-            return false;
-        }
-
-        if (playerStateModel == null)
-        {
-            Debug.Log("PlayerStateModel is null");
-            return false;
-        }
-
-        if (playerStateModel.IsGrounded)
-        {
-            Debug.Log("Player is grounded - no wall jump");
+            FindPlayer();
             return false;
         }
 
    
-        if (playerStateModel.LastWallJumpedFrom == this)
-        {
-            Debug.Log("Already jumped from this wall (need to touch ground first)");
+        if (playerStateModel.IsGrounded)
             return false;
-        }
 
- 
-        if (!IsPlayerNearWall())
-        {
-            Debug.Log("Player not near wall surface");
+        if (playerStateModel.LastWallJumpedFrom == this)
             return false;
-        }
+
+        if (!IsPlayerTouchingThisWall())
+            return false;
 
         Vector3 surfaceNormal = CalculateWallNormal();
-        if (surfaceNormal == Vector3.zero)
-        {
-            Debug.Log("Could not determine wall normal");
-            return false;
-        }
 
         jumpData = new WallJumpData
         {
@@ -125,18 +68,61 @@ public class SpringWall : MonoBehaviour
             styleIndex = playerStateModel.CurrentStyleIndex
         };
 
-        Debug.Log($"Wall jump detected! Style: {playerStateModel.CurrentStyleIndex}");
         return true;
     }
 
-    private bool IsPlayerNearWall()
+  
+    private bool IsPlayerTouchingThisWall()
     {
-        if (playerStateModel == null) return false;
+        if (playerStateModel == null || wallCollider == null)
+            return false;
 
-        Vector3 closestPoint = wallCollider.ClosestPoint(playerStateModel.transform.position);
-        float distanceToWall = Vector3.Distance(playerStateModel.transform.position, closestPoint);
+        Vector3 playerPos = playerStateModel.transform.position;
 
-        return distanceToWall <= settings.activationDistance;
+      
+        Vector3 closestPoint = wallCollider.ClosestPoint(playerPos);
+        float distanceToWall = Vector3.Distance(playerPos, closestPoint);
+
+        
+        if (distanceToWall <= 1f)
+            return true;
+
+        
+        Vector3[] checkDirections = GetCheckDirections();
+        foreach (Vector3 direction in checkDirections)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(playerPos, direction, out hit, 0.2f))
+            {
+                if (hit.collider == wallCollider)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+ 
+    private Vector3[] GetCheckDirections()
+    {
+        if (playerStateModel == null)
+            return new Vector3[0];
+
+        Vector3 forward = playerStateModel.transform.forward;
+        forward.y = 0;
+        forward.Normalize();
+
+        Vector3 right = playerStateModel.transform.right;
+        right.y = 0;
+        right.Normalize();
+
+        return new Vector3[]
+        {
+            forward,
+            -forward,
+            right,
+            -right
+        };
     }
 
     private Vector3 CalculateWallNormal()
@@ -144,12 +130,13 @@ public class SpringWall : MonoBehaviour
         if (playerStateModel == null || wallCollider == null)
             return Vector3.zero;
 
-        Vector3 playerPosition = playerStateModel.transform.position;
-        Vector3 closestPoint = wallCollider.ClosestPoint(playerPosition);
+        Vector3 playerPos = playerStateModel.transform.position;
+        Vector3 closestPoint = wallCollider.ClosestPoint(playerPos);
 
-        return (playerPosition - closestPoint).normalized;
+        return (playerPos - closestPoint).normalized;
     }
 
+  
     public IEnumerator ApplySpeedModifierCoroutine(PlayerStateModel model)
     {
         if (model == null) yield break;
@@ -165,17 +152,26 @@ public class SpringWall : MonoBehaviour
         model.SetMovementSpeedModifier(1f);
     }
 
-    private float GetPlayerDistance()
-    {
-        if (playerStateModel == null) return float.MaxValue;
-        return Vector3.Distance(transform.position, playerStateModel.transform.position);
-    }
-
+   
     private void OnDrawGizmosSelected()
     {
-        if (settings == null) return;
+        if (wallCollider == null) return;
 
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, settings.activationDistance);
+        if (wallCollider is BoxCollider box)
+        {
+            Gizmos.DrawWireCube(transform.position + box.center, box.size);
+        }
+
+     
+        if (playerStateModel != null)
+        {
+            Gizmos.color = Color.red;
+            Vector3[] directions = GetCheckDirections();
+            foreach (Vector3 dir in directions)
+            {
+                Gizmos.DrawRay(playerStateModel.transform.position, dir * 0.2f);
+            }
+        }
     }
 }

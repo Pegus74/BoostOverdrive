@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 
 public class PlayerMovementController : MonoBehaviour
@@ -139,13 +139,14 @@ public class PlayerMovementController : MonoBehaviour
     private void CheckForWallJumps()
     {
         if (playerStateModel.IsGrounded) return;
+
+        
         foreach (SpringWall wall in FindObjectsOfType<SpringWall>())
         {
-            
             if (wall.TryDetectWallJump(out WallJumpData data))
             {
                 OnWallJumpDetectedEvent?.Invoke(data);
-                return;
+                return; 
             }
         }
     }
