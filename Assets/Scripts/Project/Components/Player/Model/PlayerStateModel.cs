@@ -26,9 +26,8 @@ public class PlayerStateModel : MonoBehaviour
     private float _jumpBufferCounter;
 
     private Component _lastWallJumpedFrom;
-
     private Rigidbody _rb;
-    
+
     private void Start()
     {
         if (settings != null)
@@ -41,7 +40,6 @@ public class PlayerStateModel : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody>();
     }
-
 
     public float CurrentWalkSpeed => _walkSpeed * _movementSpeedModifier;
     public float CurrentJumpPower => _jumpPower;
@@ -59,6 +57,7 @@ public class PlayerStateModel : MonoBehaviour
     public Vector3 GroundNormal => _groundNormal;
     public float CoyoteCounter => _coyoteCounter;
     public float JumpBufferCounter => _jumpBufferCounter;
+
     public Component LastWallJumpedFrom => _lastWallJumpedFrom;
 
     public void SetWalkSpeed(float value) => _walkSpeed = value;
@@ -75,7 +74,10 @@ public class PlayerStateModel : MonoBehaviour
     public void SetIsChargingJump(bool value) => _isChargingJump = value;
 
     public void SetGroundNormal(Vector3 normal) => _groundNormal = normal;
+
     public void SetLastWallJumpedFrom(Component wall) => _lastWallJumpedFrom = wall;
+
+    public void ClearLastWallJumpedFrom() => _lastWallJumpedFrom = null;
 
     public void UpdateCoyoteTime(float deltaTime)
     {
@@ -91,9 +93,9 @@ public class PlayerStateModel : MonoBehaviour
     public void BufferJump() => _jumpBufferCounter = settings.jumpBufferTime;
     public void ResetJumpBuffer() => _jumpBufferCounter = 0f;
     public void ResetCoyoteTime() => _coyoteCounter = 0f;
-    
+
     public Vector3 GetForwardVector() => transform.forward;
-    
+
     public Vector3 GetCurrentHorizontalVelocity()
     {
         Vector3 vel = _rb.linearVelocity;
