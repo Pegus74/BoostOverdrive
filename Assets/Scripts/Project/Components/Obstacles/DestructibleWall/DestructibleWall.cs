@@ -11,7 +11,7 @@ public class RDestructibleWall : MonoBehaviour
     [SerializeField] private List<GameObject> wallParts = new List<GameObject>(); 
     [SerializeField] private Collider wallCollider;  
     private bool isDestroyed = false;
-    
+    public bool IsDestroyed => isDestroyed;
     private void Awake()
     {
         if (wallParts.Count == 0)
