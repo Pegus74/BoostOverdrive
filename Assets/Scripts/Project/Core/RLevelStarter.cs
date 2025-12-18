@@ -18,6 +18,12 @@ public class RLevelStarter : MonoBehaviour
             GameEvents.OnMenuMusicStart.Invoke();
             return;
         }
+
+        if (levelName == "HUB")
+        {
+            GameEvents.OnGameMusicStart.Invoke();
+            return;
+        }
         GameEvents.OnGameMusicStart.Invoke();
         
         TimerController.Instance.InitForLevel(levelName);

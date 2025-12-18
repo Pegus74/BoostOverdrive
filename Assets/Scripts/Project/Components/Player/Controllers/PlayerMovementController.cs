@@ -5,7 +5,6 @@ public class PlayerMovementController : MonoBehaviour
 {
     public PlayerStateModel playerStateModel;
     public WallJumpEvent OnWallJumpDetectedEvent;
-    public SpringWallSettings wallJumpSettings;
 
     private Rigidbody rb;
     private Vector2 currentMoveInput = Vector2.zero;
