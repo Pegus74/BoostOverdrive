@@ -59,7 +59,7 @@ public class MainMenu : MonoBehaviour
     public void ShowCollectables()
     {
         mainCanvas.gameObject.SetActive(false);
-        collectablesCanvas.gameObject.SetActive(true); // 
+        collectablesCanvas.gameObject.SetActive(true);
     }
 
     public void HideCollectables()

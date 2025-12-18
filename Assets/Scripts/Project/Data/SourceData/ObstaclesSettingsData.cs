@@ -15,16 +15,20 @@ public class ObstaclesSettingsData : ScriptableObject
     public float explosionForce = 10f;
     public float explosionRadius = 5f;
     
-    [Header("Настройки SpringWall")]
-    public float reboundForceHands = 15f;
-    public float extraAccelerationHands = 10f;
-    
-    public float horizontalForceLegs = 10f;
-    public float verticalForceLegs = 15f;
-    
     [Header("Настройки CrackedPlatform&DryStip")]
     public float CrackPlatDestroyDelay = 1.0f;
     
     [Header("Настройки DryStip")]
     public float DryStripDestroyDelay = 1.0f;
+    
+    [Header("Настройки SpringWall")]
+    [Header("Hands Style Settings")]
+    public float horizontalForceHands = 10f;
+    public float verticalForceHands = 12f;
+    public float handsSpeedModifier = 0.7f;
+    public float handsSpeedModifierDuration = 1f;
+
+    [Header("Legs Style Settings")]
+    public float horizontalForceLegs = 8f;
+    public float verticalForceLegs = 15f;
 }

@@ -19,6 +19,8 @@ public class PlayerStateModel : MonoBehaviour
     private bool _isSlamming;
     private bool _isChargingJump;
 
+    public void ClearLastWallJumpedFrom() => _lastWallJumpedFrom = null;
+
     public bool playerCanMove = true;
 
     private Vector3 _groundNormal = Vector3.up;

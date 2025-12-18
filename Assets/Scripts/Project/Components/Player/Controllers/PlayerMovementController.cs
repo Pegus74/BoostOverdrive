@@ -59,6 +59,11 @@ public class PlayerMovementController : MonoBehaviour
 
         playerStateModel.UpdateCoyoteTime(Time.fixedDeltaTime);
         playerStateModel.UpdateJumpBuffer(Time.fixedDeltaTime);
+        
+        if (playerStateModel.IsGrounded && rb.linearVelocity.y <= 0f)
+        {
+            playerStateModel.ClearLastWallJumpedFrom();
+        }
 
         if (playerStateModel.playerCanMove && !playerStateModel.IsDashing && !playerStateModel.IsSliding && !playerStateModel.IsSlamming)
             ApplyMovementForce(currentMoveInput);
@@ -95,13 +100,16 @@ public class PlayerMovementController : MonoBehaviour
         if (inputLocal.sqrMagnitude > 1f) inputLocal.Normalize();
 
         Vector3 rawLocalTarget = inputLocal * playerStateModel.CurrentWalkSpeed;
-        smoothedLocalVelocity = Vector3.MoveTowards(smoothedLocalVelocity, rawLocalTarget, playerStateModel.settings.acceleration * Time.fixedDeltaTime);
+        smoothedLocalVelocity = Vector3.MoveTowards(smoothedLocalVelocity, rawLocalTarget,
+            playerStateModel.settings.acceleration * Time.fixedDeltaTime);
 
         Vector3 targetVelocity = transform.TransformDirection(smoothedLocalVelocity) + externalImpulse;
         Vector3 velocityChange = targetVelocity - rb.linearVelocity;
 
-        velocityChange.x = Mathf.Clamp(velocityChange.x, -playerStateModel.settings.maxVelocityChange, playerStateModel.settings.maxVelocityChange);
-        velocityChange.z = Mathf.Clamp(velocityChange.z, -playerStateModel.settings.maxVelocityChange, playerStateModel.settings.maxVelocityChange);
+        velocityChange.x = Mathf.Clamp(velocityChange.x, -playerStateModel.settings.maxVelocityChange,
+            playerStateModel.settings.maxVelocityChange);
+        velocityChange.z = Mathf.Clamp(velocityChange.z, -playerStateModel.settings.maxVelocityChange,
+            playerStateModel.settings.maxVelocityChange);
         velocityChange.y = 0;
 
         rb.AddForce(velocityChange, ForceMode.VelocityChange);
@@ -145,54 +153,44 @@ public class PlayerMovementController : MonoBehaviour
 
     public void HandleWallJump(WallJumpData data)
     {
-        if (playerStateModel.LastWallJumpedFrom == data.wallComponent) return;
-        playerStateModel.SetLastWallJumpedFrom(data.wallComponent);
-
-        Vector3 normal = data.surfaceNormal;
         SpringWall wall = data.wallComponent as SpringWall;
-        Vector3 approachVector = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
-        bool specialVerticalCaseTriggered = false;
-        rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
+
+        if (playerStateModel.LastWallJumpedFrom == wall)
+        {
+            return;
+        }
+
+        if (playerStateModel.IsGrounded)
+        {
+            return;
+        }
+
+        Vector3 jumpDirection = transform.forward;
+        jumpDirection.y = 0;
+        jumpDirection.Normalize();
 
         if (data.styleIndex == HANDS_STYLE_INDEX)
         {
-            Vector3 V_approach_norm = approachVector.normalized;
-            float angle = Vector3.Angle(V_approach_norm, -normal);
-            bool isSpecialCase = (angle <= 15f || angle >= 165f || (angle >= 75f && angle <= 105f));
+            float horizontalForce = wall.settings.horizontalForceHands;
+            float verticalForce = wall.settings.verticalForceHands;
 
-            Vector3 reboundVector;
+            SetExternalImpulse(jumpDirection * horizontalForce);
+            rb.AddForce(Vector3.up * verticalForce, ForceMode.Impulse);
 
-            if (isSpecialCase)
-            {
-                reboundVector = normal + Vector3.up;
-                reboundVector.Normalize();
-                specialVerticalCaseTriggered = true;
-            }
-            else
-            {
-                reboundVector = Vector3.Reflect(V_approach_norm, normal);
-                reboundVector.y = 0;
-                reboundVector.Normalize();
-            }
-
-            Vector3 impulse = reboundVector * wall.settings.reboundForceHands + reboundVector * wall.settings.extraAccelerationHands;
-            SetExternalImpulse(impulse);
+            playerStateModel.SetLastWallJumpedFrom(wall);
 
             if (wall != null)
                 StartCoroutine(wall.ApplySpeedModifierCoroutine(playerStateModel));
         }
         else if (data.styleIndex == LEGS_STYLE_INDEX)
         {
-            Vector3 jumpDirection = transform.forward;
-            jumpDirection.y = 0;
-            jumpDirection.Normalize();
+            float horizontalForce = wall.settings.horizontalForceLegs;
+            float verticalForce = wall.settings.verticalForceLegs;
 
-            Vector3 finalImpulse = jumpDirection * wall.settings.horizontalForceLegs + Vector3.up * wall.settings.verticalForceLegs;
-            rb.AddForce(finalImpulse, ForceMode.Impulse);
-            SetExternalImpulse(Vector3.zero);
+            SetExternalImpulse(jumpDirection * horizontalForce);
+            rb.AddForce(Vector3.up * verticalForce, ForceMode.Impulse);
+
+            playerStateModel.SetLastWallJumpedFrom(wall);
         }
-
-        if (specialVerticalCaseTriggered && data.styleIndex == HANDS_STYLE_INDEX)
-            rb.AddForce(Vector3.up * playerStateModel.CurrentJumpPower * 0.75f, ForceMode.Impulse);
     }
 }
