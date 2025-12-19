@@ -34,14 +34,16 @@ public class MainMenu : MonoBehaviour
 
     public void ContinueGame()
     {
-        int level = PlayerPrefs.GetInt("ContinueLevel");
-        SceneManager.LoadScene(level);
+        // int level = PlayerPrefs.GetInt("ContinueLevel");
+        // SceneManager.LoadScene(level);
+        
+        SceneManager.LoadScene("HUB");
     }
 
     public void StartNewGame()
     {
         PlayerPrefs.DeleteAll();
-        LoadScene("Demo(Refactor)");
+        LoadScene("1-1");
     }
 
     public void ShowSettings()

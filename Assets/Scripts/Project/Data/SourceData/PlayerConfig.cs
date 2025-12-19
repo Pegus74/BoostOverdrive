@@ -12,7 +12,6 @@ public class PlayerConfig : ScriptableObject
     public float bobSpeed = 5f;
     public bool invertCamera = false;
     public bool lockCursor = true;
-    public bool cameraCanMove = true;
     public bool crosshair = true;
     public Sprite crosshairImage;
     public Color crosshairColor = Color.white;
@@ -20,17 +19,13 @@ public class PlayerConfig : ScriptableObject
     [Header("Настройки Движения")]
     public float maxVelocityChange = 10f;
     public float acceleration = 50f;
-    public bool playerCanMove = true;
     public bool enableJump = true;
-    public bool enableAirJump = false;
 
     [Header("Настройки Dash")]
-    public bool enableDash = true;
     public float dashDuration = 0.15f;
     public float dashCooldown = 1.0f;
     
     [Header("Настройки CrawlSlide")]
-    public bool enableCrawlSlide = true;
     public float slideDuration = 2f;
     [FormerlySerializedAs("initialSpeedMultiplier")] public float SlideSpeedMultiplier = 1.2f;
     public float FinalSlideSpeedMultiplier = 1f;
@@ -38,16 +33,10 @@ public class PlayerConfig : ScriptableObject
     public float squatTransitionDuration = 0.5f;
     
     [Header("Настройки Slam")]
-    public bool enableSlam = true;
     public float slamCooldown = 1.0f;
     public float slamSlowdownDuration = 0.5f;
     public float destructibleWallReboundMultiplier = 10.0f;
     
-    [Header("Настройки Взаимодействия со Стенами")]
-    public float raycastCheckDistance = 1.0f;
-    public float horizontalForceHands = 10f;
-    public float verticalForceLegs = 15f;
-
     [Header("Настройки заряженного прыжка")]
     public bool enableChargedJump = true;
     public float chargeSpeed = 2f;
@@ -60,7 +49,4 @@ public class PlayerConfig : ScriptableObject
     [Header("Настройки буфера прыжка")]
     public float coyoteTime = 0.15f;
     public float jumpBufferTime = 0.2f;
- 
-
-
 }
