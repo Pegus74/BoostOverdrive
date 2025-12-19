@@ -20,32 +20,23 @@ MonoBehaviour:
   bobSpeed: 10
   invertCamera: 0
   lockCursor: 1
-  cameraCanMove: 1
   crosshair: 1
   crosshairImage: {fileID: 0}
   crosshairColor: {r: 1, g: 1, b: 1, a: 1}
   maxVelocityChange: 10
   acceleration: 50
-  playerCanMove: 1
   enableJump: 1
-  enableAirJump: 0
-  enableDash: 1
   dashDuration: 0.15
   dashCooldown: 1
-  enableCrawlSlide: 1
   slideDuration: 3
   SlideSpeedMultiplier: 1.2
   FinalSlideSpeedMultiplier: 1
   squatHeightScale: 0.5
   squatTransitionDuration: 0.3
-  enableSlam: 1
   slamCooldown: 0.1
   slamSlowdownDuration: 0.5
   destructibleWallReboundMultiplier: 10
-  raycastCheckDistance: 1
-  horizontalForceHands: 10
-  verticalForceLegs: 15
-  enableChargedJump: 0
+  enableChargedJump: 1
   chargeSpeed: 2
   minJumpPowerPercent: 0.35
   groundStickForce: 8
