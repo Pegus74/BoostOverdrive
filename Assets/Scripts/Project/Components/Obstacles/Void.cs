@@ -4,14 +4,11 @@ using UnityEngine;
 
 public class Void : MonoBehaviour
 {
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision other)
     {
-        if (other.CompareTag("Player"))
+        if (other.collider.CompareTag("Player"))
         {
-            if (NewGameManager.Instance != null)
-            {
-                NewGameManager.Instance.PlayerDied();
-            }
+            NewGameManager.Instance.PlayerDied();
         }
     }
 }
