@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class RMusicManager : MonoBehaviour
@@ -10,12 +9,14 @@ public class RMusicManager : MonoBehaviour
 
     private AudioSource audioSource;
 
+    private const string VolumeKey = "MusicVolume";
+    private const string MusicOnKey = "MusicOn";
+
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-
             DontDestroyOnLoad(gameObject);
         }
         else
@@ -25,14 +26,23 @@ public class RMusicManager : MonoBehaviour
         }
 
         audioSource = GetComponent<AudioSource>();
-        
+
+        // Загружаем настройки
+        float savedVolume = PlayerPrefs.GetFloat(VolumeKey, 1f); // по умолчанию 1
+        bool savedMusicOn = PlayerPrefs.GetInt(MusicOnKey, 1) == 1; // по умолчанию включено
+
+        audioSource.volume = savedVolume;
+
+        if (savedMusicOn)
+            audioSource.Play();
+        else
+            audioSource.Stop();
     }
 
     private void OnEnable()
     {
         GameEvents.OnGameMusicStart.AddListener(PlayGameMusic);
         GameEvents.OnMenuMusicStart.AddListener(PlayMenuMusic);
-        
     }
 
     private void OnDisable()
@@ -41,28 +51,44 @@ public class RMusicManager : MonoBehaviour
         GameEvents.OnMenuMusicStart.RemoveListener(PlayMenuMusic);
     }
 
+    // set - с сохранением настройки в PlayerPrefs
+    // change - просто смена
     public void SetVolume(float volume)
     {
         if (audioSource != null)
+        {
             audioSource.volume = volume;
+            PlayerPrefs.SetFloat(VolumeKey, volume);
+        }
     }
 
-    public void SetPitch(float pitch) 
-    { 
-        if (audioSource != null) 
+    public void ChangeVolume(float volume)
+    {
+        if (audioSource != null)
+        {
+            audioSource.volume = volume;
+        }
+    }
+    
+    public void ChangePitch(float pitch)
+    {
+        if (audioSource != null)
+        {
             audioSource.pitch = pitch;
+        }
     }
 
-    public void StopMusic()
+    public void ToggleMusic(bool isOn)
     {
-        if (audioSource != null && audioSource.isPlaying)
-            audioSource.Stop();
-    }
+        if (audioSource != null)
+        {
+            if (isOn)
+                audioSource.Play();
+            else
+                audioSource.Stop();
 
-    public void PlayMusic()
-    {
-        if (audioSource != null && audioSource.isPlaying)
-            audioSource.Play();
+            PlayerPrefs.SetInt(MusicOnKey, isOn ? 1 : 0); // сохраняем состояние музыки
+        }
     }
 
     private void PlayMenuMusic()
@@ -70,21 +96,22 @@ public class RMusicManager : MonoBehaviour
         if (audioSource != null)
         {
             audioSource.Stop();
-            audioSource.resource = menuMusic;
-            audioSource.Play();
+            audioSource.clip = menuMusic;
+            if (PlayerPrefs.GetInt(MusicOnKey, 1) == 1)
+                audioSource.Play();
         }
         Debug.Log("[MusicManager] Play MenuMusic");
     }
-    
+
     private void PlayGameMusic()
     {
-        if (audioSource.resource != gameMusic)
+        if (audioSource.clip != gameMusic)
         {
             audioSource.Stop();
-            audioSource.resource = gameMusic;
-            audioSource.Play();
+            audioSource.clip = gameMusic;
+            if (PlayerPrefs.GetInt(MusicOnKey, 1) == 1)
+                audioSource.Play();
         }
         Debug.Log("[MusicManager] Play GameMusic");
     }
-    
 }

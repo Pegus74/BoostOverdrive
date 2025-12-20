@@ -9,6 +9,8 @@ public class NewGameManager : MonoBehaviour
     [SerializeField] private GameMode currentMode = GameMode.Classic;
     
     [SerializeField] private int maxGlobalCoins = 10;
+
+    [SerializeField] private Canvas settingsCanvas;
     
     private string currentLevelName;
     private int nextLevel;
@@ -49,14 +51,15 @@ public class NewGameManager : MonoBehaviour
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         currentLevelName = scene.name;
-        RMusicManager.Instance.SetVolume(0.25f);
-        RMusicManager.Instance.SetPitch(1f);
         Time.timeScale = 1f;
         if (currentLevelName == "MainMenuRefactor")
             currentState = GameState.Menu;
         else
             currentState = GameState.Playing;
         UpdateGameState();
+        
+        RMusicManager.Instance.ChangeVolume(PlayerPrefs.GetFloat("MusicVolume", 1f));
+        RMusicManager.Instance.ChangePitch(1f);
     }
     
     private void UpdateGameState()
@@ -84,8 +87,8 @@ public class NewGameManager : MonoBehaviour
 
     public void PlayerDied()
     {
-        RMusicManager.Instance.SetVolume(0.1f);
-        RMusicManager.Instance.SetPitch(0.7f);
+        RMusicManager.Instance.ChangeVolume(PlayerPrefs.GetFloat("MusicVolume", 1f) * 0.2f);
+        RMusicManager.Instance.ChangePitch(0.7f);
         currentState = GameState.GameOver;
         UpdateGameState();
     }
@@ -135,6 +138,19 @@ public class NewGameManager : MonoBehaviour
         bool isClassic = (currentMode == GameMode.Classic);
         currentMode = isClassic ? GameMode.Hard : GameMode.Classic;
         Debug.Log("[GameManager] GameMode Changed to: " + currentMode);
+    }
+
+    public void ShowSettings()
+    {
+        settingsCanvas.gameObject.SetActive(true);
+        currentState = GameState.InGameSettings;
+        
+    }
+
+    public void HideSettings()
+    {
+        settingsCanvas.gameObject.SetActive(false);
+        currentState = GameState.Paused;
     }
 
     public GameState GetCurrentState() => currentState;
