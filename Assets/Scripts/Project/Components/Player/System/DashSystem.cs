@@ -1,10 +1,12 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.Events;
 
 public class DashSystem : MonoBehaviour
 {
     public PlayerStateModel playerStateModel;
-
+    public UnityEvent OnDashPerformed;
+    public UnityEvent OnDashReady;
     private Rigidbody rb;
     private bool isDashAvailable = true;
     private Coroutine currentDashCoroutine;
@@ -26,6 +28,7 @@ public class DashSystem : MonoBehaviour
         if (rb == null || !isDashAvailable || playerStateModel.IsDashing || playerStateModel.IsSliding || playerStateModel.IsSlamming) return;
         if (currentDashCoroutine != null) StopCoroutine(currentDashCoroutine);
         currentDashCoroutine = StartCoroutine(DashCoroutine());
+        OnDashPerformed?.Invoke();
     }
 
     private IEnumerator DashCoroutine()
@@ -34,21 +37,15 @@ public class DashSystem : MonoBehaviour
         playerStateModel.SetIsDashing(true);
         AbilityEvents.OnAbilityStarted.Invoke();
 
-        // �������� ����������� ������� ������
+
         Vector3 baseDirection = transform.forward;
-
-        // ����������: ������������ ������������ ������������
-        // ��������� ������ �������������� ����������� (������� ������������ ������������)
         baseDirection.y = 0f;
-
-        // ����������� ������ ���� ���� ����������� �����
         if (baseDirection.sqrMagnitude > 0.01f)
         {
             baseDirection.Normalize();
         }
         else
         {
-            // ���� ������� ����� �����/����, ���������� ������� �������������� ����������� ��������
             Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
             if (horizontalVelocity.sqrMagnitude > 0.01f)
             {
@@ -63,8 +60,6 @@ public class DashSystem : MonoBehaviour
         float power = playerStateModel.CurrentDashPower;
         float duration = playerStateModel.settings.dashDuration;
         float cooldown = playerStateModel.settings.dashCooldown;
-
-        // ������� ������������ �������� ��� ������ �����
         rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         rb.AddForce(baseDirection * power, ForceMode.Impulse);
 
@@ -72,16 +67,13 @@ public class DashSystem : MonoBehaviour
         while (timer > 0f)
         {
             timer -= Time.deltaTime;
-
-            // � ������� ����� ���������� ��������� ���� ������ � �������������� ���������
             Vector3 currentDir = baseDirection;
-            currentDir.y = 0f; // ������������, ��� ����������� �������� ��������������
+            currentDir.y = 0f; 
 
             float accel = power * 0.6f * (timer / duration);
             rb.AddForce(currentDir * accel, ForceMode.Acceleration);
 
-            // �������������: ������������ ������������ �������� � ������� ����� �����
-            if (Mathf.Abs(rb.linearVelocity.y) > 2f) // ���� ������������ �������� 2 �/�
+            if (Mathf.Abs(rb.linearVelocity.y) > 2f) 
             {
                 rb.linearVelocity = new Vector3(
                     rb.linearVelocity.x,
@@ -101,8 +93,12 @@ public class DashSystem : MonoBehaviour
             cdTimer -= Time.deltaTime;
             yield return null;
         }
-
+        OnDashReady?.Invoke();
         isDashAvailable = true;
         currentDashCoroutine = null;
+    }
+    public float GetCooldownDuration()
+    {
+        return playerStateModel.settings.dashCooldown;
     }
 }
