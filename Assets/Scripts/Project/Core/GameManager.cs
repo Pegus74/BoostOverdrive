@@ -110,6 +110,9 @@ public class NewGameManager : MonoBehaviour
         bool isPlaying = (currentState == GameState.Playing);
         currentState = isPlaying ? GameState.Paused : GameState.Playing;
         
+        TimerController.Instance.ShowTimer(!isPlaying);
+        GameEvents.OnPause.Invoke(!isPlaying);
+        
         UpdateGameState(); 
     }
 
