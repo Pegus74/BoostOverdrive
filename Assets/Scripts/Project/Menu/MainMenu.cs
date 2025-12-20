@@ -10,6 +10,9 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private Canvas mainCanvas;
     [SerializeField] private Canvas settingsCanvas;
     [SerializeField] private Canvas collectablesCanvas;
+    [SerializeField] private Canvas keybindsCanvas;
+    
+    public ControlsMenu controls;
 
     public void OnQuitClicked() => Application.Quit();
     public void LoadScene(string sceneName) => SceneManager.LoadScene(sceneName);
@@ -56,6 +59,24 @@ public class MainMenu : MonoBehaviour
     {
         settingsCanvas.gameObject.SetActive(false);
         mainCanvas.gameObject.SetActive(true);
+    }
+
+    public void ShowBindings()
+    {
+        settingsCanvas.gameObject.SetActive(false);
+        controls.LoadBindings();
+        keybindsCanvas.gameObject.SetActive(true);
+    }
+    
+    public void HideBindings()
+    {
+        settingsCanvas.gameObject.SetActive(true);
+        keybindsCanvas.gameObject.SetActive(false);
+    }
+
+    public void SaveBindings()
+    {
+        controls.SaveBindings();
     }
 
     public void ShowCollectables()
