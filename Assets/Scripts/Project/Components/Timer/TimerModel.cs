@@ -30,7 +30,9 @@ public class TimerModel
         if (CurrentTime < BestTime)
         {
             BestTime = CurrentTime;
+            float x =  PlayerPrefs.GetFloat("AllTime",0) - PlayerPrefs.GetFloat(levelKey, 0) + BestTime;
             PlayerPrefs.SetFloat(levelKey, BestTime);
+            PlayerPrefs.SetFloat("AllTime", x);
             PlayerPrefs.Save();
         }
     }

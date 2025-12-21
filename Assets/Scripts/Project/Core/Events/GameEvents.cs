@@ -10,4 +10,6 @@ public static class GameEvents
     
     public static UnityEvent OnMenuMusicStart = new UnityEvent();
     public static UnityEvent OnGameMusicStart = new UnityEvent();
+    
+    public static BoolEvent OnPause = new  BoolEvent();
 }

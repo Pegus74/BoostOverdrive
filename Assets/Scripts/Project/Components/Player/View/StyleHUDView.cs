@@ -9,9 +9,18 @@ public class StyleHUDView : MonoBehaviour
 
     private Image activeImage;
     private Image prevImage;
-    
-    private void OnEnable() => PlayerEvents.OnStyleChangedEvent.AddListener(UpdateStyleUI);
-    private void OnDisable() => PlayerEvents.OnStyleChangedEvent.RemoveListener(UpdateStyleUI);
+
+    private void OnEnable()
+    {
+        PlayerEvents.OnStyleChangedEvent.AddListener(UpdateStyleUI);
+        GameEvents.OnPause.AddListener(ShowHud);
+    }
+
+    private void OnDisable()
+    {
+        PlayerEvents.OnStyleChangedEvent.RemoveListener(UpdateStyleUI);
+        GameEvents.OnPause.RemoveListener(ShowHud);
+    } 
 
     private void Awake()
     {
@@ -38,5 +47,10 @@ public class StyleHUDView : MonoBehaviour
 
         
         Debug.Log($"[StyleHUDView] updated. Active Index:");
+    }
+
+    public void ShowHud(bool show)
+    {
+        activeImage.gameObject.SetActive(show);
     }
 }
