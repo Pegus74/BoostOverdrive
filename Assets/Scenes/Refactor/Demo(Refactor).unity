@@ -848,6 +848,17 @@ Mesh:
       - serializedVersion: 1
         m_IndexStart: 0
         m_IndexCount: 0
+--- !u!114 &85653863 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4954423891958095644, guid: e8d25671ccfa2ada9be6ffbd02d11dd9, type: 3}
+  m_PrefabInstance: {fileID: 1896962079}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9085046f02f69544eb97fd06b6048fe2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Toggle
 --- !u!1 &112580698 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7937603568334485542, guid: 3bb6e4845b2d99840b014c0b580986f9, type: 3}
@@ -3200,6 +3211,11 @@ Mesh:
       - serializedVersion: 1
         m_IndexStart: 0
         m_IndexCount: 0
+--- !u!20 &717518895 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 6527330064568876917, guid: c43ffb9f4976f894fa7104d16ce72e4e, type: 3}
+  m_PrefabInstance: {fileID: 3502186971769417999}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &729759302 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4358785844069407048, guid: 5d0d5046c71af982294bf7a42c352a71, type: 3}
@@ -3300,7 +3316,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -9975,6 +9991,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameManager
       objectReference: {fileID: 0}
+    - target: {fileID: 600908687904473553, guid: e8d25671ccfa2ada9be6ffbd02d11dd9, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 688927868269401077, guid: e8d25671ccfa2ada9be6ffbd02d11dd9, type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 717518895}
+    - target: {fileID: 1621338473448836058, guid: e8d25671ccfa2ada9be6ffbd02d11dd9, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1975333099663803515, guid: e8d25671ccfa2ada9be6ffbd02d11dd9, type: 3}
+      propertyPath: musicToggle
+      value: 
+      objectReference: {fileID: 85653863}
     - target: {fileID: 2467805672265206934, guid: e8d25671ccfa2ada9be6ffbd02d11dd9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 9.524673
@@ -10013,6 +10045,22 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2467805672265206934, guid: e8d25671ccfa2ada9be6ffbd02d11dd9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2655738121077954382, guid: e8d25671ccfa2ada9be6ffbd02d11dd9, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7795241242191908031, guid: e8d25671ccfa2ada9be6ffbd02d11dd9, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8072638781905537793, guid: e8d25671ccfa2ada9be6ffbd02d11dd9, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8933881964091538687, guid: e8d25671ccfa2ada9be6ffbd02d11dd9, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -10618,93 +10666,27 @@ MonoBehaviour:
   - partObject: {fileID: 527134526}
     initialPosition: {x: -0.1, y: -0.62, z: -0.209}
     initialRotation: {x: 0, y: 0, z: 0, w: 1}
+    initialScale: {x: 0, y: 0, z: 0}
   - partObject: {fileID: 1051781635}
     initialPosition: {x: -0.1, y: -0.62, z: -1.16}
     initialRotation: {x: 0, y: 0, z: 0, w: 1}
+    initialScale: {x: 0, y: 0, z: 0}
   - partObject: {fileID: 1555903713}
     initialPosition: {x: -0.1, y: 0.34, z: -0.209}
     initialRotation: {x: 0, y: 0, z: 0, w: 1}
+    initialScale: {x: 0, y: 0, z: 0}
   - partObject: {fileID: 112580698}
     initialPosition: {x: -0.1, y: 1.35, z: -0.209}
     initialRotation: {x: 0, y: 0, z: 0, w: 1}
+    initialScale: {x: 0, y: 0, z: 0}
   - partObject: {fileID: 1920622611}
     initialPosition: {x: -0.1, y: 1.35, z: -1.16}
     initialRotation: {x: 0, y: 0, z: 0, w: 1}
+    initialScale: {x: 0, y: 0, z: 0}
   - partObject: {fileID: 209572447}
     initialPosition: {x: -0.1, y: 0.34, z: -1.16}
     initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 527134526}
-    initialPosition: {x: -0.1, y: -0.62, z: -0.209}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 1051781635}
-    initialPosition: {x: -0.1, y: -0.62, z: -1.16}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 1555903713}
-    initialPosition: {x: -0.1, y: 0.34, z: -0.209}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 112580698}
-    initialPosition: {x: -0.1, y: 1.35, z: -0.209}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 1920622611}
-    initialPosition: {x: -0.1, y: 1.35, z: -1.16}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 209572447}
-    initialPosition: {x: -0.1, y: 0.34, z: -1.16}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 527134526}
-    initialPosition: {x: -0.1, y: -0.62, z: -0.209}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 1051781635}
-    initialPosition: {x: -0.1, y: -0.62, z: -1.16}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 1555903713}
-    initialPosition: {x: -0.1, y: 0.34, z: -0.209}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 112580698}
-    initialPosition: {x: -0.1, y: 1.35, z: -0.209}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 1920622611}
-    initialPosition: {x: -0.1, y: 1.35, z: -1.16}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 209572447}
-    initialPosition: {x: -0.1, y: 0.34, z: -1.16}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 527134526}
-    initialPosition: {x: -0.1, y: -0.62, z: -0.209}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 1051781635}
-    initialPosition: {x: -0.1, y: -0.62, z: -1.16}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 1555903713}
-    initialPosition: {x: -0.1, y: 0.34, z: -0.209}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 112580698}
-    initialPosition: {x: -0.1, y: 1.35, z: -0.209}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 1920622611}
-    initialPosition: {x: -0.1, y: 1.35, z: -1.16}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 209572447}
-    initialPosition: {x: -0.1, y: 0.34, z: -1.16}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 527134526}
-    initialPosition: {x: -0.1, y: -0.62, z: -0.209}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 1051781635}
-    initialPosition: {x: -0.1, y: -0.62, z: -1.16}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 1555903713}
-    initialPosition: {x: -0.1, y: 0.34, z: -0.209}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 112580698}
-    initialPosition: {x: -0.1, y: 1.35, z: -0.209}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 1920622611}
-    initialPosition: {x: -0.1, y: 1.35, z: -1.16}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
-  - partObject: {fileID: 209572447}
-    initialPosition: {x: -0.1, y: 0.34, z: -1.16}
-    initialRotation: {x: 0, y: 0, z: 0, w: 1}
+    initialScale: {x: 0, y: 0, z: 0}
   wallParts:
   - {fileID: 527134526}
   - {fileID: 1051781635}

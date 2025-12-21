@@ -1,17 +1,24 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 public class RLevelStarter : MonoBehaviour
 {
-    void Awake()
-    {
-        
-    }
+    public InputActionAsset actions;
     
     void Start()
     {
+        
         string levelName = NewGameManager.Instance.GetCurrentLevelName();
         Debug.Log(levelName);
+        
+        // if (!PlayerPrefs.HasKey("InputBindings"))
+        //     return;
+        //
+        // string json = PlayerPrefs.GetString("InputBindings");
+        // actions.LoadBindingOverridesFromJson(json);
+        //
+        // Debug.Log("Bindings loaded");
         
         if (levelName == "MainMenuRefactor")
         {

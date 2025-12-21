@@ -4,5 +4,6 @@ public enum GameState
       Paused,
       GameOver,
       GameWon,
-      Menu
+      Menu,
+      InGameSettings
 }
