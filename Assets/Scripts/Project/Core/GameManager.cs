@@ -76,8 +76,13 @@ public class NewGameManager : MonoBehaviour
     public void PlayerWin()
     {
         nextLevel = SceneManager.GetActiveScene().buildIndex + 1;
-        PlayerPrefs.SetInt("ContinueLevel", nextLevel);
-        PlayerPrefs.Save();
+        int conLevel = PlayerPrefs.GetInt("ContinueLevel", 0);
+        if (conLevel <= PlayerPrefs.GetInt("ContinueLevel", 0))
+        {
+            PlayerPrefs.SetInt("ContinueLevel", nextLevel);
+            PlayerPrefs.Save();
+        }
+        
         
         currentState = GameState.GameWon;
         if  (currentMode == GameMode.Classic)
@@ -112,9 +117,13 @@ public class NewGameManager : MonoBehaviour
 
         bool isPlaying = (currentState == GameState.Playing);
         currentState = isPlaying ? GameState.Paused : GameState.Playing;
+
+        if (currentLevelName != "HUB")
+        {
+            TimerController.Instance.ShowTimer(!isPlaying);
+            GameEvents.OnPause.Invoke(!isPlaying);
+        }
         
-        TimerController.Instance.ShowTimer(!isPlaying);
-        GameEvents.OnPause.Invoke(!isPlaying);
         
         UpdateGameState(); 
     }
