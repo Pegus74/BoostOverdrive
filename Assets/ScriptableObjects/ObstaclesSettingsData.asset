@@ -18,9 +18,11 @@ MonoBehaviour:
   boostTileJumpLingerTime: 0.2
   explosionForce: 10
   explosionRadius: 5
-  reboundForceHands: 20
-  extraAccelerationHands: 10
-  horizontalForceLegs: 12
-  verticalForceLegs: 15
   CrackPlatDestroyDelay: 1
   DryStripDestroyDelay: 1
+  horizontalForceHands: 10
+  verticalForceHands: 7
+  handsSpeedModifier: 0.7
+  handsSpeedModifierDuration: 1
+  horizontalForceLegs: 10
+  verticalForceLegs: 10
