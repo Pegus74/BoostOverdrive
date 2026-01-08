@@ -161,6 +161,8 @@ public class NewGameManager : MonoBehaviour
         settingsCanvas.gameObject.SetActive(false);
         currentState = GameState.Paused;
     }
+    
+    public void BackToHub() => SceneManager.LoadScene("HUB");
 
     public GameState GetCurrentState() => currentState;
     
