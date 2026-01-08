@@ -21,4 +21,8 @@ public static class InputEvents
     
     public static UnityEvent OnPauseAttemptEvent = new UnityEvent();
     public static UnityEvent OnRestartAttemptEvent = new UnityEvent();
+    
+    public static UnityEvent OnFirstBiomeTeleportEvent = new UnityEvent();
+    public static UnityEvent OnSecondBiomeTeleportEvent = new UnityEvent();
+    public static UnityEvent OnThirdBiomeTeleportEvent = new UnityEvent();
 }

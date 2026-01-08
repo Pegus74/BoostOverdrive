@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
+using UnityEngine.UIElements;
 
 public class PlayerInputController : MonoBehaviour
 {
@@ -35,6 +36,10 @@ public class PlayerInputController : MonoBehaviour
         playerControls.Gameplay.Pause.performed += OnPause;
         
         playerControls.Gameplay.Restart.performed += OnRestart;
+
+        playerControls.Gameplay.TpTo1.performed += OnTeleportToFirstBiome;
+        playerControls.Gameplay.TpTo2.performed += OnTeleportToSecondBiome;
+        playerControls.Gameplay.TpTo3.performed += OnTeleportToThirdBiome;
     }
 
     private void OnEnable()
@@ -76,6 +81,10 @@ public class PlayerInputController : MonoBehaviour
         playerControls.Gameplay.Pause.performed -= OnPause;
         
         playerControls.Gameplay.Restart.performed -= OnRestart;
+        
+        playerControls.Gameplay.TpTo1.performed -= OnTeleportToFirstBiome;
+        playerControls.Gameplay.TpTo2.performed -= OnTeleportToSecondBiome;
+        playerControls.Gameplay.TpTo3.performed -= OnTeleportToThirdBiome;
         
         playerControls.Dispose();
     }
@@ -130,11 +139,25 @@ public class PlayerInputController : MonoBehaviour
     {
         InputEvents.JumpCanceledEvent.Invoke();
     }
-
-
+    
     private void OnRestart(InputAction.CallbackContext context)
     {
         InputEvents.OnRestartAttemptEvent.Invoke();
+    }
+
+    private void OnTeleportToFirstBiome(InputAction.CallbackContext context)
+    {
+        InputEvents.OnFirstBiomeTeleportEvent.Invoke();
+    }
+    
+    private void OnTeleportToSecondBiome(InputAction.CallbackContext context)
+    {
+        InputEvents.OnSecondBiomeTeleportEvent.Invoke();
+    }
+    
+    private void OnTeleportToThirdBiome(InputAction.CallbackContext context)
+    {
+        InputEvents.OnThirdBiomeTeleportEvent.Invoke();
     }
     
     private void HandleGameStateChange(GameState newState)

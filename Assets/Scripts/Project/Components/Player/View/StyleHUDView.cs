@@ -37,6 +37,8 @@ public class StyleHUDView : MonoBehaviour
     
     private void UpdateStyleUI()
     {
+        if (NewGameManager.Instance.GetCurrentState() != GameState.Playing)
+            return;
         (activeImage, prevImage) = (prevImage, activeImage);
         
         if (activeImage != null)

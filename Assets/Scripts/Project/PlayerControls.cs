@@ -172,6 +172,33 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""TpTo1"",
+                    ""type"": ""Button"",
+                    ""id"": ""52284efb-f122-4b4c-8692-a0a313eec93f"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""TpTo2"",
+                    ""type"": ""Button"",
+                    ""id"": ""b2b864d0-2830-4920-837c-5a16c5b624b7"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""TpTo3"",
+                    ""type"": ""Button"",
+                    ""id"": ""3b8d8789-a822-4d72-aaf7-c9d45f41544e"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -548,6 +575,39 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""Restart"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cae32a4c-ed0a-4ae3-8b6b-65e0490c4692"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""TpTo1"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4500d9fc-e1f6-442c-996e-eace20788087"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""TpTo2"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0e469075-1cfe-4dd2-a6c2-09639672ea7b"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""TpTo3"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -571,6 +631,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Gameplay_ToggleStyle = m_Gameplay.FindAction("ToggleStyle", throwIfNotFound: true);
         m_Gameplay_Pause = m_Gameplay.FindAction("Pause", throwIfNotFound: true);
         m_Gameplay_Restart = m_Gameplay.FindAction("Restart", throwIfNotFound: true);
+        m_Gameplay_TpTo1 = m_Gameplay.FindAction("TpTo1", throwIfNotFound: true);
+        m_Gameplay_TpTo2 = m_Gameplay.FindAction("TpTo2", throwIfNotFound: true);
+        m_Gameplay_TpTo3 = m_Gameplay.FindAction("TpTo3", throwIfNotFound: true);
     }
 
     ~@PlayerControls()
@@ -660,6 +723,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_ToggleStyle;
     private readonly InputAction m_Gameplay_Pause;
     private readonly InputAction m_Gameplay_Restart;
+    private readonly InputAction m_Gameplay_TpTo1;
+    private readonly InputAction m_Gameplay_TpTo2;
+    private readonly InputAction m_Gameplay_TpTo3;
     /// <summary>
     /// Provides access to input actions defined in input action map "Gameplay".
     /// </summary>
@@ -707,6 +773,18 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Gameplay/Restart".
         /// </summary>
         public InputAction @Restart => m_Wrapper.m_Gameplay_Restart;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/TpTo1".
+        /// </summary>
+        public InputAction @TpTo1 => m_Wrapper.m_Gameplay_TpTo1;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/TpTo2".
+        /// </summary>
+        public InputAction @TpTo2 => m_Wrapper.m_Gameplay_TpTo2;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/TpTo3".
+        /// </summary>
+        public InputAction @TpTo3 => m_Wrapper.m_Gameplay_TpTo3;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -760,6 +838,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Restart.started += instance.OnRestart;
             @Restart.performed += instance.OnRestart;
             @Restart.canceled += instance.OnRestart;
+            @TpTo1.started += instance.OnTpTo1;
+            @TpTo1.performed += instance.OnTpTo1;
+            @TpTo1.canceled += instance.OnTpTo1;
+            @TpTo2.started += instance.OnTpTo2;
+            @TpTo2.performed += instance.OnTpTo2;
+            @TpTo2.canceled += instance.OnTpTo2;
+            @TpTo3.started += instance.OnTpTo3;
+            @TpTo3.performed += instance.OnTpTo3;
+            @TpTo3.canceled += instance.OnTpTo3;
         }
 
         /// <summary>
@@ -798,6 +885,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Restart.started -= instance.OnRestart;
             @Restart.performed -= instance.OnRestart;
             @Restart.canceled -= instance.OnRestart;
+            @TpTo1.started -= instance.OnTpTo1;
+            @TpTo1.performed -= instance.OnTpTo1;
+            @TpTo1.canceled -= instance.OnTpTo1;
+            @TpTo2.started -= instance.OnTpTo2;
+            @TpTo2.performed -= instance.OnTpTo2;
+            @TpTo2.canceled -= instance.OnTpTo2;
+            @TpTo3.started -= instance.OnTpTo3;
+            @TpTo3.performed -= instance.OnTpTo3;
+            @TpTo3.canceled -= instance.OnTpTo3;
         }
 
         /// <summary>
@@ -914,5 +1010,26 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnRestart(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "TpTo1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnTpTo1(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "TpTo2" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnTpTo2(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "TpTo3" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnTpTo3(InputAction.CallbackContext context);
     }
 }
