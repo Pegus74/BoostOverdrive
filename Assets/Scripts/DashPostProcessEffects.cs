@@ -27,7 +27,7 @@ public class DashPostProcessEffects : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Post Process Profile не содержит Chromatic Aberration или Vignette!");
+            Debug.LogError("Post Process Profile не содержит Chromatic Aberration или Vignette");
         }
 
         if (playerStateModel == null)
