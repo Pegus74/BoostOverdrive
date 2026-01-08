@@ -22,13 +22,13 @@ public class ObstaclesSettingsData : ScriptableObject
     public float DryStripDestroyDelay = 1.0f;
     
     [Header("Настройки SpringWall")]
-    [Header("Hands Style Settings")]
+    [Header("Legs Style Settings")]
     public float horizontalForceHands = 10f;
     public float verticalForceHands = 12f;
     public float handsSpeedModifier = 0.7f;
     public float handsSpeedModifierDuration = 1f;
 
-    [Header("Legs Style Settings")]
+    [Header("Hands Style Settings")]
     public float horizontalForceLegs = 8f;
     public float verticalForceLegs = 15f;
 }

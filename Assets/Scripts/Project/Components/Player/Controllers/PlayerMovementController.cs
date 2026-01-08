@@ -154,42 +154,41 @@ public class PlayerMovementController : MonoBehaviour
     {
         SpringWall wall = data.wallComponent as SpringWall;
 
-        if (playerStateModel.LastWallJumpedFrom == wall)
-        {
+        if (playerStateModel.LastWallJumpedFrom == wall || playerStateModel.IsGrounded)
             return;
-        }
 
-        if (playerStateModel.IsGrounded)
-        {
-            return;
-        }
-
-        Vector3 jumpDirection = transform.forward;
-        jumpDirection.y = 0;
-        jumpDirection.Normalize();
+        float horizontalForce;
+        float verticalForce;
 
         if (data.styleIndex == HANDS_STYLE_INDEX)
         {
-            float horizontalForce = wall.settings.horizontalForceHands;
-            float verticalForce = wall.settings.verticalForceHands;
-
-            SetExternalImpulse(jumpDirection * horizontalForce);
-            rb.AddForce(Vector3.up * verticalForce, ForceMode.Impulse);
-
-            playerStateModel.SetLastWallJumpedFrom(wall);
+            horizontalForce = wall.settings.horizontalForceHands;
+            verticalForce = wall.settings.verticalForceHands;
 
             if (wall != null)
                 StartCoroutine(wall.ApplySpeedModifierCoroutine(playerStateModel));
         }
-        else if (data.styleIndex == LEGS_STYLE_INDEX)
+        else
         {
-            float horizontalForce = wall.settings.horizontalForceLegs;
-            float verticalForce = wall.settings.verticalForceLegs;
-
-            SetExternalImpulse(jumpDirection * horizontalForce);
-            rb.AddForce(Vector3.up * verticalForce, ForceMode.Impulse);
-
-            playerStateModel.SetLastWallJumpedFrom(wall);
+            horizontalForce = wall.settings.horizontalForceLegs;
+            verticalForce = wall.settings.verticalForceLegs;
         }
+
+        Vector3 forward = transform.forward;
+        forward.y = 0f;
+        forward.Normalize();
+
+        Vector3 desiredHorizontal = forward * horizontalForce;
+
+        Vector3 newVelocity = new Vector3(desiredHorizontal.x, verticalForce, desiredHorizontal.z);
+
+        Vector3 currentHorizontal = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        float currentHorizontalSpeed = currentHorizontal.magnitude;
+
+        rb.linearVelocity = newVelocity;
+
+        externalImpulse = Vector3.zero;
+
+        playerStateModel.SetLastWallJumpedFrom(wall);
     }
 }
