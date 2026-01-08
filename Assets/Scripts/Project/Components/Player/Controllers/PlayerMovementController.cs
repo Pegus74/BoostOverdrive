@@ -17,11 +17,16 @@ public class PlayerMovementController : MonoBehaviour
     private bool isWalking = false;
     public bool IsWalking => isWalking;
 
+    [SerializeField] private AudioClip jumpSound;
+
+    private AudioSource audioSource;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
         if (rb == null) enabled = false;
         else rb.freezeRotation = true;
+	audioSource = GetComponent<AudioSource>();
         playerStateModel.SetLastWallJumpedFrom(null);
     }
 
@@ -159,6 +164,8 @@ public class PlayerMovementController : MonoBehaviour
 
         float horizontalForce;
         float verticalForce;
+
+	audioSource.PlayOneShot(jumpSound);
 
         if (data.styleIndex == HANDS_STYLE_INDEX)
         {
