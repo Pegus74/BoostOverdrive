@@ -9,11 +9,15 @@ public class RDestructibleWall : MonoBehaviour
     [SerializeField] private List<InitialPartData> initialWallPartsData = new List<InitialPartData>();
     [SerializeField] private List<GameObject> wallParts = new List<GameObject>();
     [SerializeField] private Collider wallCollider;
+    [SerializeField] private AudioClip destroySound;
+
+    private AudioSource audioSource;
 
     private bool isDestroyed = false;
 
     private void Awake()
     {
+	audioSource = GetComponent<AudioSource>();
         BakeScaleIfNeeded();
         SaveInitialData();
         ResetWall();
@@ -136,6 +140,8 @@ public class RDestructibleWall : MonoBehaviour
         if (isDestroyed) return;
 
         isDestroyed = true;
+
+	audioSource.PlayOneShot(destroySound);
 
         if (wallCollider != null)
         {
