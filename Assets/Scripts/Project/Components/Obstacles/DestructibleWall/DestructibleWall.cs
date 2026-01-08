@@ -1,19 +1,25 @@
 using System.Collections.Generic;
 using UnityEngine;
+using System.Collections;
 
 public class RDestructibleWall : MonoBehaviour
 {
     [Header("Settings")]
     public ObstaclesSettingsData obstaclesSettings;
+    [SerializeField] private float disappearDelay = 3f;
 
     [SerializeField] private List<InitialPartData> initialWallPartsData = new List<InitialPartData>();
     [SerializeField] private List<GameObject> wallParts = new List<GameObject>();
     [SerializeField] private Collider wallCollider;
+    [SerializeField] private AudioClip destroySound;
+
+    private AudioSource audioSource;
 
     private bool isDestroyed = false;
 
     private void Awake()
     {
+	audioSource = GetComponent<AudioSource>();
         BakeScaleIfNeeded();
         SaveInitialData();
         ResetWall();
@@ -28,6 +34,7 @@ public class RDestructibleWall : MonoBehaviour
         }
     }
 #endif
+
     private void BakeScaleIfNeeded()
     {
         if (wallParts.Count == 0)
@@ -44,7 +51,6 @@ public class RDestructibleWall : MonoBehaviour
         Vector3 parentScale = transform.localScale;
         if (parentScale == Vector3.one) return;
 
-        // Сохраняем исходные localPosition всех детей
         Dictionary<GameObject, Vector3> originalLocalPositions = new Dictionary<GameObject, Vector3>();
         foreach (GameObject part in wallParts)
         {
@@ -54,7 +60,6 @@ public class RDestructibleWall : MonoBehaviour
             }
         }
 
-        // Впекаем scale в детей
         foreach (GameObject part in wallParts)
         {
             if (part != null)
@@ -63,7 +68,6 @@ public class RDestructibleWall : MonoBehaviour
             }
         }
 
-        // Масштабируем localPosition детей (относительно локального пространства матери)
         foreach (GameObject part in wallParts)
         {
             if (part != null && originalLocalPositions.TryGetValue(part, out Vector3 origLocalPos))
@@ -72,14 +76,12 @@ public class RDestructibleWall : MonoBehaviour
             }
         }
 
-        // Масштабируем BoxCollider матери по local
         if (wallCollider is BoxCollider boxCollider)
         {
             boxCollider.center = Vector3.Scale(boxCollider.center, parentScale);
             boxCollider.size = Vector3.Scale(boxCollider.size, parentScale);
         }
 
-        // Сбрасываем scale корня
         transform.localScale = Vector3.one;
     }
 
@@ -110,6 +112,8 @@ public class RDestructibleWall : MonoBehaviour
             wallCollider.enabled = true;
         }
 
+        StopAllCoroutines();
+
         foreach (InitialPartData data in initialWallPartsData)
         {
             if (data.partObject == null) continue;
@@ -121,6 +125,7 @@ public class RDestructibleWall : MonoBehaviour
                 rb.linearVelocity = Vector3.zero;
                 rb.angularVelocity = Vector3.zero;
                 rb.isKinematic = true;
+                Destroy(rb);
             }
 
             data.partObject.transform.localPosition = data.initialPosition;
@@ -137,11 +142,18 @@ public class RDestructibleWall : MonoBehaviour
 
         isDestroyed = true;
 
+	audioSource.PlayOneShot(destroySound);
+
         if (wallCollider != null)
         {
             wallCollider.enabled = false;
         }
 
+        StartCoroutine(DestroyPartsAfterDelay(impactPoint));
+    }
+
+    private IEnumerator DestroyPartsAfterDelay(Vector3 impactPoint)
+    {
         int cubeLayer = LayerMask.NameToLayer("IgnorePlayer");
 
         foreach (GameObject part in wallParts)
@@ -157,8 +169,17 @@ public class RDestructibleWall : MonoBehaviour
                 }
 
                 rb.isKinematic = false;
-
                 rb.AddExplosionForce(obstaclesSettings.explosionForce * 1.2f, impactPoint, obstaclesSettings.explosionRadius, 2f, ForceMode.Impulse);
+            }
+        }
+
+        yield return new WaitForSeconds(disappearDelay);
+
+        foreach (GameObject part in wallParts)
+        {
+            if (part != null)
+            {
+                part.SetActive(false);
             }
         }
     }
