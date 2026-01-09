@@ -15,24 +15,27 @@ public class HubManager: MonoBehaviour
     private void Awake()
     {
         Vector3 playerPos = _playerTransform.position;
+        Quaternion playerRot = _playerTransform.rotation;
         
         if (PlayerPrefs.GetFloat("AllTime", 0) < 91f && PlayerPrefs.GetInt("ContinueLevel", 0) >= 8)
         {
             lock1.SetActive(false);
             playerPos = loc2.transform.position;
-            Debug.Log(_playerTransform.position);
+            playerRot = loc2.transform.rotation;
             InputEvents.OnSecondBiomeTeleportEvent.AddListener(TpTo2);
+            
         }
 
         if (PlayerPrefs.GetFloat("AllTime", 0) < 144.5f && PlayerPrefs.GetInt("ContinueLevel", 0) >= 11)
         {
             lock2.SetActive(false);
             playerPos = loc3.transform.position;
-            Debug.Log(_playerTransform.position);
+            playerRot = loc3.transform.rotation;
             InputEvents.OnThirdBiomeTeleportEvent.AddListener(TpTo3);
         }
         
-        _playerTransform.position = playerPos; // ALSO ADD ROTATE CHANGE
+        _playerTransform.position = playerPos;
+        _playerTransform.rotation = playerRot;
     }
 
     

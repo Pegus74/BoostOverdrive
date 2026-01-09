@@ -9,7 +9,7 @@ public class LevelTeleporter: MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            SceneManager.LoadScene(levelName);
+            LevelConfirmController.Instance.Show(levelName);
         }
     }
 }

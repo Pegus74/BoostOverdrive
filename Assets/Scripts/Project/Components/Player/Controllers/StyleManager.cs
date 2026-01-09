@@ -15,6 +15,8 @@ public class StyleManager : MonoBehaviour
 
     private void SwitchStyle()
     {
+        if (NewGameManager.Instance.GetCurrentState() != GameState.Playing) return;
+        
         PlayerEvents.OnStyleChangedEvent.Invoke();
         int newIndex = (playerStateModel.CurrentStyleIndex + 1) % playerStateModel.settings.styleDataAssets.Length;
         playerStateModel.ApplyStyleToModel(newIndex);

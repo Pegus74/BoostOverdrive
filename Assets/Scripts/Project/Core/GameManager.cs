@@ -162,6 +162,16 @@ public class NewGameManager : MonoBehaviour
         currentState = GameState.Paused;
     }
     
+    public void ShowConfirm()
+    {
+        currentState = GameState.Paused;
+    }
+
+    public void HideConfirm()
+    {
+        currentState = GameState.Playing;
+    }
+    
     public void BackToHub() => SceneManager.LoadScene("HUB");
 
     public GameState GetCurrentState() => currentState;
