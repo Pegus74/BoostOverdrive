@@ -46,8 +46,10 @@ public class MainMenu : MonoBehaviour
     public void StartNewGame()
     {
         float temp = PlayerPrefs.GetFloat("MusicVolume");
+        float temp2 = PlayerPrefs.GetFloat("SoundVolume");
         PlayerPrefs.DeleteAll();
         PlayerPrefs.SetFloat("MusicVolume", temp);
+        PlayerPrefs.SetFloat("SoundVolume", temp2);
         LoadScene("1-1");
     }
 
