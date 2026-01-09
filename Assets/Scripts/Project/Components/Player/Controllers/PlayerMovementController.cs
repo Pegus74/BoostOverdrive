@@ -164,9 +164,10 @@ public class PlayerMovementController : MonoBehaviour
 
         float horizontalForce;
         float verticalForce;
-
-	audioSource.PlayOneShot(jumpSound);
-
+        
+        audioSource.volume = PlayerPrefs.GetFloat("SoundVolume");
+	    audioSource.PlayOneShot(jumpSound);
+        
         if (data.styleIndex == HANDS_STYLE_INDEX)
         {
             horizontalForce = wall.settings.horizontalForceHands;
