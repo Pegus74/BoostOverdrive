@@ -58,7 +58,7 @@ public class NewGameManager : MonoBehaviour
             currentState = GameState.Playing;
         UpdateGameState();
         
-        RMusicManager.Instance.ChangeVolume(PlayerPrefs.GetFloat("MusicVolume", 1f));
+        RMusicManager.Instance.ChangeMusicVolume(PlayerPrefs.GetFloat("MusicVolume", 1f));
         RMusicManager.Instance.ChangePitch(1f);
     }
     
@@ -92,7 +92,7 @@ public class NewGameManager : MonoBehaviour
 
     public void PlayerDied()
     {
-        RMusicManager.Instance.ChangeVolume(PlayerPrefs.GetFloat("MusicVolume", 1f) * 0.2f);
+        RMusicManager.Instance.ChangeMusicVolume(PlayerPrefs.GetFloat("MusicVolume", 1f) * 0.2f);
         RMusicManager.Instance.ChangePitch(0.7f);
         currentState = GameState.GameOver;
         UpdateGameState();

@@ -10,6 +10,7 @@ public class RMusicManager : MonoBehaviour
     private AudioSource audioSource;
 
     private const string VolumeKey = "MusicVolume";
+    private const string SoundVolumeKey = "SoundVolume";
     private const string MusicOnKey = "MusicOn";
 
     private void Awake()
@@ -28,8 +29,9 @@ public class RMusicManager : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
 
         // Загружаем настройки
-        float savedVolume = PlayerPrefs.GetFloat(VolumeKey, 1f); // по умолчанию 1
-        bool savedMusicOn = PlayerPrefs.GetInt(MusicOnKey, 1) == 1; // по умолчанию включено
+        float savedVolume = PlayerPrefs.GetFloat(VolumeKey, 1f);
+        float savedSoundVolume = PlayerPrefs.GetFloat(SoundVolumeKey, 1f);
+        bool savedMusicOn = PlayerPrefs.GetInt(MusicOnKey, 1) == 1;
 
         audioSource.volume = savedVolume;
 
@@ -53,7 +55,7 @@ public class RMusicManager : MonoBehaviour
 
     // set - с сохранением настройки в PlayerPrefs
     // change - просто смена
-    public void SetVolume(float volume)
+    public void SetMusicVolume(float volume)
     {
         if (audioSource != null)
         {
@@ -62,7 +64,23 @@ public class RMusicManager : MonoBehaviour
         }
     }
 
-    public void ChangeVolume(float volume)
+    public void ChangeMusicVolume(float volume)
+    {
+        if (audioSource != null)
+        {
+            audioSource.volume = volume;
+        }
+    }
+    
+    public void SetSoundsVolume(float volume)
+    {
+        if (audioSource != null)
+        {
+            PlayerPrefs.SetFloat(SoundVolumeKey, volume);
+        }
+    }
+
+    public void ChangeSoundVolume(float volume)
     {
         if (audioSource != null)
         {

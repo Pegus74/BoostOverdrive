@@ -141,8 +141,8 @@ public class RDestructibleWall : MonoBehaviour
         if (isDestroyed) return;
 
         isDestroyed = true;
-
-	audioSource.PlayOneShot(destroySound);
+        audioSource.volume = PlayerPrefs.GetFloat("SoundVolume");
+	    audioSource.PlayOneShot(destroySound);
 
         if (wallCollider != null)
         {

@@ -1,9 +1,11 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class MusicSettingsUI : MonoBehaviour
 {
-    public Slider volumeSlider;
+    [FormerlySerializedAs("volumeSlider")] public Slider musicVolumeSlider;
+    public Slider soundVolumeSlider;
     public Toggle musicToggle;
 
     private void Start()
@@ -11,17 +13,26 @@ public class MusicSettingsUI : MonoBehaviour
         if (RMusicManager.Instance != null)
         {
             // Устанавливаем значения UI из PlayerPrefs
-            volumeSlider.value = PlayerPrefs.GetFloat("MusicVolume", 1f);
+            musicVolumeSlider.value = PlayerPrefs.GetFloat("MusicVolume", 1f);
+            soundVolumeSlider.value = PlayerPrefs.GetFloat("SoundVolume", 1f);
+            
             musicToggle.isOn = PlayerPrefs.GetInt("MusicOn", 1) == 1;
         }
 
-        volumeSlider.onValueChanged.AddListener(OnVolumeChanged);
+        musicVolumeSlider.onValueChanged.AddListener(OnMusicVolumeChanged);
+        soundVolumeSlider.onValueChanged.AddListener(OnSoundVolumeChanged);
         musicToggle.onValueChanged.AddListener(OnMusicToggled);
+        
     }
 
-    private void OnVolumeChanged(float value)
+    private void OnMusicVolumeChanged(float value)
     {
-        RMusicManager.Instance.SetVolume(value);
+        RMusicManager.Instance.SetMusicVolume(value);
+    }
+
+    private void OnSoundVolumeChanged(float value)
+    {
+        RMusicManager.Instance.SetSoundsVolume(value);
     }
 
     private void OnMusicToggled(bool isOn)
