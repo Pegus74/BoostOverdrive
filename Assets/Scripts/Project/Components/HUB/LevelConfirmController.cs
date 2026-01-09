@@ -9,6 +9,8 @@ public class LevelConfirmController : MonoBehaviour
     [Header("UI")]
     public TMP_Text levelText;
     public TMP_Text bestTimeText;
+    public TMP_Text borderTimeText;
+    public TMP_Text biomeText;
 
     private string currentLevelIndex;
 
@@ -22,7 +24,7 @@ public class LevelConfirmController : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void Show(string levelIndex)
+    public void Show(string levelIndex, float borderTime,string biomeName)
     {
         NewGameManager.Instance.ShowConfirm();
         currentLevelIndex = levelIndex;
@@ -34,13 +36,15 @@ public class LevelConfirmController : MonoBehaviour
         if (PlayerPrefs.HasKey(key))
         {
             float time = PlayerPrefs.GetFloat(key);
-            bestTimeText.text = $"{time:F4} сек";
+            bestTimeText.text = $"{time:F4}";
+
         }
         else
         {
             bestTimeText.text = "—";
         }
-
+        borderTimeText.text = borderTime.ToString("F4");
+        biomeText.text = biomeName;
         gameObject.SetActive(true);
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
