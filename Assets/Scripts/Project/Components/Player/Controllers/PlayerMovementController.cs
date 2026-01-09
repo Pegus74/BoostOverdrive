@@ -77,6 +77,10 @@ public class PlayerMovementController : MonoBehaviour
             ProjectVelocityToGround();
             ApplyGroundStickForce();
         }
+        if (playerStateModel.IsGrounded)
+        {
+            Debug.Log($"Velocity Y: {rb.linearVelocity.y:F3} | Horizontal Speed: {new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z).magnitude:F2} | Slope Angle: {Vector3.Angle(playerStateModel.GroundNormal, Vector3.up):F1}");
+        }
     }
 
     private void TryJump()
@@ -129,17 +133,28 @@ public class PlayerMovementController : MonoBehaviour
     {
         Vector3 normal = playerStateModel.GroundNormal;
         if (normal == Vector3.zero) normal = Vector3.up;
+
         rb.linearVelocity = Vector3.ProjectOnPlane(rb.linearVelocity, normal);
+
+        if (playerStateModel.IsGrounded && Mathf.Abs(rb.linearVelocity.y) < 1f)
+        {
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        }
     }
 
     private void ApplyGroundStickForce()
     {
-        float slopeAngle = Vector3.Angle(playerStateModel.GroundNormal, Vector3.up);
-        if (slopeAngle < 1f || slopeAngle > playerStateModel.settings.groundStickMaxSlope) return;
+        Vector3 normal = playerStateModel.GroundNormal;
+        if (normal == Vector3.zero) normal = Vector3.up;
 
-        Vector3 stickDirection = -playerStateModel.GroundNormal;
-        float stickForce = playerStateModel.settings.groundStickForce * Mathf.Sin(slopeAngle * Mathf.Deg2Rad);
-        rb.AddForce(stickDirection * stickForce, ForceMode.Acceleration);
+        Vector3 parallelGravity = Vector3.ProjectOnPlane(Physics.gravity, normal);
+        rb.AddForce(-parallelGravity * 1.05f, ForceMode.Acceleration);
+
+        float slopeAngle = Vector3.Angle(normal, Vector3.up);
+        if (slopeAngle <= 10f)
+        {
+            rb.AddForce(-Vector3.up * playerStateModel.settings.flatGroundStickForce, ForceMode.Acceleration);
+        }
     }
 
     private void CheckForWallJumps()

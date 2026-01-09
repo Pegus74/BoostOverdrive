@@ -49,4 +49,7 @@ public class PlayerConfig : ScriptableObject
     [Header("Настройки буфера прыжка")]
     public float coyoteTime = 0.15f;
     public float jumpBufferTime = 0.2f;
+
+    public float flatGroundStickForce = 15f;
 }
+

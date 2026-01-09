@@ -222,7 +222,7 @@ GameObject:
   m_Component:
   - component: {fileID: 31781715}
   - component: {fileID: 31781717}
-  - component: {fileID: 31781716}
+  - component: {fileID: 31781718}
   m_Layer: 0
   m_Name: boost
   m_TagString: Untagged
@@ -245,21 +245,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 429613527}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &31781716
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 31781714}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f870903bb71b2f04083c0ca10daaa011, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  accelMultiplier: 1.3
-  lingerTimeWalk: 0.5
-  lingerTimeJump: 0.2
 --- !u!65 &31781717
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -281,6 +266,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &31781718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 31781714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e865e51b7963490a9bdac9520ad724e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BoostTileHandler
+  obstaclesSettingsData: {fileID: 11400000, guid: ebe29eef7bdecf5999d2bd28f0e1528c, type: 2}
 --- !u!1001 &95017729
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6375,7 +6373,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2007806593}
   - component: {fileID: 2007806595}
-  - component: {fileID: 2007806594}
+  - component: {fileID: 2007806596}
   m_Layer: 0
   m_Name: boost
   m_TagString: Untagged
@@ -6398,21 +6396,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 429613527}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2007806594
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2007806592}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f870903bb71b2f04083c0ca10daaa011, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  accelMultiplier: 1.3
-  lingerTimeWalk: 0.5
-  lingerTimeJump: 0.2
 --- !u!65 &2007806595
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6434,6 +6417,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2007806596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2007806592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e865e51b7963490a9bdac9520ad724e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BoostTileHandler
+  obstaclesSettingsData: {fileID: 11400000, guid: ebe29eef7bdecf5999d2bd28f0e1528c, type: 2}
 --- !u!1001 &2024567298
 PrefabInstance:
   m_ObjectHideFlags: 0
