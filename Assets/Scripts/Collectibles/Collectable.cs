@@ -42,6 +42,13 @@ public class Collectable : MonoBehaviour
 
         isCollected = true;
         collectableSystem.CollectCoin(levelName, uniqueId);
+
+        CollectableUI ui = Object.FindObjectOfType<CollectableUI>();
+        if (ui != null)
+        {
+            ui.UpdateAllUI();
+        }
+
         gameObject.SetActive(false);
     }
 

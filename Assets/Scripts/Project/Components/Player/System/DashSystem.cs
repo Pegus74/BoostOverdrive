@@ -30,13 +30,11 @@ public class DashSystem : MonoBehaviour
         currentDashCoroutine = StartCoroutine(DashCoroutine());
         OnDashPerformed?.Invoke();
     }
-
     private IEnumerator DashCoroutine()
     {
         isDashAvailable = false;
         playerStateModel.SetIsDashing(true);
         AbilityEvents.OnAbilityStarted.Invoke();
-
 
         Vector3 baseDirection = transform.forward;
         baseDirection.y = 0f;
@@ -68,12 +66,12 @@ public class DashSystem : MonoBehaviour
         {
             timer -= Time.deltaTime;
             Vector3 currentDir = baseDirection;
-            currentDir.y = 0f; 
+            currentDir.y = 0f;
 
             float accel = power * 0.6f * (timer / duration);
             rb.AddForce(currentDir * accel, ForceMode.Acceleration);
 
-            if (Mathf.Abs(rb.linearVelocity.y) > 2f) 
+            if (Mathf.Abs(rb.linearVelocity.y) > 2f)
             {
                 rb.linearVelocity = new Vector3(
                     rb.linearVelocity.x,
@@ -81,6 +79,8 @@ public class DashSystem : MonoBehaviour
                     rb.linearVelocity.z
                 );
             }
+
+            TryDestroyWallDuringDash(baseDirection);
 
             yield return null;
         }
@@ -97,6 +97,36 @@ public class DashSystem : MonoBehaviour
         isDashAvailable = true;
         currentDashCoroutine = null;
     }
+
+    private void TryDestroyWallDuringDash(Vector3 dashDirection)
+    {
+        if (playerStateModel.CurrentStyleIndex != 1)
+            return;
+
+        Vector3[] origins = new Vector3[]
+        {
+        transform.position + Vector3.up * 0.5f,
+        transform.position + Vector3.up * 1.2f,
+        transform.position + Vector3.up * 0.1f
+        };
+
+        float checkDistance = 1.2f;
+
+        foreach (Vector3 origin in origins)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(origin, dashDirection, out hit, checkDistance))
+            {
+                RDestructibleWall destructible = hit.collider.GetComponentInParent<RDestructibleWall>();
+                if (destructible != null)
+                {
+                    destructible.DestroyWall(hit.point);
+                    break;
+                }
+            }
+        }
+    }
+
     public float GetCooldownDuration()
     {
         return playerStateModel.settings.dashCooldown;
