@@ -52,7 +52,6 @@ public class CollectableUI : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // Очищаем кэш при смене уровня
         levelCoinCache.Clear();
 
         UpdateLevelName();
@@ -67,14 +66,10 @@ public class CollectableUI : MonoBehaviour
         {
             currentLevelName = GameManager.Instance.GetCurrentLevelName();
         }
-
-        // Если все еще null, получаем из SceneManager
         if (string.IsNullOrEmpty(currentLevelName))
         {
             currentLevelName = SceneManager.GetActiveScene().name;
         }
-
-        // Если и это не помогло, используем дефолтное значение
         if (string.IsNullOrEmpty(currentLevelName))
         {
             currentLevelName = "UnknownLevel";
@@ -85,15 +80,12 @@ public class CollectableUI : MonoBehaviour
     {
         UpdateLevelName();
 
-        // Важно: Проверяем что currentLevelName не null/empty
         if (string.IsNullOrEmpty(currentLevelName))
         {
             Debug.LogWarning("CountCoinsOnLevel: currentLevelName is null or empty!");
             totalCoinsOnLevel = 0;
             return;
         }
-
-        // Проверяем кэш
         if (levelCoinCache.ContainsKey(currentLevelName))
         {
             totalCoinsOnLevel = levelCoinCache[currentLevelName];
@@ -118,29 +110,31 @@ public class CollectableUI : MonoBehaviour
         UpdatePauseMenuUI();
         UpdateMainMenuUI();
     }
-
-    public void UpdatePauseMenuUI()
+    private void UpdatePauseMenuUI()
     {
-        if (pauseMenuCollectablesText != null)
+        if (pauseMenuCollectablesText == null)
         {
-            // Получаем актуальные данные
-            UpdateLevelName();
-            CountCoinsOnLevel();
-
-            // Проверяем что у нас есть валидный уровень
-            if (string.IsNullOrEmpty(currentLevelName) || collectableSystem == null)
+            GameObject textObj = GameObject.Find("PauseMenuCollectablesText");
+            if (textObj != null)
             {
-                pauseMenuCollectablesText.text = "Собрано: 0/0";
-                return;
+                pauseMenuCollectablesText = textObj.GetComponent<TextMeshProUGUI>();
             }
-
-            int collectedOnLevel = collectableSystem.GetLevelCollectedCount(currentLevelName);
-
-            // Для отладки
-            Debug.Log($"Пауза UI - Уровень: {currentLevelName}, Собрано: {collectedOnLevel}/{totalCoinsOnLevel}");
-
-            pauseMenuCollectablesText.text = $"Собрано: {collectedOnLevel}/{totalCoinsOnLevel}";
         }
+
+        if (pauseMenuCollectablesText == null)
+        {
+            return;
+        }
+
+        UpdateLevelName();
+        CountCoinsOnLevel();
+        if (string.IsNullOrEmpty(currentLevelName) || collectableSystem == null)
+        {
+            pauseMenuCollectablesText.text = "Собрано: 0/0";
+            return;
+        }
+        int collectedOnLevel = collectableSystem.GetLevelCollectedCount(currentLevelName);
+        pauseMenuCollectablesText.text = $"Собрано: {collectedOnLevel}/{totalCoinsOnLevel}";
     }
 
     public void UpdateMainMenuUI()
@@ -170,24 +164,21 @@ public class CollectableUI : MonoBehaviour
 
     private void ResetLevelCoins()
     {
-        if (collectableSystem == null || string.IsNullOrEmpty(currentLevelName) || currentLevelName == "MainMenu")
+        if (collectableSystem == null)
         {
-            Debug.LogWarning($"Cannot reset coins: collectableSystem={collectableSystem}, level={currentLevelName}");
+            Debug.LogWarning("Cannot reset coins: collectableSystem is null");
             return;
         }
 
-        Debug.Log($"Сброс монет для уровня: {currentLevelName}");
+        string currentSceneName = SceneManager.GetActiveScene().name;
+        collectableSystem.ResetLevelCoins(currentSceneName);
 
-        // Сбрасываем монеты
-        collectableSystem.ResetLevelCoins(currentLevelName);
-
-        // Очищаем кэш для этого уровня
-        if (levelCoinCache.ContainsKey(currentLevelName))
+        if (levelCoinCache.ContainsKey(currentSceneName))
         {
-            levelCoinCache.Remove(currentLevelName);
+            levelCoinCache.Remove(currentSceneName);
         }
 
-        // Перезагружаем уровень
-        SceneManager.LoadScene(currentLevelName);
+        int currentBuildIndex = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(currentBuildIndex);
     }
 }
