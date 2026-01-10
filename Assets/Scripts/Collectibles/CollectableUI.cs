@@ -100,13 +100,9 @@ public class CollectableUI : MonoBehaviour
             return;
         }
 
-        // Кэшируем количество монет на уровне
-        // Используем FindObjectsOfType с includeInactive = true
-        // чтобы найти ВСЕ монеты, включая собранные (неактивные)
         Collectable[] allCoins = GameObject.FindObjectsOfType<Collectable>(true);
         totalCoinsOnLevel = allCoins.Length;
 
-        // Сохраняем в кэш
         levelCoinCache[currentLevelName] = totalCoinsOnLevel;
 
         Debug.Log($"Кэшировано монет для уровня '{currentLevelName}': {totalCoinsOnLevel}");
