@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 /// <summary>
 /// Listener, активирующий/деактивирующий GameObject в зависимости от состояния игры
 /// </summary>
@@ -30,13 +31,22 @@ public class UIGameStateListener : MonoBehaviour
     private void HandleGameStateChange(GameState newState)
     {
         bool shouldBeActive = (targetGameState == newState);
-        
+
         if (targetCanvasGroup != null)
         {
             targetCanvasGroup.alpha = shouldBeActive ? 1f : 0f;
             targetCanvasGroup.interactable = shouldBeActive;
             targetCanvasGroup.blocksRaycasts = shouldBeActive;
+            if (shouldBeActive)
+            {
+                TextMeshProUGUI[] tmpTexts = targetCanvasGroup.GetComponentsInChildren<TextMeshProUGUI>(true);
+                foreach (TextMeshProUGUI tmp in tmpTexts)
+                {
+                    tmp.ForceMeshUpdate();
+                }
+
+                Canvas.ForceUpdateCanvases();
+            }
         }
     }
-    
 }
