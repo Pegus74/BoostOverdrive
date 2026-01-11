@@ -5,5 +5,6 @@ public enum GameState
       GameOver,
       GameWon,
       Menu,
-      InGameSettings
+      InGameSettings,
+      Confirmation
 }
