@@ -48,8 +48,16 @@ public class MainMenu : MonoBehaviour
         float temp = PlayerPrefs.GetFloat("MusicVolume");
         float temp2 = PlayerPrefs.GetFloat("SoundVolume");
         PlayerPrefs.DeleteAll();
-        PlayerPrefs.SetFloat("MusicVolume", temp);
-        PlayerPrefs.SetFloat("SoundVolume", temp2);
+        if (temp == 0f || temp2 == 0f)
+        {
+            PlayerPrefs.SetFloat("MusicVolume", 0.25f);
+            PlayerPrefs.SetFloat("SoundVolume", 0.3f);
+        }
+        else 
+        {
+            PlayerPrefs.SetFloat("MusicVolume", temp);
+            PlayerPrefs.SetFloat("SoundVolume", temp2);
+        }
         LoadScene("1-1");
     }
 
