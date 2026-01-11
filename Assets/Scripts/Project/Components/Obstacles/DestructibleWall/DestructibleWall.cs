@@ -16,7 +16,7 @@ public class RDestructibleWall : MonoBehaviour
     private AudioSource audioSource;
 
     private bool isDestroyed = false;
-
+    public bool IsDestroyed => isDestroyed;
     private void Awake()
     {
 	audioSource = GetComponent<AudioSource>();
