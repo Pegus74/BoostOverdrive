@@ -17,25 +17,21 @@ public class HubManager: MonoBehaviour
         Vector3 playerPos = _playerTransform.position;
         Quaternion playerRot = _playerTransform.rotation;
         
-        if (PlayerPrefs.GetFloat("AllTime", 0) < 119.5f && PlayerPrefs.GetInt("ContinueLevel", 0) >= 8
-            || PlayerPrefs.GetInt("Lock1Unlocked", 0) == 1)
+        if (PlayerPrefs.GetFloat("AllTime", 0) < 91f && PlayerPrefs.GetInt("ContinueLevel", 0) >= 8)
         {
             lock1.SetActive(false);
             playerPos = loc2.transform.position;
             playerRot = loc2.transform.rotation;
             InputEvents.OnSecondBiomeTeleportEvent.AddListener(TpTo2);
-            PlayerPrefs.SetInt("Lock1Unlocked", 1);
             
         }
 
-        if (PlayerPrefs.GetFloat("AllTime", 0) < 182f && PlayerPrefs.GetInt("ContinueLevel", 0) >= 11
-            || PlayerPrefs.GetInt("Lock2Unlocked", 0) == 1)
+        if (PlayerPrefs.GetFloat("AllTime", 0) < 144.5f && PlayerPrefs.GetInt("ContinueLevel", 0) >= 11)
         {
             lock2.SetActive(false);
             playerPos = loc3.transform.position;
             playerRot = loc3.transform.rotation;
             InputEvents.OnThirdBiomeTeleportEvent.AddListener(TpTo3);
-            PlayerPrefs.SetInt("Lock2Unlocked", 1);
         }
         
         _playerTransform.position = playerPos;

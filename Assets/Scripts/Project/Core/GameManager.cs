@@ -92,7 +92,7 @@ public class NewGameManager : MonoBehaviour
 
     public void PlayerDied()
     {
-        RMusicManager.Instance.ChangeMusicVolume(PlayerPrefs.GetFloat("MusicVolume", 1f) * 0.8f);
+        RMusicManager.Instance.ChangeMusicVolume(PlayerPrefs.GetFloat("MusicVolume", 1f) * 0.2f);
         RMusicManager.Instance.ChangePitch(0.7f);
         currentState = GameState.GameOver;
         UpdateGameState();
@@ -106,33 +106,18 @@ public class NewGameManager : MonoBehaviour
 
     public void LoadNextLevel()
     {
-        if (currentLevelName == "1-6" 
-            || currentLevelName == "2-3"
-            ||   currentLevelName == "3-3")
-            SceneManager.LoadScene("HUB");
-        else SceneManager.LoadScene(nextLevel);
+        Debug.Log("Prefs");
+        SceneManager.LoadScene(nextLevel);
     }
     
     public void TogglePause()
     {
         if (currentState != GameState.Playing && currentState != GameState.Paused && currentState != GameState.GameWon)
             return;
-        
+
         bool isPlaying = (currentState == GameState.Playing);
         currentState = isPlaying ? GameState.Paused : GameState.Playing;
 
-        if (isPlaying == true)
-        {
-            RMusicManager.Instance.ChangeMusicVolume(PlayerPrefs.GetFloat("MusicVolume", 1f) * 0.8f);
-            RMusicManager.Instance.ChangePitch(0.7f);
-        }
-        else
-        {
-            RMusicManager.Instance.ChangeMusicVolume(PlayerPrefs.GetFloat("MusicVolume", 1f));
-            RMusicManager.Instance.ChangePitch(1);
-        }
-        
-        
         if (currentLevelName != "HUB")
         {
             TimerController.Instance.ShowTimer(!isPlaying);
@@ -179,7 +164,7 @@ public class NewGameManager : MonoBehaviour
     
     public void ShowConfirm()
     {
-        currentState = GameState.Confirmation;
+        currentState = GameState.Paused;
     }
 
     public void HideConfirm()
