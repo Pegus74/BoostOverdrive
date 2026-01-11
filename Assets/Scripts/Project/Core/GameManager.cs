@@ -107,7 +107,7 @@ public class NewGameManager : MonoBehaviour
     public void LoadNextLevel()
     {
         if (currentLevelName == "1-6" 
-            || currentLevelName == "2-3"
+            || currentLevelName == "2-4"
             ||   currentLevelName == "3-3")
             SceneManager.LoadScene("HUB");
         else SceneManager.LoadScene(nextLevel);
