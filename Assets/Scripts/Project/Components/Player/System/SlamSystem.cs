@@ -15,6 +15,10 @@ public class SlamSystem : MonoBehaviour
     private bool _isSlamAvailable = true;
     private Coroutine _currentSlamCoroutine;
 
+    [SerializeField] private AudioClip slamSound;
+
+    private AudioSource audioSource;
+
     private GameObject currentIndicator;
 
     void Awake()
@@ -31,6 +35,7 @@ public class SlamSystem : MonoBehaviour
             currentIndicator = Instantiate(slamIndicatorPrefab);
             currentIndicator.SetActive(false);
         }
+        audioSource = GetComponent<AudioSource>();
     }
 
     void OnEnable()
@@ -111,6 +116,9 @@ public class SlamSystem : MonoBehaviour
         _isSlamAvailable = false;
         playerStateModel.SetIsSlamming(true);
         AbilityEvents.OnAbilityStarted.Invoke();
+
+        audioSource.volume = PlayerPrefs.GetFloat("SoundVolume");
+	    audioSource.PlayOneShot(slamSound);
 
         Vector3 slamDirection = Vector3.down;
         float finalSlamPower = playerStateModel.CurrentSlamPower;
