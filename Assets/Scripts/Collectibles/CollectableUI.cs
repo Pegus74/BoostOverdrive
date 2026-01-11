@@ -110,7 +110,7 @@ public class CollectableUI : MonoBehaviour
         UpdatePauseMenuUI();
         UpdateMainMenuUI();
     }
-    private void UpdatePauseMenuUI()
+    public void UpdatePauseMenuUI()
     {
         if (pauseMenuCollectablesText == null)
         {
@@ -120,21 +120,28 @@ public class CollectableUI : MonoBehaviour
                 pauseMenuCollectablesText = textObj.GetComponent<TextMeshProUGUI>();
             }
         }
-
         if (pauseMenuCollectablesText == null)
         {
             return;
         }
-
         UpdateLevelName();
         CountCoinsOnLevel();
-        if (string.IsNullOrEmpty(currentLevelName) || collectableSystem == null)
-        {
-            pauseMenuCollectablesText.text = "Собрано: 0/0";
-            return;
-        }
-        int collectedOnLevel = collectableSystem.GetLevelCollectedCount(currentLevelName);
-        pauseMenuCollectablesText.text = $"Собрано: {collectedOnLevel}/{totalCoinsOnLevel}";
+
+        string word = GetCrystalWord(totalCoinsOnLevel);
+        pauseMenuCollectablesText.text = $"На уровне можно найти {totalCoinsOnLevel} {word}";
+    }
+
+    private string GetCrystalWord(int count)
+    {
+        if (count == 0) return "кристаллов";
+
+        int lastDigit = count % 10;
+        int lastTwoDigits = count % 100;
+
+        if (lastDigit == 1 && lastTwoDigits != 11) return "кристалл";
+        if (lastDigit >= 2 && lastDigit <= 4 && (lastTwoDigits < 10 || lastTwoDigits >= 20)) return "кристалла";
+
+        return "кристаллов";
     }
 
     public void UpdateMainMenuUI()
