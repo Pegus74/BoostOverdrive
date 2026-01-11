@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e9d03edcb43e74439861fc59f7faf07, type: 3}
+  m_Name: MusicSettings
+  m_EditorClassIdentifier: Assembly-CSharp::MusicSettings
+  levelMusicRanges:
+  - startLevel: 1
+    endLevel: 6
+    musicClip: {fileID: 8300000, guid: 3025a5823b2d16e4a95475c31567dc79, type: 3}
+  - startLevel: 7
+    endLevel: 9
+    musicClip: {fileID: 8300000, guid: c0beb32cea3438f4688ce97b2c62720a, type: 3}
+  - startLevel: 10
+    endLevel: 12
+    musicClip: {fileID: 8300000, guid: 3d36d3b5322c55d40bf44d351ab35cdf, type: 3}
+  defaultMusic: {fileID: 8300000, guid: 7cf58861b94000f499619a56fb1a1bf8, type: 3}
+  menuMusic: {fileID: 8300000, guid: 257339a913c73774fa3ebcd68cde2dec, type: 3}
