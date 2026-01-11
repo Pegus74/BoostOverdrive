@@ -5,6 +5,10 @@ public class Collectable : MonoBehaviour
     [Header("Collectable Settings")]
     public CollectableSystem collectableSystem;
 
+    [Header("Sound Settings")]
+    public AudioClip collectSound;
+    [Range(0f, 1f)] public float volume = 1f;
+
     private bool isCollected = false;
     private string uniqueId;
     private string levelName;
@@ -41,6 +45,8 @@ public class Collectable : MonoBehaviour
         if (isCollected) return;
 
         isCollected = true;
+        PlayCollectSound();
+
         collectableSystem.CollectCoin(levelName, uniqueId);
 
         CollectableUI ui = Object.FindObjectOfType<CollectableUI>();
@@ -50,6 +56,15 @@ public class Collectable : MonoBehaviour
         }
 
         gameObject.SetActive(false);
+    }
+
+    private void PlayCollectSound()
+    {
+        if (collectSound != null)
+        {
+            float soundVolume = volume * PlayerPrefs.GetFloat("SoundVolume", 1f);
+            AudioSource.PlayClipAtPoint(collectSound, transform.position, soundVolume);
+        }
     }
 
     public string GetCoinId()

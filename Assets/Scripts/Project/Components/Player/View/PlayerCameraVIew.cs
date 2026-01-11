@@ -1,33 +1,32 @@
-
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 
 public class PlayerCameraView : MonoBehaviour
 {
-    [Header("Model & Settings")]
     public PlayerMovementController playerMovementController;
     public PlayerConfig playerSettingsData;
-
-    [Header("Camera Components")]
     public Camera playerCamera;
-
     public Transform joint;
-    private PlayerInputController playerInputController;
+    public Vector3 normalBobAmount = new Vector3(.15f, .05f, 0f);
+    public Vector3 fastBobAmount = new Vector3(.20f, .08f, 0f);
+    public float bobSpeed = 5f;
+    public Image windEffectImage;
+    public Sprite[] windSprites;
+    public float windFrameRate = 10f;
 
-    // Углы вращения
+    private PlayerInputController playerInputController;
     private float yaw = 0f;
     private float pitch = 0f;
-
-    // Ввод для обработки в Update()
     private Vector2 currentLookInput = Vector2.zero;
     private Image crosshairObject;
-    private Coroutine currentCameraRotationCoroutine;
-
     private float timer = 0f;
-    public Vector3 bobAmount = new Vector3(.15f, .05f, 0f);
     private Vector3 jointOriginalPos;
-
+    private float currentSpeed = 0f;
+    private Rigidbody playerRigidbody;
+    private int currentWindFrame = 0;
+    private float windFrameTimer = 0f;
+    private bool windActive = false;
 
     private void Awake()
     {
@@ -45,8 +44,21 @@ public class PlayerCameraView : MonoBehaviour
 
         yaw = transform.localEulerAngles.y;
         pitch = playerCamera.transform.localEulerAngles.x;
-
         jointOriginalPos = joint.localPosition;
+
+        if (playerMovementController != null)
+        {
+            playerRigidbody = playerMovementController.GetComponent<Rigidbody>();
+        }
+
+        if (windEffectImage != null)
+        {
+            windEffectImage.gameObject.SetActive(false);
+            if (windSprites != null && windSprites.Length > 0)
+            {
+                windEffectImage.sprite = windSprites[0];
+            }
+        }
     }
 
     private void OnEnable()
@@ -59,12 +71,15 @@ public class PlayerCameraView : MonoBehaviour
         InputEvents.LookInputEvent.RemoveListener(OnLookInput);
     }
 
-    /// <summary>
-    /// Получает Vector2 ввода для обзора от PlayerInputController.
-    /// </summary>
     public void OnLookInput(Vector2 input)
     {
         currentLookInput = input;
+    }
+
+    private void Update()
+    {
+        UpdateCurrentSpeed();
+        UpdateWindEffect();
     }
 
     private void LateUpdate()
@@ -73,13 +88,51 @@ public class PlayerCameraView : MonoBehaviour
         {
             ApplyLookRotation(currentLookInput);
         }
-
         HeadBob();
     }
 
-    /// <summary>
-    /// Применяет вращение камеры на основе Vector2 ввода.
-    /// </summary>
+    private void UpdateCurrentSpeed()
+    {
+        if (playerRigidbody != null)
+        {
+            Vector3 horizontalVelocity = playerRigidbody.linearVelocity;
+            horizontalVelocity.y = 0;
+            currentSpeed = horizontalVelocity.magnitude;
+        }
+    }
+
+    private void UpdateWindEffect()
+    {
+        if (windEffectImage == null || windSprites == null || windSprites.Length == 0)
+            return;
+
+        bool shouldShowWind = currentSpeed >= 13f;
+
+        if (shouldShowWind != windActive)
+        {
+            windActive = shouldShowWind;
+            windEffectImage.gameObject.SetActive(windActive);
+        }
+
+        if (windActive)
+        {
+            windFrameTimer += Time.deltaTime;
+            float frameTime = 1f / windFrameRate;
+
+            if (windFrameTimer >= frameTime)
+            {
+                windFrameTimer = 0f;
+                currentWindFrame = (currentWindFrame + 1) % windSprites.Length;
+                windEffectImage.sprite = windSprites[currentWindFrame];
+            }
+
+            float windIntensity = Mathf.Clamp01((currentSpeed - 13f) / 10f);
+            Color color = windEffectImage.color;
+            color.a = 0.3f + windIntensity * 0.4f;
+            windEffectImage.color = color;
+        }
+    }
+
     private void ApplyLookRotation(Vector2 input)
     {
         float sensitivity = playerSettingsData.mouseSensitivity;
@@ -97,22 +150,34 @@ public class PlayerCameraView : MonoBehaviour
     {
         if (playerMovementController.IsWalking)
         {
-            timer += Time.deltaTime * playerSettingsData.bobSpeed;
+            timer += Time.deltaTime * bobSpeed;
+
+            Vector3 currentBobAmount = normalBobAmount;
+            float speedFactor = 1f;
+
+            if (currentSpeed >= 13f)
+            {
+                currentBobAmount = fastBobAmount;
+                speedFactor = 1.5f;
+            }
+            else if (currentSpeed >= 10f)
+            {
+                currentBobAmount = fastBobAmount;
+                speedFactor = 1.2f;
+            }
+
             joint.localPosition = jointOriginalPos + new Vector3(
-                Mathf.Sin(timer) * bobAmount.x,
-                Mathf.Sin(timer) * bobAmount.y,
-                Mathf.Sin(timer) * bobAmount.z);
+                Mathf.Sin(timer) * currentBobAmount.x * speedFactor,
+                Mathf.Sin(timer * 2f) * currentBobAmount.y * speedFactor,
+                0f);
         }
         else
         {
             timer = 0;
-            joint.localPosition = Vector3.Lerp(joint.localPosition, jointOriginalPos, Time.deltaTime * playerSettingsData.bobSpeed);
+            joint.localPosition = Vector3.Lerp(joint.localPosition, jointOriginalPos, Time.deltaTime * bobSpeed * 2f);
         }
     }
 
-    /// <summary>
-    /// Настройка crosshair
-    /// </summary>
     private void SetupCrosshair()
     {
         if (!playerSettingsData.crosshairImage) return;
@@ -122,7 +187,6 @@ public class PlayerCameraView : MonoBehaviour
         crosshairObject = crosshairGO.AddComponent<Image>();
         crosshairObject.sprite = playerSettingsData.crosshairImage;
         crosshairObject.color = playerSettingsData.crosshairColor;
-
         crosshairObject.rectTransform.sizeDelta = new Vector2(2, 4);
     }
 }
