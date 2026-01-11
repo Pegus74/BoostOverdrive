@@ -10,7 +10,7 @@ public class SecretLevelConfirmController : MonoBehaviour
     public TMP_Text levelText;
     public TMP_Text bestTimeText;
     public TMP_Text colNumber;
-    public TMP_Text biomeText;
+    public TMP_Text biomeText; // abc
 
     private int currentColNum;
     private int currentColBorder;
