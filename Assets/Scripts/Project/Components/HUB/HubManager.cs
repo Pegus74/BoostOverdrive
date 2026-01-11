@@ -28,7 +28,7 @@ public class HubManager: MonoBehaviour
             
         }
 
-        if (PlayerPrefs.GetFloat("AllTime", 0) < 204f && PlayerPrefs.GetInt("ContinueLevel", 0) >= 11
+        if (PlayerPrefs.GetFloat("AllTime", 0) < 182f && PlayerPrefs.GetInt("ContinueLevel", 0) >= 11
             || PlayerPrefs.GetInt("Lock2Unlocked", 0) == 1)
         {
             lock2.SetActive(false);
